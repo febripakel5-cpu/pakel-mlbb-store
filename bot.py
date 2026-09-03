@@ -1,7 +1,7 @@
 import telebot
 from telebot import types
 import random
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
 # Token bot lu yang aktif
 TOKEN = '8637403539:AAExQXPSnm8_eNoMyjCzA2Ldl1sOXRAVzcM'
@@ -9,6 +9,7 @@ bot = telebot.TeleBot(TOKEN)
 
 # Data Kontak Admin & Info Pembayaran Resmi
 ADMIN_USERNAME = "@PakelMlbbOfficial"
+ADMIN_LINK = "https://t.me/PakelMlbbOfficial"
 DANA_NUMBER = "089526466512"
 DANA_NAME = "PakelMlbb"
 GOPAY_NUMBER = "089526466512"
@@ -33,7 +34,7 @@ def send_welcome(message):
     btn_bayar = types.InlineKeyboardButton("💳 Metode Pembayaran Resmi", callback_data='menu_bayar')
     btn_faq = types.InlineKeyboardButton("💡 FAQ / Pertanyaan Umum", callback_data='menu_faq')
     btn_konfirmasi = types.InlineKeyboardButton("✅ Cek Status & Konfirmasi Resi", callback_data='menu_konfirmasi')
-    btn_admin = types.InlineKeyboardButton("💬 Hubungi Admin Resmi", url="https://t.me/PakelMlbbOfficial")
+    btn_admin = types.InlineKeyboardButton("💬 Hubungi Admin Resmi", url=ADMIN_LINK)
     
     markup.add(btn_katalog, btn_promo, btn_cara_order, btn_bayar, btn_faq, btn_konfirmasi, btn_admin)
     
@@ -93,7 +94,7 @@ def callback_handler(call):
         btn_bayar = types.InlineKeyboardButton("💳 Metode Pembayaran Resmi", callback_data='menu_bayar')
         btn_faq = types.InlineKeyboardButton("💡 FAQ / Pertanyaan Umum", callback_data='menu_faq')
         btn_konfirmasi = types.InlineKeyboardButton("✅ Cek Status & Konfirmasi Resi", callback_data='menu_konfirmasi')
-        btn_admin = types.InlineKeyboardButton("💬 Hubungi Admin Resmi", url="https://t.me/PakelMlbbOfficial")
+        btn_admin = types.InlineKeyboardButton("💬 Hubungi Admin Resmi", url=ADMIN_LINK)
         markup.add(btn_katalog, btn_promo, btn_cara_order, btn_bayar, btn_faq, btn_konfirmasi, btn_admin)
         
         welcome_text = (
@@ -213,9 +214,9 @@ def callback_handler(call):
             f"• **DANA / GoPay:** `{DANA_NUMBER}` (A/N: {DANA_NAME})\n"
             f"• **Saweria (QRIS/Bank):** {SAWERIA_LINK}\n\n"
             "🛡️ *INSTRUKSI KONFIRMASI:*\n"
-            f"Setelah melakukan pembayaran, silakan kirim bukti screenshot/foto transaksi beserta nomor resi di atas langsung ke admin utama: `{ADMIN_USERNAME}` agar pesananmu segera diproses!"
+            f"Setelah melakukan pembayaran, silakan kirim bukti screenshot/foto transaksi beserta nomor resi di atas langsung ke admin utama: [{ADMIN_USERNAME}]({ADMIN_LINK}) agar pesananmu segera diproses!"
         )
-        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=invoice_text, parse_mode='Markdown', reply_markup=get_back_markup())
+        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=invoice_text, parse_mode='Markdown', reply_markup=get_back_markup(), disable_web_page_preview=True)
         bot.answer_callback_query(call.id, text="Invoice berhasil dibuat! Silakan lakukan pembayaran.")
 
     elif call.data == 'menu_cara_order':
@@ -224,7 +225,7 @@ def callback_handler(call):
             "1️⃣ Pilih paket di menu katalog dan klik tombol **Beli**.\n"
             "2️⃣ Bot otomatis menerbitkan **Nomor Seri Resi & Invoice Pembayaran**.\n"
             f"3️⃣ Transfer sesuai tagihan ke DANA/GoPay (`{DANA_NUMBER}`) atau Saweria.\n"
-            f"4️⃣ Kirim screenshot bukti transfer & nomor resi langsung ke admin utama: `{ADMIN_USERNAME}`.\n\n"
+            f"4️⃣ Kirim screenshot bukti transfer & nomor resi langsung ke admin utama: {ADMIN_USERNAME}.\n\n"
             "⚡ *Aman & Terpercaya!*"
         )
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=panduan_text, parse_mode='Markdown', reply_markup=get_back_markup(), disable_web_page_preview=True)
@@ -237,7 +238,7 @@ def callback_handler(call):
             f"👤 Atas Nama: *{DANA_NAME}*\n\n"
             f"🧡 **Saweria (QRIS / Bank Transfer / E-Wallet):**\n"
             f"🔗 {SAWERIA_LINK}\n\n"
-            f"📌 *Konfirmasi Pembayaran:* Kirim bukti transfer ke `{ADMIN_USERNAME}`."
+            f"📌 *Konfirmasi Pembayaran:* Kirim bukti transfer ke {ADMIN_USERNAME}."
         )
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=bayar_text, parse_mode='Markdown', reply_markup=get_back_markup(), disable_web_page_preview=True)
         bot.answer_callback_query(call.id)
@@ -247,18 +248,20 @@ def callback_handler(call):
         konfirmasi_text = (
             f"✅ *KONFIRMASI PEMBAYARAN & RESI* (Kak *{user_name}*)\n\n"
             f"🛡️ *Contoh Nomor Resi:* `PKL-MLBB-{random_serial}`\n\n"
-            f"Silakan kirimkan **screenshot bukti transfer asli** beserta nomor resi pesananmu langsung ke admin utama: `{ADMIN_USERNAME}` untuk diverifikasi dan dikirim filenya!"
+            f"Silakan kirimkan **screenshot bukti transfer asli** beserta nomor resi pesananmu langsung ke admin utama: [{ADMIN_USERNAME}]({ADMIN_LINK}) untuk diverifikasi dan dikirim filenya!"
         )
-        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=konfirmasi_text, parse_mode='Markdown', reply_markup=get_back_markup())
+        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=konfirmasi_text, parse_mode='Markdown', reply_markup=get_back_markup(), disable_web_page_preview=True)
         bot.answer_callback_query(call.id)
 
-# 3. Handler Foto (Generate Resi, Waktu Real-Time, & Format Copy Text Siap Salin)
+# 3. Handler Foto (Generate Resi, Waktu Akurat WIB, & Format Copy Text Siap Salin)
 @bot.message_handler(content_types=['photo'])
 def handle_photo(message):
     user_name = message.from_user.first_name
     random_serial = random.randint(10000, 99999)
     
-    now = datetime.now()
+    # Paksa waktu ke Waktu Indonesia Barat (WIB / UTC+7)
+    WIB = timezone(timedelta(hours=7))
+    now = datetime.now(WIB)
     tanggal_str = now.strftime("%d-%m-%Y")
     jam_str = now.strftime("%H:%M:%S WIB")
     
@@ -274,8 +277,9 @@ def handle_photo(message):
         f"• Tanggal/Jam  : {tanggal_str} - {jam_str}\n"
         f"• Status Bayar : LUNAS / MENUNGGU CEK\n"
         f"• Request File : Kirim file script & bonus sekarang\n"
+        f"• Link Admin   : {ADMIN_LINK}\n"
         f"```\n"
-        f"🚀 *Segera salin teks dalam kotak di atas dan kirimkan langsung ke admin utama:* `{ADMIN_USERNAME}` agar file pesananmu langsung diproses!"
+        f"🚀 *Segera salin teks dalam kotak di atas dan kirimkan langsung ke admin utama:* [{ADMIN_USERNAME}]({ADMIN_LINK}) agar file pesananmu langsung diproses!"
     )
     bot.reply_to(message, response_text, parse_mode='Markdown')
 
@@ -302,7 +306,7 @@ def auto_reply(message):
             f"💳 *INFO PEMBAYARAN RESMI* (Kak *{user_name}*)\n\n"
             f"📱 DANA / GoPay: `{DANA_NUMBER}` (A/N: {DANA_NAME})\n"
             f"🧡 Saweria: {SAWERIA_LINK}\n\n"
-            f"Silakan konfirmasi pembayaran ke admin: {ADMIN_USERNAME} ya, Kak! 🙏"
+            f"Silakan konfirmasi pembayaran ke admin: [{ADMIN_USERNAME}]({ADMIN_LINK}) ya, Kak! 🙏"
         )
         bot.reply_to(message, reply, parse_mode='Markdown', disable_web_page_preview=True)
         
@@ -313,7 +317,7 @@ def auto_reply(message):
     else:
         reply = (
             f"Halo Kak *{user_name}*! Pesan Anda telah diterima oleh sistem *Pakel MlbbStore*.\n"
-            f"Untuk bantuan, pemesanan, atau konfirmasi bukti pembayaran, silakan langsung hubungi admin utama kami di: {ADMIN_USERNAME}. Terima kasih! 🙏✨"
+            f"Untuk bantuan, pemesanan, atau konfirmasi bukti pembayaran, silakan langsung hubungi admin utama kami di: [{ADMIN_USERNAME}]({ADMIN_LINK}). Terima kasih! 🙏✨"
         )
         bot.reply_to(message, reply, parse_mode='Markdown')
 
