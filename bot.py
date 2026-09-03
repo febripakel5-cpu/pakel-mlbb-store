@@ -1,6 +1,7 @@
 import telebot
 from telebot import types
 import random
+from datetime import datetime
 
 # Token bot lu yang aktif
 TOKEN = '8637403539:AAExQXPSnm8_eNoMyjCzA2Ldl1sOXRAVzcM'
@@ -126,7 +127,7 @@ def callback_handler(call):
             "• **VIP Pro One Hit 80% (30 Hari):** Rp 100.000\n"
             "• **Semi-Private (14 Hari):** Rp 75.000\n"
             "• **Permanent Legend (Lifetime):** Rp 250.000\n\n"
-            "💳 *INFO PEMBAYARAN:* DANA/GoPay: `{DANA_NUMBER}`\n\n"
+            f"💳 *INFO PEMBAYARAN:* DANA/GoPay: `{DANA_NUMBER}`\n\n"
             "👇 *Pilih paket atau kembali ke Bagian 1:*"
         )
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=katalog_text, parse_mode='Markdown', reply_markup=markup, disable_web_page_preview=True)
@@ -204,19 +205,33 @@ def callback_handler(call):
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=konfirmasi_text, parse_mode='Markdown', reply_markup=get_back_markup())
         bot.answer_callback_query(call.id)
 
-# 3. Handler Foto (Langsung Mengarahkan ke Admin Tanpa Antrean Fiktif)
+# 3. Handler Foto (Generate Resi, Waktu, & Format Copy Text Siap Salin ke Admin)
 @bot.message_handler(content_types=['photo'])
 def handle_photo(message):
     user_name = message.from_user.first_name
     random_serial = random.randint(10000, 99999)
     
-    reply_text = (
-        f"📸 *BUKTI PEMBAYARAN DITERIMA BOT* (Kak *{user_name}*)\n\n"
-        "Terima kasih telah mengirimkan bukti transaksi. Untuk mempercepat proses pengecekan mutasi dan pengiriman file script, silakan teruskan/kirim ulang bukti foto ini beserta nomor resi transaksi langsung ke admin utama kami:\n\n"
-        f"💬 **Kontak Admin Resmi:** `{ADMIN_USERNAME}`\n\n"
-        "⚡ *Admin akan segera memverifikasi saldo dan mengirimkan file ke akunmu secara langsung!*"
+    # Ambil waktu dan tanggal saat ini
+    now = datetime.now()
+    tanggal_str = now.strftime("%d-%m-%Y")
+    jam_str = now.strftime("%H:%M:%S WIB")
+    
+    response_text = (
+        f"✅ *BUKTI PEMBAYARAN DITERIMA & DICATAT* (Kak *{user_name}*)\n\n"
+        f"🛡️ *No Resi Unik:* `PKL-MLBB-{random_serial}`\n"
+        f"📅 *Tanggal:* {tanggal_str}\n"
+        f"⏱️ *Jam:* {jam_str}\n\n"
+        f"📋 *SALIN FORMAT DI BAWAH INI DAN KIRIM KE ADMIN:*\n"
+        f"```text\n"
+        f"• No Resi Unik : PKL-MLBB-{random_serial}\n"
+        f"• Nama Pembeli : {user_name}\n"
+        f"• Tanggal/Jam  : {tanggal_str} - {jam_str}\n"
+        f"• Status Bayar : LUNAS / MENUNGGU CEK\n"
+        f"• Request File : Kirim file script & bonus sekarang\n"
+        f"```\n"
+        f"🚀 *Segera salin teks dalam kotak di atas dan kirimkan langsung ke admin utama:* `{ADMIN_USERNAME}` agar file pesananmu langsung diproses!"
     )
-    bot.reply_to(message, reply_text, parse_mode='Markdown')
+    bot.reply_to(message, response_text, parse_mode='Markdown')
 
 # 4. Auto-Reply Kata Kunci Teks Pintar
 @bot.message_handler(func=lambda message: True)
