@@ -21,7 +21,7 @@ def get_back_markup():
     markup.add(types.InlineKeyboardButton("⬅️ Kembali ke Menu Utama", callback_data='menu_utama'))
     return markup
 
-# 1. Perintah /start (Menu Utama Rapi & Profesional)
+# 1. Perintah /start & /help (Menu Utama Rapi & Profesional)
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
     user_name = message.from_user.first_name
@@ -43,6 +43,18 @@ def send_welcome(message):
         "👇 *Silakan pilih menu di bawah ini untuk mulai bertransaksi:*"
     )
     bot.send_message(message.chat.id, welcome_text, parse_mode='Markdown', reply_markup=markup)
+
+# Command Tambahan: /cekresi atau /resi
+@bot.message_handler(commands=['cekresi', 'resi'])
+def cmd_cekresi(message):
+    user_name = message.from_user.first_name
+    
+    reply_text = (
+        f"🔍 *CEK STATUS RESI PEMBELIAN* (Kak *{user_name}*)\n\n"
+        "Silakan kirimkan **Nomor Resi Unik** milikmu (Contoh: `PKL-MLBB-12345`) atau kirimkan screenshot bukti transfer langsung ke chat ini.\n\n"
+        f"💬 Konfirmasi lebih lanjut bisa langsung ke admin: {ADMIN_USERNAME}"
+    )
+    bot.reply_to(message, reply_text, parse_mode='Markdown')
 
 # 2. Handler Tombol (Callback Query)
 @bot.callback_query_handler(func=lambda call: True)
