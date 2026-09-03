@@ -18,30 +18,29 @@ SAWERIA_LINK = "https://saweria.co/PakelMlbb"
 # Fungsi Tombol Kembali ke Menu Utama
 def get_back_markup():
     markup = types.InlineKeyboardMarkup()
-    markup.add(types.InlineKeyboardButton("⬅️ Kembali ke Menu Utama / Main Menu", callback_data='menu_utama'))
+    markup.add(types.InlineKeyboardButton("⬅️ Kembali ke Menu Utama", callback_data='menu_utama'))
     return markup
 
-# 1. Perintah /start (Menu Utama + Promo Member Baru)
+# 1. Perintah /start (Menu Utama Rapi & Profesional)
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
     user_name = message.from_user.first_name
     
     markup = types.InlineKeyboardMarkup(row_width=1)
-    btn_katalog = types.InlineKeyboardButton("💎 Pilih & Beli Paket VIP (Katalog Lengkap)", callback_data='menu_katalog')
-    btn_promo = types.InlineKeyboardButton("🎁 Klaim Promo Member Baru (Diskon Spesial)", callback_data='menu_promo')
-    btn_cara_order = types.InlineKeyboardButton("❓ Cara Order & Panduan Otomatis", callback_data='menu_cara_order')
+    btn_katalog = types.InlineKeyboardButton("💎 Katalog VIP & Harga Paket", callback_data='menu_katalog')
+    btn_promo = types.InlineKeyboardButton("🎁 Klaim Promo Member Baru", callback_data='menu_promo')
+    btn_cara_order = types.InlineKeyboardButton("❓ Panduan Cara Order", callback_data='menu_cara_order')
     btn_bayar = types.InlineKeyboardButton("💳 Metode Pembayaran Resmi", callback_data='menu_bayar')
-    btn_konfirmasi = types.InlineKeyboardButton("✅ Konfirmasi Pembayaran & Cek Resi", callback_data='menu_konfirmasi')
+    btn_faq = types.InlineKeyboardButton("💡 FAQ / Pertanyaan Umum", callback_data='menu_faq')
+    btn_konfirmasi = types.InlineKeyboardButton("✅ Cek Status & Konfirmasi Resi", callback_data='menu_konfirmasi')
     btn_admin = types.InlineKeyboardButton("💬 Hubungi Admin Resmi", url="https://t.me/PakelMlbbOfficial")
     
-    markup.add(btn_katalog, btn_promo, btn_cara_order, btn_bayar, btn_konfirmasi, btn_admin)
+    markup.add(btn_katalog, btn_promo, btn_cara_order, btn_bayar, btn_faq, btn_konfirmasi, btn_admin)
     
     welcome_text = (
         f"🔥 *Halo, Kak {user_name}!* Selamat datang di Official *Pakel MlbbStore* 🙏✨\n\n"
         "Pusat layanan script custom damage, one hit, server lag panel, & drone view terlengkap dengan sistem otomatis tercanggih anti-nipu.\n\n"
-        "🇲🇨 *ID:* Silakan pilih paket di menu katalog atau klaim promo member baru!\n"
-        "🇬🇧 *EN:* Please select a package or claim your new member promo below.\n\n"
-        "👇 *Silakan ketuk tombol di bawah ini, Kak:*"
+        "👇 *Silakan pilih menu di bawah ini untuk mulai bertransaksi:*"
     )
     bot.send_message(message.chat.id, welcome_text, parse_mode='Markdown', reply_markup=markup)
 
@@ -54,13 +53,14 @@ def callback_handler(call):
 
     if call.data == 'menu_utama':
         markup = types.InlineKeyboardMarkup(row_width=1)
-        btn_katalog = types.InlineKeyboardButton("💎 Pilih & Beli Paket VIP (Katalog Lengkap)", callback_data='menu_katalog')
-        btn_promo = types.InlineKeyboardButton("🎁 Klaim Promo Member Baru (Diskon Spesial)", callback_data='menu_promo')
-        btn_cara_order = types.InlineKeyboardButton("❓ Cara Order & Panduan Otomatis", callback_data='menu_cara_order')
+        btn_katalog = types.InlineKeyboardButton("💎 Katalog VIP & Harga Paket", callback_data='menu_katalog')
+        btn_promo = types.InlineKeyboardButton("🎁 Klaim Promo Member Baru", callback_data='menu_promo')
+        btn_cara_order = types.InlineKeyboardButton("❓ Panduan Cara Order", callback_data='menu_cara_order')
         btn_bayar = types.InlineKeyboardButton("💳 Metode Pembayaran Resmi", callback_data='menu_bayar')
-        btn_konfirmasi = types.InlineKeyboardButton("✅ Konfirmasi Pembayaran & Cek Resi", callback_data='menu_konfirmasi')
+        btn_faq = types.InlineKeyboardButton("💡 FAQ / Pertanyaan Umum", callback_data='menu_faq')
+        btn_konfirmasi = types.InlineKeyboardButton("✅ Cek Status & Konfirmasi Resi", callback_data='menu_konfirmasi')
         btn_admin = types.InlineKeyboardButton("💬 Hubungi Admin Resmi", url="https://t.me/PakelMlbbOfficial")
-        markup.add(btn_katalog, btn_promo, btn_cara_order, btn_bayar, btn_konfirmasi, btn_admin)
+        markup.add(btn_katalog, btn_promo, btn_cara_order, btn_bayar, btn_faq, btn_konfirmasi, btn_admin)
         
         welcome_text = (
             f"🔥 *Halo kembali, Kak {user_name}!* 🙏\n"
@@ -71,15 +71,28 @@ def callback_handler(call):
 
     elif call.data == 'menu_promo':
         promo_text = (
-            f"🎁 *PROMO SPESIAL PELANGGAN BARU (NEW MEMBER)* (Untuk Kak *{user_name}*) 🎉\n\n"
+            f"🎁 *PROMO PELANGGAN BARU (NEW MEMBER)* (Kak *{user_name}*) 🎉\n\n"
             "Nikmati penawaran khusus pembelian pertama di *Pakel MlbbStore*:\n\n"
             "🎟️ **KODE KUPON:** `WELCOMEPAKEL`\n"
-            "💰 **Keuntungan:** Potongan harga langsung Rp 10.000 / Diskon Spesial di semua kategori paket VIP!\n\n"
+            "💰 **Keuntungan:** Potongan harga langsung / Diskon spesial di semua kategori paket VIP!\n\n"
             "📌 *Cara Pakai:*\n"
-            "Cukup sebutkan kode kupon `WELCOMEPAKEL` kepada admin saat melakukan konfirmasi pembayaran setelah memilih paket di katalog. Gampang banget kan? 🚀"
+            "Sebutkan kode kupon `WELCOMEPAKEL` kepada admin saat konfirmasi pembayaran setelah memilih paket di katalog. Gampang banget! 🚀"
         )
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=promo_text, parse_mode='Markdown', reply_markup=get_back_markup())
         bot.answer_callback_query(call.id, text="Kupon berhasil dilihat!")
+
+    elif call.data == 'menu_faq':
+        faq_text = (
+            f"💡 *FAQ / PERTANYAAN UMUM* (Kak *{user_name}*)\n\n"
+            "❓ *Q: Apakah script aman dari banned?*\n"
+            "💬 A: Paket VIP kami dilengkapi enkripsi anti-detect tingkat tinggi, sangat aman digunakan jika mengikuti petunjuk.\n\n"
+            "❓ *Q: Bagaimana cara pasang script-nya?*\n"
+            "💬 A: Setelah pembayaran divalidasi admin, file script & panduan pemasangan lengkap akan langsung dikirim ke chat kamu.\n\n"
+            "❓ *Q: Apakah dapat bonus tambahan?*\n"
+            "💬 A: Ya! Setiap pembelian paket sudah otomatis mendapatkan bonus Panel Server Lag Musuh & Drone View X1-X10 gratis!"
+        )
+        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=faq_text, parse_mode='Markdown', reply_markup=get_back_markup())
+        bot.answer_callback_query(call.id)
 
     elif call.data == 'menu_katalog' or call.data == 'katalog_part1':
         markup = types.InlineKeyboardMarkup(row_width=1)
@@ -205,13 +218,12 @@ def callback_handler(call):
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=konfirmasi_text, parse_mode='Markdown', reply_markup=get_back_markup())
         bot.answer_callback_query(call.id)
 
-# 3. Handler Foto (Generate Resi, Waktu, & Format Copy Text Siap Salin ke Admin)
+# 3. Handler Foto (Generate Resi, Waktu Real-Time, & Format Copy Text Siap Salin)
 @bot.message_handler(content_types=['photo'])
 def handle_photo(message):
     user_name = message.from_user.first_name
     random_serial = random.randint(10000, 99999)
     
-    # Ambil waktu dan tanggal saat ini
     now = datetime.now()
     tanggal_str = now.strftime("%d-%m-%Y")
     jam_str = now.strftime("%H:%M:%S WIB")
