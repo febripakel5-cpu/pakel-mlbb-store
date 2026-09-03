@@ -56,6 +56,28 @@ def cmd_cekresi(message):
     )
     bot.reply_to(message, reply_text, parse_mode='Markdown')
 
+# Command Tambahan: /katalog
+@bot.message_handler(commands=['katalog'])
+def cmd_katalog(message):
+    user_name = message.from_user.first_name
+    
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    markup.add(types.InlineKeyboardButton("🛒 Beli: Natural Balance (Rp 120k)", callback_data='buy_natural'))
+    markup.add(types.InlineKeyboardButton("🛒 Beli: Light VIP + Drone (Rp 95k)", callback_data='buy_light'))
+    markup.add(types.InlineKeyboardButton("🛒 Beli: Semi-Safe 14 Hari (Rp 75k)", callback_data='buy_semisafe'))
+    markup.add(types.InlineKeyboardButton("🛒 Beli: Lifetime Safe Permanent (Rp 200k)", callback_data='buy_lifetimesafe'))
+    markup.add(types.InlineKeyboardButton("▶️ Lanjut ke Katalog Bagian 2 (One Hit)", callback_data='katalog_part2'))
+    markup.add(types.InlineKeyboardButton("⬅️ Kembali ke Menu Utama", callback_data='menu_utama'))
+
+    katalog_text = (
+        f"🔥 *VIP EXCLUSIVE CATALOGUE - BAGIAN 1* (Kak *{user_name}*) 🔥\n"
+        "*(Kategori: Custom Damage & Fair Play)*\n\n"
+        "⚡ *BONUS SPESIAL FREE ALL PACKAGES:* \n"
+        "🎁 Otomatis mendapatkan **Panel Server Lag Musuh** & **Drone View X1 - X10** gratis!\n\n"
+        "👇 *Silakan pilih paket di bawah atau lanjut ke Bagian 2:*"
+    )
+    bot.send_message(message.chat.id, katalog_text, parse_mode='Markdown', reply_markup=markup)
+
 # 2. Handler Tombol (Callback Query)
 @bot.callback_query_handler(func=lambda call: True)
 def callback_handler(call):
