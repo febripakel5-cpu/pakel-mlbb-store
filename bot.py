@@ -329,7 +329,7 @@ def auto_reply(message):
         
     elif any(word in text for word in ['terima kasih', 'makasih', 'oke', 'ok', 'salam', 'thank', 'thanks']):
         reply = f"Sama-sama dengan senang hati, Kak *{user_name}*! Semoga makin jago dan win streak terus bersama *Pakel MlbbStore*! 🚀?"
-bot.reply_to(message, reply, parse_mode='Markdown')
+        bot.reply_to(message, reply, parse_mode='Markdown')
         
     else:
         reply = (
