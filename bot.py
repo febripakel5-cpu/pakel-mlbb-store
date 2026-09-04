@@ -53,9 +53,9 @@ def cmd_cekresi(message):
     reply_text = (
         f"🔍 *CEK STATUS RESI PEMBELIAN* (Kak *{user_name}*)\n\n"
         "Silakan kirimkan **Nomor Resi Unik** milikmu (Contoh: `PKL-MLBB-12345`) atau kirimkan screenshot bukti transfer langsung ke chat ini.\n\n"
-        f"💬 Konfirmasi lebih lanjut bisa langsung ke admin: {ADMIN_USERNAME}"
+        f"💬 Konfirmasi lebih lanjut bisa langsung ke admin: [{ADMIN_USERNAME}]({ADMIN_LINK})"
     )
-    bot.reply_to(message, reply_text, parse_mode='Markdown')
+    bot.reply_to(message, reply_text, parse_mode='Markdown', disable_web_page_preview=True)
 
 # Command Tambahan: /katalog
 @bot.message_handler(commands=['katalog'])
@@ -75,6 +75,15 @@ def cmd_katalog(message):
         "*(Kategori: Custom Damage & Fair Play)*\n\n"
         "⚡ *BONUS SPESIAL FREE ALL PACKAGES:* \n"
         "🎁 Otomatis mendapatkan **Panel Server Lag Musuh** & **Drone View X1 - X10** gratis!\n\n"
+        "📂 *DETAIL & FUNGSI PAKET UTAMA:*\n"
+        "• 💎 **Natural Balance (30 Hari)** — Rp 120.000\n"
+        "  └ 🎯 *Fungsi:* Penyesuaian damage seimbang dan stabil, sangat natural dipakai main tanpa bikin musuh curiga.\n"
+        "• ⚡ **Light VIP + Drone (30 Hari)** — Rp 95.000\n"
+        "  └ 🎯 *Fungsi:* Paket hemat damage ringan + bonus fitur luas pandang map (drone view) anti-buta map.\n"
+        "• 🛡️ **Semi-Safe (14 Hari)** — Rp 75.000\n"
+        "  └ 🎯 *Fungsi:* Durasi singkat tapi punya performa boost optimal buat ngebut push rank.\n"
+        "• 👑 **Lifetime Safe (Permanent)** — Rp 200.000\n"
+        "  └ 🎯 *Fungsi:* Akses permanen selamanya dengan proteksi sistem enkripsi anti-detect tingkat tinggi.\n\n"
         "👇 *Silakan pilih paket di bawah atau lanjut ke Bagian 2:*"
     )
     bot.send_message(message.chat.id, katalog_text, parse_mode='Markdown', reply_markup=markup)
@@ -146,12 +155,16 @@ def callback_handler(call):
             "⚡ *BONUS SPESIAL FREE ALL PACKAGES:* \n"
             "🎁 Otomatis mendapatkan **Panel Server Lag Musuh** & **Drone View X1 - X10** gratis!\n\n"
             
-            "📂 *KATEGORI 1: CUSTOM DAMAGE & FAIR PLAY* 🛡️\n"
-            "• **Natural Balance (30 Hari):** Rp 120.000\n"
-            "• **Light VIP + Drone (30 Hari):** Rp 95.000\n"
-            "• **Semi-Safe (14 Hari):** Rp 75.000\n"
-            "• **Lifetime Safe (Permanent):** Rp 200.000\n\n"
-            "👇 *Pilih paket di bawah atau lanjut ke Bagian 2:*"
+            "📂 *DETAIL & FUNGSI PAKET UTAMA:*\n"
+            "• 💎 **Natural Balance (30 Hari)** — Rp 120.000\n"
+            "  └ 🎯 *Fungsi:* Penyesuaian damage seimbang dan stabil, sangat natural dipakai main tanpa bikin musuh curiga.\n"
+            "• ⚡ **Light VIP + Drone (30 Hari)** — Rp 95.000\n"
+            "  └ 🎯 *Fungsi:* Paket hemat damage ringan + bonus fitur luas pandang map (drone view) anti-buta map.\n"
+            "• 🛡️ **Semi-Safe (14 Hari)** — Rp 75.000\n"
+            "  └ 🎯 *Fungsi:* Durasi singkat tapi punya performa boost optimal buat ngebut push rank.\n"
+            "• 👑 **Lifetime Safe (Permanent)** — Rp 200.000\n"
+            "  └ 🎯 *Fungsi:* Akses permanen selamanya dengan proteksi sistem enkripsi anti-detect tingkat tinggi.\n\n"
+            "👇 *Silakan pilih paket di bawah atau lanjut ke Bagian 2:*"
         )
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=katalog_text, parse_mode='Markdown', reply_markup=markup, disable_web_page_preview=True)
         bot.answer_callback_query(call.id)
@@ -170,11 +183,15 @@ def callback_handler(call):
             f"🔥 *VIP EXCLUSIVE CATALOGUE - BAGIAN 2* (Kak *{user_name}*) 🔥\n"
             "*(Kategori: One Hit & High Class)*\n\n"
             
-            "📂 *KATEGORI 2: ONE HIT & HIGH CLASS* 💥\n"
-            "• **Sultan One Hit 100% (30 Hari):** Rp 150.000\n"
-            "• **VIP Pro One Hit 80% (30 Hari):** Rp 100.000\n"
-            "• **Semi-Private (14 Hari):** Rp 75.000\n"
-            "• **Permanent Legend (Lifetime):** Rp 250.000\n\n"
+            "📂 *DETAIL & FUNGSI PAKET SULTAN:*\n"
+            "• 💥 **Sultan One Hit 100% (30 Hari)** — Rp 150.000\n"
+            "  └ 🎯 *Fungsi:* Efek kill instan / one hit maksimal untuk dominasi total di dalam Land of Dawn.\n"
+            "• ⚡ **VIP Pro One Hit 80% (30 Hari)** — Rp 100.000\n"
+            "  └ 🎯 *Fungsi:* Power one hit pro 80% yang stabil dan aman digunakan untuk mode ranked kompetitif.\n"
+            "• 🔒 **Semi-Private (14 Hari)** — Rp 75.000\n"
+            "  └ 🎯 *Fungsi:* Script privat khusus durasi 2 minggu dengan fitur eksklusif terbatas.\n"
+            "• 🏆 **Permanent Legend (Lifetime)** — Rp 250.000\n"
+            "  └ 🎯 *Fungsi:* Status legend lifetime, bebas update fitur selamanya tanpa biaya tambahan.\n\n"
             f"💳 *INFO PEMBAYARAN:* DANA/GoPay: `{DANA_NUMBER}`\n\n"
             "👇 *Pilih paket atau kembali ke Bagian 1:*"
         )
@@ -185,21 +202,21 @@ def callback_handler(call):
         paket_tipe = call.data.replace('buy_', '')
         
         if paket_tipe == 'natural':
-            paket_nama = "Natural Balance (Rp 120.000)"
+            paket_nama = "Natural Balance (Rp 120.000) - Penyesuaian damage seimbang"
         elif paket_tipe == 'light':
-            paket_nama = "Light VIP + Drone (Rp 95.000)"
+            paket_nama = "Light VIP + Drone (Rp 95.000) - Damage ringan + Drone View"
         elif paket_tipe == 'semisafe':
-            paket_nama = "Semi-Safe 14 Hari (Rp 75.000)"
+            paket_nama = "Semi-Safe 14 Hari (Rp 75.000) - Durasi pendek boost optimal"
         elif paket_tipe == 'lifetimesafe':
-            paket_nama = "Lifetime Safe Permanent (Rp 200.000)"
+            paket_nama = "Lifetime Safe Permanent (Rp 200.000) - Akses permanen anti-detect"
         elif paket_tipe == 'sultan':
-            paket_nama = "Sultan One Hit 100% (Rp 150.000)"
+            paket_nama = "Sultan One Hit 100% (Rp 150.000) - Kill instan maksimal"
         elif paket_tipe == 'pro':
-            paket_nama = "VIP Pro One Hit 80% (Rp 100.000)"
+            paket_nama = "VIP Pro One Hit 80% (Rp 100.000) - One hit pro stabil"
         elif paket_tipe == 'semiprivate':
-            paket_nama = "Semi-Private 14 Hari (Rp 75.000)"
+            paket_nama = "Semi-Private 14 Hari (Rp 75.000) - Script privat eksklusif"
         elif paket_tipe == 'permanent':
-            paket_nama = "Permanent Legend (Rp 250.000)"
+            paket_nama = "Permanent Legend (Rp 250.000) - Status legend lifetime"
         else:
             paket_nama = "Paket VIP Custom"
 
@@ -225,7 +242,7 @@ def callback_handler(call):
             "1️⃣ Pilih paket di menu katalog dan klik tombol **Beli**.\n"
             "2️⃣ Bot otomatis menerbitkan **Nomor Seri Resi & Invoice Pembayaran**.\n"
             f"3️⃣ Transfer sesuai tagihan ke DANA/GoPay (`{DANA_NUMBER}`) atau Saweria.\n"
-            f"4️⃣ Kirim screenshot bukti transfer & nomor resi langsung ke admin utama: {ADMIN_USERNAME}.\n\n"
+            f"4️⃣ Kirim screenshot bukti transfer & nomor resi langsung ke admin utama: [{ADMIN_USERNAME}]({ADMIN_LINK}).\n\n"
             "⚡ *Aman & Terpercaya!*"
         )
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=panduan_text, parse_mode='Markdown', reply_markup=get_back_markup(), disable_web_page_preview=True)
@@ -238,7 +255,7 @@ def callback_handler(call):
             f"👤 Atas Nama: *{DANA_NAME}*\n\n"
             f"🧡 **Saweria (QRIS / Bank Transfer / E-Wallet):**\n"
             f"🔗 {SAWERIA_LINK}\n\n"
-            f"📌 *Konfirmasi Pembayaran:* Kirim bukti transfer ke {ADMIN_USERNAME}."
+            f"📌 *Konfirmasi Pembayaran:* Kirim bukti transfer ke [{ADMIN_USERNAME}]({ADMIN_LINK})."
         )
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=bayar_text, parse_mode='Markdown', reply_markup=get_back_markup(), disable_web_page_preview=True)
         bot.answer_callback_query(call.id)
@@ -279,9 +296,9 @@ def handle_photo(message):
         f"• Request File : Kirim file script & bonus sekarang\n"
         f"• Link Admin   : {ADMIN_LINK}\n"
         f"```\n"
-        f"🚀 *Segera salin teks dalam kotak di atas dan kirimkan langsung ke admin utama:* [{ADMIN_USERNAME}]({ADMIN_LINK}) agar file pesananmu langsung diproses!"
+        f"🚀 *Segera salin teks dalam kotak di atas dan kirimkan langsung ke admin utama:* [{ADMIN_USERNAME}]({ADMIN_LINK}) agar pesananmu langsung diproses!"
     )
-    bot.reply_to(message, response_text, parse_mode='Markdown')
+    bot.reply_to(message, response_text, parse_mode='Markdown', disable_web_page_preview=True)
 
 # 4. Auto-Reply Kata Kunci Teks Pintar
 @bot.message_handler(func=lambda message: True)
@@ -311,15 +328,15 @@ def auto_reply(message):
         bot.reply_to(message, reply, parse_mode='Markdown', disable_web_page_preview=True)
         
     elif any(word in text for word in ['terima kasih', 'makasih', 'oke', 'ok', 'salam', 'thank', 'thanks']):
-        reply = f"Sama-sama dengan senang hati, Kak *{user_name}*! Semoga makin jago dan win streak terus bersama *Pakel MlbbStore*! 🚀🔥"
-        bot.reply_to(message, reply, parse_mode='Markdown')
+        reply = f"Sama-sama dengan senang hati, Kak *{user_name}*! Semoga makin jago dan win streak terus bersama *Pakel MlbbStore*! 🚀?"
+bot.reply_to(message, reply, parse_mode='Markdown')
         
     else:
         reply = (
             f"Halo Kak *{user_name}*! Pesan Anda telah diterima oleh sistem *Pakel MlbbStore*.\n"
             f"Untuk bantuan, pemesanan, atau konfirmasi bukti pembayaran, silakan langsung hubungi admin utama kami di: [{ADMIN_USERNAME}]({ADMIN_LINK}). Terima kasih! 🙏✨"
         )
-        bot.reply_to(message, reply, parse_mode='Markdown')
+        bot.reply_to(message, reply, parse_mode='Markdown', disable_web_page_preview=True)
 
 # Jalankan Bot
 print("[INFO] Bot Telegram Pakel MlbbStore Berjalan...")
