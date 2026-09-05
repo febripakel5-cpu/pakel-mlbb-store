@@ -4,7 +4,7 @@ import random
 from datetime import datetime, timezone, timedelta
 
 # Token bot lu yang aktif
-TOKEN = '8637403539:AAExQXPSnm8_eNoMyjCzA2Ldl1sOXRAVzcM'
+TOKEN = '8637403539:AAFyKck7U8POV3hzSw9UcF_sDDp0d_hKat0'
 bot = telebot.TeleBot(TOKEN)
 
 # Data Kontak Admin & Info Pembayaran Resmi
