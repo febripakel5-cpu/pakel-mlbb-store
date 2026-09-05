@@ -3,11 +3,12 @@ from telebot import types
 import random
 from datetime import datetime, timezone, timedelta
 
-# Token bot lu yang aktif
+# Token bot lu yang baru, bersih, dan siap tempur
 TOKEN = '8637403539:AAFyKck7U8POV3hzSw9UcF_sDDp0d_hKat0'
 bot = telebot.TeleBot(TOKEN)
 
-# Data Kontak Admin & Info Pembayaran Resmi
+# Data Kontak Admin, Info Pembayaran Resmi, & ID Admin Broadcast
+ADMIN_TELEGRAM_ID = 8772023108  # ID Telegram pribadi lu
 ADMIN_USERNAME = "@PakelMlbbOfficial"
 ADMIN_LINK = "https://t.me/PakelMlbbOfficial"
 DANA_NUMBER = "089526466512"
@@ -15,6 +16,18 @@ DANA_NAME = "PakelMlbb"
 GOPAY_NUMBER = "089526466512"
 GOPAY_NAME = "PakelMlbb"
 SAWERIA_LINK = "https://saweria.co/PakelMlbb"
+
+# ==================== FUNGSI DATABASE USER & BROADCAST ====================
+def save_user(chat_id):
+    try:
+        with open("users.txt", "r") as f:
+            users = f.read().splitlines()
+        if str(chat_id) not in users:
+            with open("users.txt", "a") as f:
+                f.write(str(chat_id) + "\n")
+    except FileNotFoundError:
+        with open("users.txt", "w") as f:
+            f.write(str(chat_id) + "\n")
 
 # ==================== MASTER GLOBAL TRANSLATION ENGINE ====================
 TRANSLATIONS = {
@@ -50,7 +63,7 @@ TRANSLATIONS = {
         'confirm_instr': "🛡️ *INSTRUKSI KONFIRMASI:*",
         'photo_rec': "✅ *BUKTI PEMBAYARAN DITERIMA & DICATAT* (Kak *{name}*)"
     },
-    'tl': { # Filipina (Tagalog)
+    'tl': {
         'wel': "🔥 *Hello, {name}!* Maligayang pagdating sa Official *Pakel MlbbStore* 🙏✨\n\nAng sentro para sa custom damage scripts, one hit, server lag panel, at drone view.\n\n👇 *Mangyaring piliin ang menu sa ibaba:*",
         'btn_katalog': "💎 VIP Catalogue & Presyo",
         'btn_promo': "🎁 Kunin ang New Member Promo",
@@ -82,7 +95,7 @@ TRANSLATIONS = {
         'confirm_instr': "🛡️ *CONFIRMATION INSTRUCTION:*",
         'photo_rec': "✅ *PAYMENT PROOF RECEIVED* ( *{name}*)"
     },
-    'en': { # Global / Universal Fallback
+    'en': {
         'wel': "🔥 *Hello, {name}!* Welcome to Official *Pakel MlbbStore* 🙏✨\n\nThe ultimate global provider for custom damage scripts, one hit, server lag panel, & drone view.\n\n👇 *Please select a menu below:*",
         'btn_katalog': "💎 VIP Catalogue & Pricing",
         'btn_promo': "🎁 Claim New Member Promo",
@@ -124,19 +137,50 @@ def get_lang(user):
             return 'id'
         elif code.startswith('tl') or code.startswith('fil'):
             return 'tl'
-    return 'en' # Universal fallback untuk seluruh negara di dunia (India, Amerika, Eropa, dll.)
+    return 'en'
 
 def get_back_markup(l):
     markup = types.InlineKeyboardMarkup()
     text = TRANSLATIONS.get(l, TRANSLATIONS['en'])['back']
     markup.add(types.InlineKeyboardButton(text, callback_data='menu_utama'))
     return markup
-# ======================================================================
 
-# 1. Perintah /start & /help
+# ==================== FITUR BROADCAST ADMIN ====================
+@bot.message_handler(commands=['bc', 'broadcast'])
+def broadcast_message(message):
+    if message.from_user.id != ADMIN_TELEGRAM_ID:
+        bot.reply_to(message, "⚠️ Perintah ini khusus untuk Admin utama!")
+        return
+    
+    pesan_bc = message.text.replace('/bc', '').replace('/broadcast', '').strip()
+    if not pesan_bc:
+        bot.reply_to(message, "⚠️ Format salah! Contoh: `/bc Halo semua, ada promo script baru nih!`", parse_mode='Markdown')
+        return
+    
+    try:
+        with open("users.txt", "r") as f:
+            users = f.read().splitlines()
+    except FileNotFoundError:
+        bot.reply_to(message, "⚠️ Belum ada user yang tercatat di database.")
+        return
+        
+    success = 0
+    failed = 0
+    
+    for chat_id in users:
+        try:
+            bot.send_message(chat_id, f"📢 *PENGUMUMAN PAKEL MLBBSTORE*\n\n{pesan_bc}", parse_mode='Markdown')
+            success += 1
+        except Exception:
+            failed += 1
+            
+    bot.reply_to(message, f"✅ Broadcast Selesai!\n- Berhasil dikirim: {success} user\n- Gagal (User blokir bot): {failed} user")
+
+# ==================== HANDLER UTAMA BOT ====================
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
     user = message.from_user
+    save_user(message.chat.id)
     l = get_lang(user)
     t = TRANSLATIONS[l]
     
@@ -154,9 +198,9 @@ def send_welcome(message):
     welcome_text = t['wel'].format(name=user.first_name)
     bot.send_message(message.chat.id, welcome_text, parse_mode='Markdown', reply_markup=markup)
 
-# Command Tambahan: /cekresi
 @bot.message_handler(commands=['cekresi', 'resi'])
 def cmd_cekresi(message):
+    save_user(message.chat.id)
     user = message.from_user
     l = get_lang(user)
     if l == 'id':
@@ -165,9 +209,9 @@ def cmd_cekresi(message):
         text = f"🔍 *CHECK RECEIPT STATUS* ( *{user.first_name}*)\n\nPlease send your **Unique Receipt Number** or payment proof.\n\n💬 Admin: [{ADMIN_USERNAME}]({ADMIN_LINK})"
     bot.reply_to(message, text, parse_mode='Markdown', disable_web_page_preview=True)
 
-# Command Tambahan: /katalog
 @bot.message_handler(commands=['katalog'])
 def cmd_katalog(message):
+    save_user(message.chat.id)
     user = message.from_user
     l = get_lang(user)
     t = TRANSLATIONS[l]
@@ -181,9 +225,9 @@ def cmd_katalog(message):
     katalog_text = f"{t['cat_title_1'].format(name=user.first_name)}\n\n{t['bonus_txt']}\n" + "\n".join([desc for _, _, desc in t['p1']])
     bot.send_message(message.chat.id, katalog_text, parse_mode='Markdown', reply_markup=markup)
 
-# 2. Handler Tombol (Callback Query Multi-Negara)
 @bot.callback_query_handler(func=lambda call: True)
 def callback_handler(call):
+    save_user(call.message.chat.id)
     user = call.from_user
     l = get_lang(user)
     t = TRANSLATIONS[l]
@@ -267,7 +311,7 @@ def callback_handler(call):
         bot.answer_callback_query(call.id)
 
     elif call.data == 'menu_bayar':
-        text = f"💳 *PAYMENT METHODS*\n\n📱 **DANA/GoPay:** `{DANA_NUMBER}`\n🧡 **Saweria (Global):** {SAWERIA_LINK}\n\n📌 Confirm to [{ADMIN_USERNAME}]({ADMIN_LINK})." if l != 'id' else f"💳 *METODE PEMBAYARAN*\n\n📱 **DANA/GoPay:** `{DANA_NUMBER}`\n🧡 **Saweria:** {SAWERIA_LINK}\n\n📌 Konfirmasi ke [{ADMIN_USERNAME}]({ADMIN_LINK})."
+        text = f"💳 *PAYMENT METHODS*\n\n📱 **DANA/GoPay:** `{DANA_NUMBER}`\n🧡 **Saweria (Global):** {SAWERIA_LINK}\n\n📌 Konfirmasi ke [{ADMIN_USERNAME}]({ADMIN_LINK})."
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, parse_mode='Markdown', reply_markup=get_back_markup(l), disable_web_page_preview=True)
         bot.answer_callback_query(call.id)
 
@@ -277,9 +321,9 @@ def callback_handler(call):
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, parse_mode='Markdown', reply_markup=get_back_markup(l), disable_web_page_preview=True)
         bot.answer_callback_query(call.id)
 
-# 3. Handler Foto Resi Universal
 @bot.message_handler(content_types=['photo'])
 def handle_photo(message):
+    save_user(message.chat.id)
     user = message.from_user
     l = get_lang(user)
     t = TRANSLATIONS[l]
@@ -306,9 +350,9 @@ def handle_photo(message):
     )
     bot.reply_to(message, res, parse_mode='Markdown', disable_web_page_preview=True)
 
-# 4. Auto-Reply Cerdas Lintas Bahasa
 @bot.message_handler(func=lambda message: True)
 def auto_reply(message):
+    save_user(message.chat.id)
     user = message.from_user
     l = get_lang(user)
     txt = message.text.lower()
@@ -322,6 +366,5 @@ def auto_reply(message):
         
     bot.reply_to(message, rep, parse_mode='Markdown', disable_web_page_preview=True)
 
-# Jalankan Bot
 print("[INFO] Ultimate Global Localized Bot Pakel MlbbStore Berjalan...")
 bot.infinity_polling()
