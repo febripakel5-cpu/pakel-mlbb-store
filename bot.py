@@ -147,6 +147,7 @@ def get_random_masked_name():
         "@Fuat902***", "@Gani123***", "@Gerry234***", "@Hadi345***"
     ]
     return random.choice(list_nama_tele)
+
 # ==================== GENERATOR TESTIMONI LIVE ====================
 def generate_single_testimonial():
     list_paket = [
@@ -208,7 +209,6 @@ def generate_fake_testimonials_list():
             f"   • Waktu: {menit_lalu} menit yang lalu\n\n"
         )
     return testi_output
-
 # ==================== BACKGROUND WORKER (AUTO-POST 10 - 25 MENIT SEKALI) ====================
 def background_auto_poster():
     time.sleep(30)
@@ -245,6 +245,37 @@ def admin_push_testi(message):
         bot.reply_to(message, "✅ Berhasil! Testimoni real-time baru saja dikirim ke topik grup.")
     except Exception as e:
         bot.reply_to(message, f"⚠️ Gagal mengirim testimoni: {e}")
+
+# ==================== FITUR INTERAKTIF MANUAL /SC ====================
+@bot.message_handler(commands=['sc'])
+def cmd_sc_interactive(message):
+    args = message.text.replace('/sc', '').strip()
+    if not args:
+        bot.reply_to(message, "⚠️ Format salah! Gunakan format:\nContoh: /sc @UsernamePembeli")
+        return
+    
+    target_buyer = args if args.startswith('@') else f"@{args}"
+    
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    packages = [
+        ("💎 Natural Balance (Rp 120k)", "sc_buy_natural"),
+        ("⚡ Light VIP + Drone (Rp 95k)", "sc_buy_light"),
+        ("🛡️ Semi-Safe 14 Hari (Rp 75k)", "sc_buy_semisafe"),
+        ("👑 Lifetime Safe Permanent (Rp 200k)", "sc_buy_lifetimesafe"),
+        ("💥 Sultan One Hit 100% (Rp 150k)", "sc_buy_sultan"),
+        ("⚡ VIP Pro One Hit 80% (Rp 100k)", "sc_buy_pro"),
+        ("🏆 Permanent Legend (Rp 250k)", "sc_buy_permanent")
+    ]
+    
+    for btn_text, cb_data in packages:
+        markup.add(types.InlineKeyboardButton(btn_text, callback_data=f"{cb_data}|{target_buyer}"))
+    
+    bot.reply_to(
+        message, 
+        f"🎯 Target Pembeli: <b>{target_buyer}</b>\n👇 Silakan klik paket script yang dibeli di bawah ini:", 
+        reply_markup=markup, 
+        parse_mode="HTML"
+    )
 
 # ==================== MASTER GLOBAL TRANSLATION ENGINE ====================
 TRANSLATIONS = {
@@ -340,7 +371,6 @@ TRANSLATIONS = {
         'confirm_instr': "🛡️ CONFIRMATION INSTRUCTION:\nAfter successful payment, send your Transfer Proof Screenshot to this bot.",
     }
 }
-
 def get_lang(user):
     code = getattr(user, 'language_code', 'en')
     if code:
@@ -454,6 +484,64 @@ def callback_handler(call):
     chat_id = call.message.chat.id
     message_id = call.message.message_id
     greeting = get_time_greeting()
+
+    # --- HANDLER AKSI TOMBOL /SC INTERAKTIF ---
+    if call.data.startswith('sc_buy_'):
+        try:
+            data_split = call.data.split('|')
+            action = data_split[0]
+            buyer_name = data_split[1]
+            
+            paket_map = {
+                'sc_buy_natural': ("Natural Balance (30 Hari)", "Rp 120.000"),
+                'sc_buy_light': ("Light VIP + Drone (30 Hari)", "Rp 95.000"),
+                'sc_buy_semisafe': ("Semi-Safe 14 Hari", "Rp 75.000"),
+                'sc_buy_lifetimesafe': ("Lifetime Safe Permanent", "Rp 200.000"),
+                'sc_buy_sultan': ("Sultan One Hit 100% (30 Hari)", "Rp 150.000"),
+                'sc_buy_pro': ("VIP Pro One Hit 80% (30 Hari)", "Rp 100.000"),
+                'sc_buy_permanent': ("Permanent Legend", "Rp 250.000")
+            }
+            
+            paket_nama, harga = paket_map.get(action, ("VIP Package", "Rp 100.000"))
+            menit_lalu = random.randint(1, 5)
+            
+            current_hour = datetime.now(timezone(timedelta(hours=7))).hour
+            if 4 <= current_hour < 11:
+                waktu_ket = "pagi ini"
+            elif 11 <= current_hour < 15:
+                waktu_ket = "siang ini"
+            elif 15 <= current_hour < 18:
+                waktu_ket = "sore ini"
+            else:
+                waktu_ket = "malam ini"
+                
+            post_text = (
+                "🚨 REAL-TIME TRANSACTION REPORT 🚨\n\n"
+                f"✅ Buyer ID: {buyer_name}\n"
+                f"📦 Item Purchased: {paket_nama}\n"
+                f"💵 Price: {harga}\n"
+                f"⏱️ Time: {menit_lalu} menit yang lalu ({waktu_ket})\n"
+                f"🔒 Status: SUCCESS & SCRIPT DELIVERED\n\n"
+                "🔥 Terima kasih telah berbelanja di Official Pakel MlbbStore! Aman, lancar, & anti-detect. Mau order juga? Langsung sikat ke bot ya! 👇\n"
+                f"🤖 Bot Store: @{bot.get_me().username}"
+            )
+            
+            bot.send_message(
+                chat_id=GROUP_CHAT_ID, 
+                text=post_text, 
+                message_thread_id=GROUP_TOPIC_ID, 
+                disable_web_page_preview=True
+            )
+            
+            bot.edit_message_text(
+                chat_id=chat_id,
+                message_id=message_id,
+                text=f"✅ **BERHASIL DIKIRIM KE GRUP!**\n\n• Pembeli: {buyer_name}\n• Paket: {paket_nama} ({harga})"
+            )
+            bot.answer_callback_query(call.id, text="Testimoni sukses terkirim ke grup!")
+        except Exception as e:
+            bot.answer_callback_query(call.id, text=f"Gagal: {e}", show_alert=True)
+        return
 
     if call.data == 'menu_utama':
         markup = types.InlineKeyboardMarkup(row_width=1)
@@ -617,6 +705,7 @@ def callback_handler(call):
             text = f"✅ PAYMENT CONFIRMATION\nExample Receipt: PKL-MLBB-{rs}\nSend transfer screenshot to admin."
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, reply_markup=get_back_markup(l), disable_web_page_preview=True)
         bot.answer_callback_query(call.id)
+
 @bot.message_handler(content_types=['photo'])
 def handle_photo(message):
     save_user(message.chat.id)
@@ -661,5 +750,5 @@ def auto_reply(message):
         
     bot.reply_to(message, res_msg, disable_web_page_preview=True)
 
-print("[INFO] Pakel MlbbStore VIP Edition (Markdown Safe & Clean) Berhasil Dijalankan...")
+print("[INFO] Pakel MlbbStore VIP Edition (Full Interactive /sc & Auto-Post) Berhasil Dijalankan...")
 bot.infinity_polling()
