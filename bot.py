@@ -148,7 +148,7 @@ def get_random_masked_name():
     ]
     return random.choice(list_nama_tele)
 
-# ==================== GENERATOR TESTIMONI LIVE ====================
+# ==================== GENERATOR TESTIMONI LIVE (8 PAKET) ====================
 def generate_single_testimonial():
     list_paket = [
         ("Natural Balance (30 Hari)", "Rp 120.000"),
@@ -157,7 +157,8 @@ def generate_single_testimonial():
         ("Lifetime Safe Permanent", "Rp 200.000"),
         ("Sultan One Hit 100% (30 Hari)", "Rp 150.000"),
         ("VIP Pro One Hit 80% (30 Hari)", "Rp 100.000"),
-        ("Permanent Legend", "Rp 250.000")
+        ("Semi-Private 14 Hari", "Rp 75.000"),
+        ("Permanent Legend (Lifetime)", "Rp 250.000")
     ]
     
     nama = get_random_masked_name()
@@ -194,6 +195,7 @@ def generate_fake_testimonials_list():
         ("Lifetime Safe Permanent", "Rp 200.000"),
         ("Sultan One Hit 100%", "Rp 150.000"),
         ("VIP Pro One Hit 80%", "Rp 100.000"),
+        ("Semi-Private 14 Hari", "Rp 75.000"),
         ("Permanent Legend", "Rp 250.000")
     ]
     
@@ -246,7 +248,7 @@ def admin_push_testi(message):
     except Exception as e:
         bot.reply_to(message, f"⚠️ Gagal mengirim testimoni: {e}")
 
-# ==================== FITUR INTERAKTIF MANUAL /SC ====================
+# ==================== FITUR INTERAKTIF MANUAL /SC (8 PAKET LENGKAP) ====================
 @bot.message_handler(commands=['sc'])
 def cmd_sc_interactive(message):
     args = message.text.replace('/sc', '').strip()
@@ -258,13 +260,14 @@ def cmd_sc_interactive(message):
     
     markup = types.InlineKeyboardMarkup(row_width=1)
     packages = [
-        ("💎 Natural Balance (Rp 120k)", "sc_buy_natural"),
-        ("⚡ Light VIP + Drone (Rp 95k)", "sc_buy_light"),
-        ("🛡️ Semi-Safe 14 Hari (Rp 75k)", "sc_buy_semisafe"),
-        ("👑 Lifetime Safe Permanent (Rp 200k)", "sc_buy_lifetimesafe"),
-        ("💥 Sultan One Hit 100% (Rp 150k)", "sc_buy_sultan"),
-        ("⚡ VIP Pro One Hit 80% (Rp 100k)", "sc_buy_pro"),
-        ("🏆 Permanent Legend (Rp 250k)", "sc_buy_permanent")
+        ("💎 Natural Balance (30 Hari)", "sc_buy_natural"),
+        ("⚡ Light VIP + Drone (30 Hari)", "sc_buy_light"),
+        ("🛡️ Semi-Safe 14 Hari", "sc_buy_semisafe"),
+        ("👑 Lifetime Safe Permanent", "sc_buy_lifetimesafe"),
+        ("💥 Sultan One Hit 100% (30 Hari)", "sc_buy_sultan"),
+        ("⚡ VIP Pro One Hit 80% (30 Hari)", "sc_buy_pro"),
+        ("🔒 Semi-Private 14 Hari", "sc_buy_semiprivate"),
+        ("🏆 Permanent Legend (Lifetime)", "sc_buy_permanent")
     ]
     
     for btn_text, cb_data in packages:
@@ -272,7 +275,7 @@ def cmd_sc_interactive(message):
     
     bot.reply_to(
         message, 
-        f"🎯 Target Pembeli: <b>{target_buyer}</b>\n👇 Silakan klik paket script yang dibeli di bawah ini:", 
+        f"🎯 Target Pembeli: <b>{target_buyer}</b>\n👇 Silakan pilih paket script yang dibeli:", 
         reply_markup=markup, 
         parse_mode="HTML"
     )
@@ -485,7 +488,7 @@ def callback_handler(call):
     message_id = call.message.message_id
     greeting = get_time_greeting()
 
-    # --- HANDLER AKSI TOMBOL /SC INTERAKTIF ---
+    # --- HANDLER AKSI TOMBOL /SC INTERAKTIF (8 PAKET LENGKAP) ---
     if call.data.startswith('sc_buy_'):
         try:
             data_split = call.data.split('|')
@@ -499,7 +502,8 @@ def callback_handler(call):
                 'sc_buy_lifetimesafe': ("Lifetime Safe Permanent", "Rp 200.000"),
                 'sc_buy_sultan': ("Sultan One Hit 100% (30 Hari)", "Rp 150.000"),
                 'sc_buy_pro': ("VIP Pro One Hit 80% (30 Hari)", "Rp 100.000"),
-                'sc_buy_permanent': ("Permanent Legend", "Rp 250.000")
+                'sc_buy_semiprivate': ("Semi-Private 14 Hari", "Rp 75.000"),
+                'sc_buy_permanent': ("Permanent Legend (Lifetime)", "Rp 250.000")
             }
             
             paket_nama, harga = paket_map.get(action, ("VIP Package", "Rp 100.000"))
@@ -750,5 +754,5 @@ def auto_reply(message):
         
     bot.reply_to(message, res_msg, disable_web_page_preview=True)
 
-print("[INFO] Pakel MlbbStore VIP Edition (Full Interactive /sc & Auto-Post) Berhasil Dijalankan...")
+print("[INFO] Pakel MlbbStore VIP Edition (Full Interactive 8-Packages /sc) Berhasil Dijalankan...")
 bot.infinity_polling()
