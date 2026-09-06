@@ -177,7 +177,7 @@ def background_auto_poster():
 poster_thread = threading.Thread(target=background_auto_poster, daemon=True)
 poster_thread.start()
 
-# ==================== COMMAND PUSH TESTI INSTAN (BEBAS DIAKSES DI GRUP) ====================
+# ==================== COMMAND PUSH TESTI INSTAN ====================
 @bot.message_handler(commands=['testi', 'push'])
 def admin_push_testi(message):
     try:
@@ -193,20 +193,18 @@ def admin_push_testi(message):
         bot.reply_to(message, f"⚠️ Gagal mengirim testimoni: {e}")
 
 # ==================== ROBLOX-STYLE ADMIN PANEL ENGINE (/sc ATAU /panel) ====================
-# Temporary memory buat nyimpen pilihan paket admin per session
 admin_panel_sessions = {}
 
 @bot.message_handler(commands=['sc', 'panel'])
 def cmd_roblox_admin_panel(message):
-    args = message.text.replace('/sc', '').replace('/panel', '').strip()
-    if not args:
-        bot.reply_to(message, "⚠️ Format salah! Gunakan format:\nContoh: /sc @UsernamePembeli")
+    text_clean = message.text.replace('/sc', '').replace('/panel', '').strip()
+    if not text_clean:
+        bot.reply_to(message, "⚠️ Format kurang lengkap!\nGunakan format: /panel @UsernamePembeli")
         return
     
-    target_buyer = args if args.startswith('@') else f"@{args}"
+    target_buyer = text_clean if text_clean.startswith('@') else f"@{text_clean}"
     chat_id = message.chat.id
     
-    # Simpan status awal sesi panel admin (Belum pilih paket)
     admin_panel_sessions[chat_id] = {
         'buyer': target_buyer,
         'package': None,
@@ -220,10 +218,9 @@ def render_roblox_panel(chat_id, message_id, is_new=False):
     session = admin_panel_sessions.get(chat_id, {'buyer': '@Customer', 'package': 'Belum Dipilih', 'price': '-'})
     
     buyer = session['buyer']
-    pkg = session['package'] if session['package'] else "❌ Belum Dipilih (Silakan Klik di Bawah)"
+    pkg = session['package'] if session['package'] else "❌ Belum Dipilih (Silakan Pilih di Bawah)"
     prc = session['price'] if session['price'] else "-"
     
-    # Layout Frame Roblox Studio (Text Box Screen)
     panel_text = (
         "🖥️ ━━━━━━━━━━━━━━━━━━━━━ 🖥️\n"
         "     <b>[ PAKEL ROBLOX ADMIN STUDIO ]</b>\n"
@@ -237,7 +234,6 @@ def render_roblox_panel(chat_id, message_id, is_new=False):
     
     markup = types.InlineKeyboardMarkup(row_width=1)
     
-    # 8 Pilihan Paket (Scrolling Frame Simulation Buttons)
     packages_btn = [
         ("💎 Natural Balance (30 Hari) [120k]", "rbx_pkg|natural|Natural Balance (30 Hari)|Rp 120.000"),
         ("⚡ Light VIP + Drone (30 Hari) [95k]", "rbx_pkg|light|Light VIP + Drone (30 Hari)|Rp 95.000"),
@@ -250,11 +246,9 @@ def render_roblox_panel(chat_id, message_id, is_new=False):
     ]
     
     for text_b, cb_b in packages_btn:
-        # Cek centang jika paket ini sedang dipilih
         active_mark = " ✅" if session['key'] in cb_b else ""
         markup.add(types.InlineKeyboardButton(text_b + active_mark, callback_data=cb_b))
         
-    # Tombol Aksi di Baris Bawah (Action Buttons Layout)
     markup.row(
         types.InlineKeyboardButton("🚀 Kirim Testi / Done", callback_data="rbx_action|send"),
         types.InlineKeyboardButton("🔄 Reset", callback_data="rbx_action|reset")
@@ -333,7 +327,6 @@ def callback_roblox_panel(call):
                 f"🤖 Bot Store: @{bot.get_me().username}"
             )
             
-            # Tembak langsung ke grup target topik ID 368
             bot.send_message(
                 chat_id=GROUP_CHAT_ID, 
                 text=post_text, 
@@ -341,7 +334,6 @@ def callback_roblox_panel(call):
                 disable_web_page_preview=True
             )
             
-            # Update panel jadi status sukses
             bot.edit_message_text(
                 chat_id=chat_id,
                 message_id=message_id,
@@ -770,5 +762,5 @@ def auto_reply(message):
         
     bot.reply_to(message, res_msg, disable_web_page_preview=True)
 
-print("[INFO] Pakel MlbbStore Roblox Studio Panel Edition Berhasil Dijalankan...")
+print("[INFO] Pakel MlbbStore Ultimate Edition Berhasil Dijalankan...")
 bot.infinity_polling()
