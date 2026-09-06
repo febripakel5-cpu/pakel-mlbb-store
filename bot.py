@@ -103,13 +103,13 @@ def generate_single_testimonial():
         waktu_ket = "malam ini"
     
     text = (
-        f"🚨 *REAL-TIME TRANSACTION REPORT* 🚨\n\n"
-        f"✅ *Buyer ID:* `{nama}`\n"
-        f"📦 *Item Purchased:* `{paket}`\n"
-        f"💵 *Price:* `{harga}`\n"
-        f"⏱️ *Time:* `{menit_lalu} menit yang lalu ({waktu_ket})`\n"
-        f"🔒 *Status:* `SUCCESS & SCRIPT DELIVERED`\n\n"
-        f"🔥 Terima kasih telah berbelanja di Official *Pakel MlbbStore*! Aman, lancar, & anti-detect. Mau order juga? Langsung sikat ke bot ya! 👇\n"
+        "🚨 REAL-TIME TRANSACTION REPORT 🚨\n\n"
+        f"✅ Buyer ID: {nama}\n"
+        f"📦 Item Purchased: {paket}\n"
+        f"💵 Price: {harga}\n"
+        f"⏱️ Time: {menit_lalu} menit yang lalu ({waktu_ket})\n"
+        f"🔒 Status: SUCCESS & SCRIPT DELIVERED\n\n"
+        "🔥 Terima kasih telah berbelanja di Official Pakel MlbbStore! Aman, lancar, & anti-detect. Mau order juga? Langsung sikat ke bot ya! 👇\n"
         f"🤖 Bot Store: @{bot.get_me().username}"
     )
     return text
@@ -131,10 +131,10 @@ def generate_fake_testimonials_list():
         paket, harga = random.choice(list_paket)
         menit_lalu = random.randint(2, 45)
         testi_output += (
-            f"✅ *{i}. Buyer ID:* `{nama}`\n"
-            f"   • *Dibeli:* `{paket}` ({harga})\n"
-            f"   • *Status:* `LUNAS & SCRIPT TERKIRIM`\n"
-            f"   • *Waktu:* `{menit_lalu} menit yang lalu`\n\n"
+            f"✅ {i}. Buyer ID: {nama}\n"
+            f"   • Dibeli: {paket} ({harga})\n"
+            f"   • Status: LUNAS & SCRIPT TERKIRIM\n"
+            f"   • Waktu: {menit_lalu} menit yang lalu\n\n"
         )
     return testi_output
 
@@ -150,7 +150,6 @@ def background_auto_poster():
             bot.send_message(
                 chat_id=GROUP_CHAT_ID, 
                 text=post_text, 
-                parse_mode='Markdown', 
                 message_thread_id=GROUP_TOPIC_ID, 
                 disable_web_page_preview=True
             )
@@ -169,7 +168,6 @@ def admin_push_testi(message):
         bot.send_message(
             chat_id=GROUP_CHAT_ID, 
             text=post_text, 
-            parse_mode='Markdown', 
             message_thread_id=GROUP_TOPIC_ID, 
             disable_web_page_preview=True
         )
@@ -189,55 +187,55 @@ TRANSLATIONS = {
         'btn_konfirmasi': "✅ Cek Status & Konfirmasi Resi",
         'btn_admin': "💬 Hubungi Admin Resmi",
         'back': "⬅️ Kembali ke Menu Utama",
-        'cat_title_1': "🔥 *VIP EXCLUSIVE CATALOGUE - BAGIAN 1* (Kak *{name}*) 🔥\n*(Kategori: Custom Damage High-Tier & Fair Play Anti-Detect)*",
-        'cat_title_2': "🔥 *VIP EXCLUSIVE CATALOGUE - BAGIAN 2* (Kak *{name}*) 🔥\n*(Kategori: Sultan One Hit Instan & Dominasi Mutlak)*",
-        'bonus_txt': "⚡ *BONUS SPESIAL FREE ALL PACKAGES (TANPA BIAYA TAMBAHAN):* \n🎁 Setiap pembelian paket apa saja, otomatis mendapatkan:\n  • **Panel Server Lag Musuh (Global Ping Spikes)**\n  • **Drone View Eksklusif X1 sampai X10 (Ultra Wide View)**\n\n📂 *SILAKAN PILIH SCRIPT & PELAJARI DETAIL FITUR DI BAWAH INI:*",
+        'cat_title_1': "🔥 VIP EXCLUSIVE CATALOGUE - BAGIAN 1 (Kak {name}) 🔥\n*(Kategori: Custom Damage High-Tier & Fair Play Anti-Detect)*",
+        'cat_title_2': "🔥 VIP EXCLUSIVE CATALOGUE - BAGIAN 2 (Kak {name}) 🔥\n*(Kategori: Sultan One Hit Instan & Dominasi Mutlak)*",
+        'bonus_txt': "⚡ BONUS SPESIAL FREE ALL PACKAGES (TANPA BIAYA TAMBAHAN): \n🎁 Setiap pembelian paket apa saja, otomatis mendapatkan:\n  • Panel Server Lag Musuh (Global Ping Spikes)\n  • Drone View Eksklusif X1 sampai X10 (Ultra Wide View)\n\n📂 SILAKAN PILIH SCRIPT & PELAJARI DETAIL FITUR DI BAWAH INI:",
         'p1': [
             ("🛒 Beli: Natural Balance (Rp 120k)", "buy_natural", 
-             "• 💎 *Natural Balance (30 Hari)* — **Rp 120.000**\n"
-             "  └ 🎯 *Fungsi & Keunggulan:* Script dirancang khusus untuk menyetarakan damage hero secara halus, natural, dan sangat stabil tanpa menimbulkan kecurigaan sistem ban. Sangat cocok bagi player yang ingin mendominasi ranked match secara konsisten, tidak mencolok, namun tetap mematikan di setiap teamfight. Aman untuk akun utama tier Mythic ke atas."),
+             "• 💎 Natural Balance (30 Hari) — Rp 120.000\n"
+             "  └ 🎯 Fungsi & Keunggulan: Script dirancang khusus untuk menyetarakan damage hero secara halus, natural, dan sangat stabil tanpa menimbulkan kecurigaan sistem ban. Sangat cocok bagi player yang ingin mendominasi ranked match secara konsisten, tidak mencolok, namun tetap mematikan di setiap teamfight. Aman untuk akun utama tier Mythic ke atas."),
             
             ("🛒 Beli: Light VIP + Drone (Rp 95k)", "buy_light", 
-             "• ⚡ *Light VIP + Drone (30 Hari)* — **Rp 95.000**\n"
-             "  └ 🎯 *Fungsi & Keunggulan:* Memberikan boost damage ringan yang presisi dipadukan dengan fitur luas pandang map (drone view). Memungkinkan Anda melihat posisi musuh dari kejauhan sebelum mereka menyergap, mengamankan objective lord/turtle dengan mudah, serta memenangkan pertempuran kecil di early game tanpa terdeteksi sistem keamanan game."),
+             "• ⚡ Light VIP + Drone (30 Hari) — Rp 95.000\n"
+             "  └ 🎯 Fungsi & Keunggulan: Memberikan boost damage ringan yang presisi dipadukan dengan fitur luas pandang map (drone view). Memungkinkan Anda melihat posisi musuh dari kejauhan sebelum mereka menyergap, mengamankan objective lord/turtle dengan mudah, serta memenangkan pertempuran kecil di early game tanpa terdeteksi sistem keamanan game."),
             
             ("🛒 Beli: Semi-Safe 14 Hari (Rp 75k)", "buy_semisafe", 
-             "• 🛡️ *Semi-Safe (14 Hari)* — **Rp 75.000**\n"
-             "  └ 🎯 *Fungsi & Keunggulan:* Solusi cepat dan bertenaga untuk durasi singkat bagi Anda yang sedang terburu-buru mengejar target star/winrate di akhir season. Performa script digenjot secara maksimal untuk memberikan keunggulan instan dalam duel 1vs1 maupun war besar."),
+             "• 🛡️ Semi-Safe (14 Hari) — Rp 75.000\n"
+             "  └ 🎯 Fungsi & Keunggulan: Solusi cepat dan bertenaga untuk durasi singkat bagi Anda yang sedang terburu-buru mengejar target star/winrate di akhir season. Performa script digenjot secara maksimal untuk memberikan keunggulan instan dalam duel 1vs1 maupun war besar."),
             
             ("🛒 Beli: Lifetime Safe Permanent (Rp 200k)", "buy_lifetimesafe", 
-             "• 👑 *Lifetime Safe (Permanent)* — **Rp 200.000**\n"
-             "  └ 🎯 *Fungsi & Keunggulan:* Investasi jangka panjang terbaik! Akses permanen selamanya dengan enkripsi tingkat tinggi berlapis anti-detect system. Dapatkan pembaruan (update) otomatis setiap patch patch terbaru tanpa perlu bayar ulang. Kualitas sultan, performa stabil seumur hidup.")
+             "• 👑 Lifetime Safe (Permanent) — Rp 200.000\n"
+             "  └ 🎯 Fungsi & Keunggulan: Investasi jangka panjang terbaik! Akses permanen selamanya dengan enkripsi tingkat tinggi berlapis anti-detect system. Dapatkan pembaruan (update) otomatis setiap patch patch terbaru tanpa perlu bayar ulang. Kualitas sultan, performa stabil seumur hidup.")
         ],
         'p2': [
             ("🛒 Beli: Sultan One Hit 100% (Rp 150k)", "buy_sultan", 
-             "• 💥 *Sultan One Hit 100% (30 Hari)* — **Rp 150.000**\n"
-             "  └ 🎯 *Fungsi & Keunggulan:* Kasta tertinggi script mematikan! Memberikan efek eliminasi instan (one hit kill) secara mutlak pada monster, minion, dan hero lawan. Musuh dijamin tidak akan sempat menggunakan skill atau spell ketika berhadapan dengan Anda. Sensasi dominasi total tanpa tanding di setiap pertandingan."),
+             "• 💥 Sultan One Hit 100% (30 Hari) — Rp 150.000\n"
+             "  └ 🎯 Fungsi & Keunggulan: Kasta tertinggi script mematikan! Memberikan efek eliminasi instan (one hit kill) secara mutlak pada monster, minion, dan hero lawan. Musuh dijamin tidak akan sempat menggunakan skill atau spell ketika berhadapan dengan Anda. Sensasi dominasi total tanpa tanding di setiap pertandingan."),
             
             ("🛒 Beli: VIP Pro One Hit 80% (Rp 100k)", "buy_pro", 
-             "• ⚡ *VIP Pro One Hit 80% (30 Hari)* — **Rp 100.000**\n"
-             "  └ 🎯 *Fungsi & Keunggulan:* Keseimbangan sempurna antara kekuatan destruktif dan keamanan akun. Power one hit sebesar 80% disetel agar tetap terlihat natural oleh sistem laporan musuh, namun sangat mematikan saat Anda melakukan eksekusi di mode ranked kompetitif."),
+             "• ⚡ VIP Pro One Hit 80% (30 Hari) — Rp 100.000\n"
+             "  └ 🎯 Fungsi & Keunggulan: Keseimbangan sempurna antara kekuatan destruktif dan keamanan akun. Power one hit sebesar 80% disetel agar tetap terlihat natural oleh sistem laporan musuh, namun sangat mematikan saat Anda melakukan eksekusi di mode ranked kompetitif."),
             
             ("🛒 Beli: Semi-Private 14 Hari (Rp 75k)", "buy_semiprivate", 
-             "• 🔒 *Semi-Private (14 Hari)* — **Rp 75.000**\n"
-             "  └ 🎯 *Fungsi & Keunggulan:* Script privat eksklusif dengan distribusi terbatas untuk menjaga kerahasiaan performa. Durasi 2 minggu penuh untuk memaksimalkan push rank tanpa hambatan berarti."),
+             "• 🔒 Semi-Private (14 Hari) — Rp 75.000\n"
+             "  └ 🎯 Fungsi & Keunggulan: Script privat eksklusif dengan distribusi terbatas untuk menjaga kerahasiaan performa. Durasi 2 minggu penuh untuk memaksimalkan push rank tanpa hambatan berarti."),
             
             ("🛒 Beli: Permanent Legend (Rp 250k)", "buy_permanent", 
-             "• 🏆 *Permanent Legend (Lifetime)* — **Rp 250.000**\n"
-             "  └ 🎯 *Fungsi & Keunggulan:* Paket paling elit di Pakel MlbbStore. Status permanen seumur hidup dengan prioritas update script tercepat di setiap patch baru. Kebebasan mutlak menguasai permainan selamanya.")
+             "• 🏆 Permanent Legend (Lifetime) — Rp 250.000\n"
+             "  └ 🎯 Fungsi & Keunggulan: Paket paling elit di Pakel MlbbStore. Status permanen seumur hidup dengan prioritas update script tercepat di setiap patch baru. Kebebasan mutlak menguasai permainan selamanya.")
         ],
         'next_1': "▶️ Lanjut ke Katalog Bagian 2 (Sultan One Hit)",
         'prev_2': "◀️ Kembali ke Katalog Bagian 1",
-        'inv_title': "🛒 *INVOICE PEMESANAN RESMI VIP* (Kak *{name}*) 🧾",
+        'inv_title': "🛒 INVOICE PEMESANAN RESMI VIP (Kak {name}) 🧾",
         'pay_info': (
-            "💳 *SILAKAN PILIH METODE TRANSFER DI BAWAH INI:*\n\n"
-            "1️⃣ **TRANSFER DANA / GOPAY:**\n"
-            f"   • **Nomor DANA:** `{INFO_DANA}`\n"
-            f"   • **Nomor GoPay:** `{INFO_GOPAY}`\n\n"
-            "2️⃣ **SAWERIA (Support Kartu, QRIS, E-Wallet):**\n"
+            "💳 SILAKAN PILIH METODE TRANSFER DI BAWAH INI:\n\n"
+            "1️⃣ TRANSFER DANA / GOPAY:\n"
+            f"   • Nomor DANA: {INFO_DANA}\n"
+            f"   • Nomor GoPay: {INFO_GOPAY}\n\n"
+            "2️⃣ SAWERIA (Support Kartu, QRIS, E-Wallet):\n"
             f"   • Link Pembayaran: {INFO_SAWERIA}\n"
         ),
-        'confirm_instr': "🛡️ *INSTRUKSI KONFIRMASI PEMBAYARAN:*\nSetelah sukses melakukan pembayaran via metode apapun, silakan kirim **Screenshot Bukti Transfer** ke bot ini untuk mendapatkan Nomor Resi Unik Anda.",
+        'confirm_instr': "🛡️ INSTRUKSI KONFIRMASI PEMBAYARAN:\nSetelah sukses melakukan pembayaran via metode apapun, silakan kirim Screenshot Bukti Transfer ke bot ini untuk mendapatkan Nomor Resi Unik Anda.",
     },
     'en': {
         'btn_katalog': "💎 VIP Catalogue & Pricing",
@@ -249,26 +247,26 @@ TRANSLATIONS = {
         'btn_konfirmasi': "✅ Check Status & Receipt",
         'btn_admin': "💬 Contact Official Admin",
         'back': "⬅️ Back to Main Menu",
-        'cat_title_1': "🔥 *VIP EXCLUSIVE CATALOGUE - PART 1* ( *{name}*) 🔥\n*(Category: Custom Damage High-Tier & Anti-Detect)*",
-        'cat_title_2': "🔥 *VIP EXCLUSIVE CATALOGUE - PART 2* ( *{name}*) 🔥\n*(Category: Sultan One Hit & Absolute Domination)*",
-        'bonus_txt': "⚡ *SPECIAL BONUS (FREE ALL PACKAGES):* \n🎁 Get for FREE:\n  • **Enemy Server Lag Panel**\n  • **Drone View X1 - X10 (Ultra Wide)**\n\n📂 *PACKAGE DETAILS & FUNCTIONS:*",
+        'cat_title_1': "🔥 VIP EXCLUSIVE CATALOGUE - PART 1 ({name}) 🔥",
+        'cat_title_2': "🔥 VIP EXCLUSIVE CATALOGUE - PART 2 ({name}) 🔥",
+        'bonus_txt': "⚡ SPECIAL BONUS (FREE ALL PACKAGES): \n🎁 Get for FREE:\n  • Enemy Server Lag Panel\n  • Drone View X1 - X10 (Ultra Wide)\n\n📂 PACKAGE DETAILS & FUNCTIONS:",
         'p1': [
-            ("🛒 Buy: Natural Balance ($8 / Rp 120k)", "buy_natural", "• 💎 *Natural Balance (30 Days)* — $8 / Rp 120k\n  └ 🎯 *Function:* Balanced & smooth damage adjustment without suspicion."),
-            ("🛒 Buy: Light VIP + Drone ($6 / Rp 95k)", "buy_light", "• ⚡ *Light VIP + Drone (30 Days)* — $6 / Rp 95k\n  └ 🎯 *Function:* Precision damage boost + wide map vision bonus."),
-            ("🛒 Buy: Semi-Safe 14 Days ($5 / Rp 75k)", "buy_semisafe", "• 🛡️ *Semi-Safe (14 Days)* — $5 / Rp 75k\n  └ 🎯 *Function:* Short duration optimal boost for rank push."),
-            ("🛒 Buy: Lifetime Permanent ($13 / Rp 200k)", "buy_lifetimesafe", "• 👑 *Lifetime Permanent* — $13 / Rp 200k\n  └ 🎯 *Function:* Permanent access with high anti-detect protection & free updates.")
+            ("🛒 Buy: Natural Balance ($8 / Rp 120k)", "buy_natural", "• 💎 Natural Balance (30 Days) — $8 / Rp 120k\n  └ 🎯 Function: Balanced & smooth damage adjustment without suspicion."),
+            ("🛒 Buy: Light VIP + Drone ($6 / Rp 95k)", "buy_light", "• ⚡ Light VIP + Drone (30 Days) — $6 / Rp 95k\n  └ 🎯 Function: Precision damage boost + wide map vision bonus."),
+            ("🛒 Buy: Semi-Safe 14 Days ($5 / Rp 75k)", "buy_semisafe", "• 🛡️ Semi-Safe (14 Days) — $5 / Rp 75k\n  └ 🎯 Function: Short duration optimal boost for rank push."),
+            ("🛒 Buy: Lifetime Permanent ($13 / Rp 200k)", "buy_lifetimesafe", "• 👑 Lifetime Permanent — $13 / Rp 200k\n  └ 🎯 Function: Permanent access with high anti-detect protection & free updates.")
         ],
         'p2': [
-            ("🛒 Buy: Sultan One Hit 100% ($10 / Rp 150k)", "buy_sultan", "• 💥 *Sultan One Hit 100%* — $10 / Rp 150k\n  └ 🎯 *Function:* Instant kill effect for total absolute domination."),
-            ("🛒 Buy: VIP Pro One Hit 80% ($7 / Rp 100k)", "buy_pro", "• ⚡ *VIP Pro One Hit 80%* — $7 / Rp 100k\n  └ 🎯 *Function:* Stable pro one hit power for ranked mode."),
-            ("🛒 Buy: Semi-Private 14 Days ($5 / Rp 75k)", "buy_semiprivate", "• 🔒 *Semi-Private (14 Days)* — $5 / Rp 75k\n  └ 🎯 *Function:* Exclusive 2-week private script."),
-            ("🛒 Buy: Permanent Legend ($16 / Rp 250k)", "buy_permanent", "• 🏆 *Permanent Legend* — $16 / Rp 250k\n  └ 🎯 *Function:* Lifetime status with free updates forever.")
+            ("🛒 Buy: Sultan One Hit 100% ($10 / Rp 150k)", "buy_sultan", "• 💥 Sultan One Hit 100% — $10 / Rp 150k\n  └ 🎯 Function: Instant kill effect for total absolute domination."),
+            ("🛒 Buy: VIP Pro One Hit 80% ($7 / Rp 100k)", "buy_pro", "• ⚡ VIP Pro One Hit 80% — $7 / Rp 100k\n  └ 🎯 Function: Stable pro one hit power for ranked mode."),
+            ("🛒 Buy: Semi-Private 14 Days ($5 / Rp 75k)", "buy_semiprivate", "• 🔒 Semi-Private (14 Days) — $5 / Rp 75k\n  └ 🎯 Function: Exclusive 2-week private script."),
+            ("🛒 Buy: Permanent Legend ($16 / Rp 250k)", "buy_permanent", "• 🏆 Permanent Legend — $16 / Rp 250k\n  └ 🎯 Function: Lifetime status with free updates forever.")
         ],
         'next_1': "▶️ Next: Catalog Part 2 (One Hit)",
         'prev_2': "◀️ Back to Catalog Part 1",
-        'inv_title': "🛒 *AUTOMATED VIP ORDER INVOICE* ( *{name}*) 🧾",
-        'pay_info': "💳 *CHOOSE YOUR PAYMENT METHOD:*\n1. DANA / GoPay\n2. Saweria",
-        'confirm_instr': "🛡️ *CONFIRMATION INSTRUCTION:*\nAfter successful payment, send your **Transfer Proof Screenshot** to this bot.",
+        'inv_title': "🛒 AUTOMATED VIP ORDER INVOICE ({name}) 🧾",
+        'pay_info': "💳 CHOOSE YOUR PAYMENT METHOD:\n1. DANA / GoPay\n2. Saweria",
+        'confirm_instr': "🛡️ CONFIRMATION INSTRUCTION:\nAfter successful payment, send your Transfer Proof Screenshot to this bot.",
     }
 }
 
@@ -291,7 +289,7 @@ def get_back_markup(l):
 def broadcast_message(message):
     pesan_bc = message.text.replace('/bc', '').replace('/broadcast', '').strip()
     if not pesan_bc:
-        bot.reply_to(message, "⚠️ Format salah! Contoh: `/bc Halo semua, ada promo script VIP baru nih!`", parse_mode='Markdown')
+        bot.reply_to(message, "⚠️ Format salah! Contoh: /bc Halo semua, ada promo script VIP baru nih!")
         return
     
     try:
@@ -306,7 +304,7 @@ def broadcast_message(message):
     
     for chat_id in users:
         try:
-            bot.send_message(chat_id, f"📢 *PENGUMUMAN RESMI PAKEL MLBBSTORE*\n\n{pesan_bc}", parse_mode='Markdown')
+            bot.send_message(chat_id, f"📢 PENGUMUMAN RESMI PAKEL MLBBSTORE\n\n{pesan_bc}")
             success += 1
         except Exception:
             failed += 1
@@ -336,18 +334,18 @@ def send_welcome(message):
     
     if l == 'id':
         welcome_text = (
-            f"🔥 *{greeting}, Kak {user.first_name}!* Selamat datang di Official *Pakel MlbbStore* 🙏✨\n\n"
-            f"Pusat layanan script cheat Mobile Legends premium terpercaya, anti-detect kelas atas, server lag panel, & drone view paling stabil se-Indonesia.\n\n"
-            f"👇 *Silakan pilih menu di bawah ini untuk mulai berbelanja:*"
+            f"🔥 {greeting}, Kak {user.first_name}! Selamat datang di Official Pakel MlbbStore 🙏✨\n\n"
+            "Pusat layanan script cheat Mobile Legends premium terpercaya, anti-detect kelas atas, server lag panel, & drone view paling stabil se-Indonesia.\n\n"
+            "👇 Silakan pilih menu di bawah ini untuk mulai berbelanja:"
         )
     else:
         welcome_text = (
-            f"🔥 *{greeting}, {user.first_name}!* Welcome to Official *Pakel MlbbStore* 🙏✨\n\n"
-            f"The ultimate trusted provider for high-tier MLBB scripts, anti-detect protection, & premium features.\n\n"
-            f"👇 *Please select a menu below to start:*"
+            f"🔥 {greeting}, {user.first_name}! Welcome to Official Pakel MlbbStore 🙏✨\n\n"
+            "The ultimate trusted provider for high-tier MLBB scripts, anti-detect protection, & premium features.\n\n"
+            "👇 Please select a menu below to start:"
         )
         
-    bot.send_message(message.chat.id, welcome_text, parse_mode='Markdown', reply_markup=markup)
+    bot.send_message(message.chat.id, welcome_text, reply_markup=markup)
 
 @bot.message_handler(commands=['cekresi', 'resi'])
 def cmd_cekresi(message):
@@ -355,10 +353,10 @@ def cmd_cekresi(message):
     user = message.from_user
     l = get_lang(user)
     if l == 'id':
-        text = f"🔍 *CEK STATUS RESI PEMBELIAN VIP* (Kak *{user.first_name}*)\n\nKirimkan **Nomor Resi Unik** (`PKL-MLBB-12345`) atau screenshot bukti transfer Anda ke sini.\n\n💬 Admin Utama: [{ADMIN_USERNAME}]({ADMIN_LINK})"
+        text = f"🔍 CEK STATUS RESI PEMBELIAN VIP (Kak {user.first_name})\n\nKirimkan Nomor Resi Unik (PKL-MLBB-12345) atau screenshot bukti transfer Anda ke sini.\n\n💬 Admin Utama: {ADMIN_USERNAME}"
     else:
-        text = f"🔍 *CHECK RECEIPT STATUS* ( *{user.first_name}*)\n\nPlease send your **Unique Receipt Number** or payment proof.\n\n💬 Admin: [{ADMIN_USERNAME}]({ADMIN_LINK})"
-    bot.reply_to(message, text, parse_mode='Markdown', disable_web_page_preview=True)
+        text = f"🔍 CHECK RECEIPT STATUS ({user.first_name})\n\nPlease send your Unique Receipt Number or payment proof.\n\n💬 Admin: {ADMIN_USERNAME}"
+    bot.reply_to(message, text, disable_web_page_preview=True)
 
 @bot.message_handler(commands=['katalog'])
 def cmd_katalog(message):
@@ -374,7 +372,7 @@ def cmd_katalog(message):
     markup.add(types.InlineKeyboardButton(t['back'], callback_data='menu_utama'))
 
     katalog_text = f"{t['cat_title_1'].format(name=user.first_name)}\n\n{t['bonus_txt']}\n\n" + "\n\n".join([desc for _, _, desc in t['p1']])
-    bot.send_message(message.chat.id, katalog_text, parse_mode='Markdown', reply_markup=markup)
+    bot.send_message(message.chat.id, katalog_text, reply_markup=markup)
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_handler(call):
@@ -398,59 +396,59 @@ def callback_handler(call):
             types.InlineKeyboardButton(t['btn_konfirmasi'], callback_data='menu_konfirmasi'),
             types.InlineKeyboardButton(t['btn_admin'], url=ADMIN_LINK)
         )
-        text = f"🔥 *{greeting}! Silakan pilih menu utama Pakel MlbbStore:*" if l == 'id' else f"🔥 *{greeting}! Main Menu:*"
+        text = f"🔥 {greeting}! Silakan pilih menu utama Pakel MlbbStore:" if l == 'id' else f"🔥 {greeting}! Main Menu:"
         try:
-            bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, parse_mode='Markdown', reply_markup=markup)
+            bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, reply_markup=markup)
         except Exception:
-            bot.send_message(chat_id=chat_id, text=text, parse_mode='Markdown', reply_markup=markup)
+            bot.send_message(chat_id=chat_id, text=text, reply_markup=markup)
         bot.answer_callback_query(call.id)
 
     elif call.data == 'menu_testi':
         fake_data = generate_fake_testimonials_list()
         if l == 'id':
             testi_text = (
-                f"🌟 *LIVE TESTIMONI & TRANSAKSI SUKSES* (Kak *{user.first_name}*)\n"
-                f"Berikut adalah daftar pembeli yang baru saja sukses melakukan checkout script VIP di Pakel MlbbStore secara real-time:\n\n"
+                f"🌟 LIVE TESTIMONI & TRANSAKSI SUKSES (Kak {user.first_name})\n"
+                "Berikut adalah daftar pembeli yang baru saja sukses melakukan checkout script VIP di Pakel MlbbStore secara real-time:\n\n"
                 f"{fake_data}"
-                f"💡 *Catatan:* Data di atas diperbarui secara otomatis setiap kali Anda membuka menu testimoni. Toko terpercaya & 100% amanah! 🚀"
+                "💡 Catatan: Data di atas diperbarui secara otomatis setiap kali Anda membuka menu testimoni. Toko terpercaya & 100% amanah! 🚀"
             )
         else:
-            testi_text = f"🌟 *LIVE TESTIMONIALS*\n\n{fake_data}"
+            testi_text = f"🌟 LIVE TESTIMONIALS\n\n{fake_data}"
         
         markup_testi = types.InlineKeyboardMarkup(row_width=1)
         markup_testi.add(types.InlineKeyboardButton("🔄 Refresh Testimoni Terbaru", callback_data='menu_testi'))
         markup_testi.add(types.InlineKeyboardButton(t['back'], callback_data='menu_utama'))
         
-        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=testi_text, parse_mode='Markdown', reply_markup=markup_testi, disable_web_page_preview=True)
+        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=testi_text, reply_markup=markup_testi, disable_web_page_preview=True)
         bot.answer_callback_query(call.id, text="Testimoni berhasil diperbarui!")
 
     elif call.data == 'menu_promo':
         if l == 'id':
-            promo_text = f"🎁 *PROMO EKSKLUSIF PELANGGAN BARU* (Kak *{user.first_name}*)\n\n🎟️ **KODE KUPON:** `WELCOMEPAKEL`\n💰 Nikmati potongan harga spesial untuk pembelian paket VIP pertama Anda hari ini! Klaim sekarang sebelum kuota promo habis."
+            promo_text = f"🎁 PROMO EKSKLUSIF PELANGGAN BARU (Kak {user.first_name})\n\n🎟️ KODE KUPON: WELCOMEPAKEL\n💰 Nikmati potongan harga spesial untuk pembelian paket VIP pertama Anda hari ini! Klaim sekarang sebelum kuota promo habis."
         else:
-            promo_text = f"🎁 *NEW MEMBER PROMO* ( *{user.first_name}*)\n\n🎟️ **COUPON:** `WELCOMEPAKEL`\n💰 Special discount for your first VIP package purchase!"
+            promo_text = f"🎁 NEW MEMBER PROMO ({user.first_name})\n\n🎟️ COUPON: WELCOMEPAKEL\n💰 Special discount for your first VIP package purchase!"
         
-        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=promo_text, parse_mode='Markdown', reply_markup=get_back_markup(l))
+        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=promo_text, reply_markup=get_back_markup(l))
         bot.answer_callback_query(call.id)
 
     elif call.data == 'menu_faq':
         if l == 'id':
             faq_text = (
-                "💡 *FAQ / PERTANYAAN UMUM PAKEL MLBBSTORE*\n\n"
-                "❓ *Q: Apakah script ini aman dari banned akun utama?*\n"
+                "💡 FAQ / PERTANYAAN UMUM PAKEL MLBBSTORE\n\n"
+                "❓ Q: Apakah script ini aman dari banned akun utama?\n"
                 "💬 A: Sangat aman! Setiap script kami dilengkapi enkripsi anti-detect tingkat tinggi dan sistem bypass pengaman game terbaru.\n\n"
-                "❓ *Q: Bagaimana cara instalasi filenya setelah dibeli?*\n"
+                "❓ Q: Bagaimana cara instalasi filenya setelah dibeli?\n"
                 "💬 A: File script lengkap beserta tutorial video panduan pemasangan yang sangat mudah akan langsung dikirimkan oleh Admin setelah pembayaran dikonfirmasi.\n\n"
-                "❓ *Q: Apakah ada garansi jika patch game berubah?*\n"
+                "❓ Q: Apakah ada garansi jika patch game berubah?\n"
                 "💬 A: Tentu! Setiap pembelian paket mendapatkan update gratis sesuai masa aktif paket Anda."
             )
         else:
             faq_text = (
-                "💡 *FAQ*\n\n"
-                "❓ *Safe from ban?* 💬 A: High-level anti-detect encryption.\n"
-                "❓ *How to install?* 💬 A: Script & tutorial sent by admin after payment."
+                "💡 FAQ\n\n"
+                "❓ Safe from ban? 💬 A: High-level anti-detect encryption.\n"
+                "❓ How to install? 💬 A: Script & tutorial sent by admin after payment."
             )
-        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=faq_text, parse_mode='Markdown', reply_markup=get_back_markup(l))
+        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=faq_text, reply_markup=get_back_markup(l))
         bot.answer_callback_query(call.id)
 
     elif call.data == 'menu_katalog' or call.data == 'katalog_part1':
@@ -461,7 +459,7 @@ def callback_handler(call):
         markup.add(types.InlineKeyboardButton(t['back'], callback_data='menu_utama'))
 
         katalog_text = f"{t['cat_title_1'].format(name=user.first_name)}\n\n{t['bonus_txt']}\n\n" + "\n\n".join([desc for _, _, desc in t['p1']])
-        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=katalog_text, parse_mode='Markdown', reply_markup=markup, disable_web_page_preview=True)
+        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=katalog_text, reply_markup=markup, disable_web_page_preview=True)
         bot.answer_callback_query(call.id)
 
     elif call.data == 'katalog_part2':
@@ -472,7 +470,7 @@ def callback_handler(call):
         markup.add(types.InlineKeyboardButton(t['back'], callback_data='menu_utama'))
 
         katalog_text = f"{t['cat_title_2'].format(name=user.first_name)}\n\n" + "\n\n".join([desc for _, _, desc in t['p2']])
-        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=katalog_text, parse_mode='Markdown', reply_markup=markup, disable_web_page_preview=True)
+        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=katalog_text, reply_markup=markup, disable_web_page_preview=True)
         bot.answer_callback_query(call.id)
 
     elif call.data.startswith('buy_'):
@@ -487,12 +485,12 @@ def callback_handler(call):
         
         invoice_text = (
             f"{t['inv_title']}\n\n"
-            f"📦 *Paket Dipilih:* `{paket_nama}`\n"
-            f"🔢 *Nomor Resi Unik:* `PKL-MLBB-{random_serial}`\n"
-            f"⏱️ *Batas Waktu Pembayaran:* 15 Menit\n\n"
+            f"📦 Paket Dipilih: {paket_nama}\n"
+            f"🔢 Nomor Resi Unik: PKL-MLBB-{random_serial}\n"
+            f"⏱️ Batas Waktu Pembayaran: 15 Menit\n\n"
             f"{t['pay_info']}\n\n"
             f"{t['confirm_instr']}\n"
-            f"👉 Kirim bukti transfer & resi ke admin: [{ADMIN_USERNAME}]({ADMIN_LINK})"
+            f"👉 Kirim bukti transfer & resi ke admin: {ADMIN_USERNAME}"
         )
         
         try:
@@ -501,52 +499,52 @@ def callback_handler(call):
             pass
             
         markup_inv = get_back_markup(l)
-        bot.send_message(chat_id, invoice_text, parse_mode='Markdown', reply_markup=markup_inv, disable_web_page_preview=True)
+        bot.send_message(chat_id, invoice_text, reply_markup=markup_inv, disable_web_page_preview=True)
         bot.answer_callback_query(call.id, text="Invoice Generated!")
 
     elif call.data == 'menu_cara_order':
         if l == 'id':
             text = (
-                "❓ *PANDUAN CARA ORDER DI PAKEL MLBBSTORE*\n\n"
-                "1️⃣ Pilih paket script VIP impian Anda melalui menu *Katalog*.\n"
-                "2️⃣ Klik tombol beli pada paket yang diinginkan untuk mendapatkan *Nomor Resi Unik* & daftar metode pembayaran.\n"
-                "3️⃣ Lakukan pembayaran via metode pilihan Anda: **DANA, GoPay, atau Saweria**.\n"
+                "❓ PANDUAN CARA ORDER DI PAKEL MLBBSTORE\n\n"
+                "1️⃣ Pilih paket script VIP impian Anda melalui menu Katalog.\n"
+                "2️⃣ Klik tombol beli pada paket yang diinginkan untuk mendapatkan Nomor Resi Unik & daftar metode pembayaran.\n"
+                "3️⃣ Lakukan pembayaran via metode pilihan Anda: DANA, GoPay, atau Saweria.\n"
                 "4️⃣ Kirimkan screenshot bukti transfer beserta Nomor Resi ke bot ini atau langsung ke Admin utama.\n"
                 "5️⃣ Admin akan memverifikasi dan mengirimkan file script beserta panduan lengkapnya detik itu juga!"
             )
         else:
-            text = "❓ *HOW TO ORDER*\n1️⃣ Select package & click Buy.\n2️⃣ Choose payment (DANA, GoPay, Saweria).\n3️⃣ Pay & send proof to admin."
-        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, parse_mode='Markdown', reply_markup=get_back_markup(l), disable_web_page_preview=True)
+            text = "❓ HOW TO ORDER\n1️⃣ Select package & click Buy.\n2️⃣ Choose payment (DANA, GoPay, Saweria).\n3️⃣ Pay & send proof to admin."
+        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, reply_markup=get_back_markup(l), disable_web_page_preview=True)
         bot.answer_callback_query(call.id)
 
     elif call.data == 'menu_bayar':
         if l == 'id':
             text = (
-                "💳 *METODE PEMBAYARAN LENGKAP PAKEL MLBBSTORE*\n\n"
+                "💳 METODE PEMBAYARAN LENGKAP PAKEL MLBBSTORE\n\n"
                 "Bebas pilih metode pembayaran yang paling nyaman untuk Anda:\n\n"
-                "1️⃣ **TRANSFER DANA / GOPAY:**\n"
-                f"   • **Nomor DANA:** `{INFO_DANA}`\n"
-                f"   • **Nomor GoPay:** `{INFO_GOPAY}`\n\n"
-                "2️⃣ **SAWERIA (Dukungan Donasi / Kartu / E-Wallet):**\n"
+                "1️⃣ TRANSFER DANA / GOPAY:\n"
+                f"   • Nomor DANA: {INFO_DANA}\n"
+                f"   • Nomor GoPay: {INFO_GOPAY}\n\n"
+                "2️⃣ SAWERIA (Dukungan Donasi / Kartu / E-Wallet):\n"
                 f"   • Link Pembayaran: {INFO_SAWERIA}\n\n"
-                "📌 *Catatan:* Silakan pilih paket di katalog lalu klik beli untuk memunculkan instruksi pembayaran lengkap, atau langsung hubungi [{ADMIN_USERNAME}]({ADMIN_LINK})."
+                "📌 Catatan: Silakan pilih paket di katalog lalu klik beli untuk memunculkan instruksi pembayaran lengkap, atau langsung hubungi {ADMIN_USERNAME}."
             )
         else:
-            text = f"💳 *ALL PAYMENT METHODS*\n\n1. DANA / GoPay\n2. Saweria\n📌 Confirm to [{ADMIN_USERNAME}]({ADMIN_LINK})."
-        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, parse_mode='Markdown', reply_markup=get_back_markup(l), disable_web_page_preview=True)
+            text = f"💳 ALL PAYMENT METHODS\n\n1. DANA / GoPay\n2. Saweria\n📌 Confirm to {ADMIN_USERNAME}."
+        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, reply_markup=get_back_markup(l), disable_web_page_preview=True)
         bot.answer_callback_query(call.id)
 
     elif call.data == 'menu_konfirmasi':
         rs = random.randint(10000, 99999)
         if l == 'id':
             text = (
-                f"✅ *KONFIRMASI PEMBAYARAN & KLAIM SCRIPT*\n\n"
-                f"Contoh Format Resi Anda: `PKL-MLBB-{rs}`\n\n"
-                f"Silakan kirim screenshot bukti transfer pembayaran Anda (baik dari DANA, GoPay, maupun Saweria) ke chat ini atau langsung ke Admin untuk segera diproses."
+                "✅ KONFIRMASI PEMBAYARAN & KLAIM SCRIPT\n\n"
+                f"Contoh Format Resi Anda: PKL-MLBB-{rs}\n\n"
+                "Silakan kirim screenshot bukti transfer pembayaran Anda (baik dari DANA, GoPay, maupun Saweria) ke chat ini atau langsung ke Admin untuk segera diproses."
             )
         else:
-            text = f"✅ *PAYMENT CONFIRMATION*\nExample Receipt: `PKL-MLBB-{rs}`\nSend transfer screenshot to admin."
-        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, parse_mode='Markdown', reply_markup=get_back_markup(l), disable_web_page_preview=True)
+            text = f"✅ PAYMENT CONFIRMATION\nExample Receipt: PKL-MLBB-{rs}\nSend transfer screenshot to admin."
+        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, reply_markup=get_back_markup(l), disable_web_page_preview=True)
         bot.answer_callback_query(call.id)
 
 @bot.message_handler(content_types=['photo'])
@@ -563,19 +561,19 @@ def handle_photo(message):
     tm_str = now.strftime("%H:%M:%S WIB")
     
     res = (
-        f"✅ *BUKTI PEMBAYARAN BERHASIL DIUNGGAH!*\n"
-        f"Terima kasih banyak Kak *{user.first_name}* atas kepercayaannya berbelanja di Pakel MlbbStore 🙏✨\n\n"
-        f"🛡️ *Nomor Resi Unik Anda:* `PKL-MLBB-{rs}`\n"
-        f"⏱️ *Waktu Transaksi:* {dt_str} - {tm_str}\n\n"
-        f"📋 *SALIN FORMAT DI BAWAH INI DAN KIRIM KE ADMIN:*\n"
-        f"```text\n"
+        "✅ BUKTI PEMBAYARAN BERHASIL DIUNGGAH!\n"
+        f"Terima kasih banyak Kak {user.first_name} atas kepercayaannya berbelanja di Pakel MlbbStore 🙏✨\n\n"
+        f"🛡️ Nomor Resi Unik Anda: PKL-MLBB-{rs}\n"
+        f"⏱️ Waktu Transaksi: {dt_str} - {tm_str}\n\n"
+        "📋 SALIN FORMAT DI BAWAH INI DAN KIRIM KE ADMIN:\n"
+        "----------------------------------------\n"
         f"• No Resi      : PKL-MLBB-{rs}\n"
         f"• Nama Pembeli : {user.first_name}\n"
-        f"• Status       : LUNAS / MENUNGGU SCRIPT\n"
-        f"```\n"
-        f"🚀 **Klik link berikut untuk mengirim data ke Admin:** [{ADMIN_USERNAME}]({ADMIN_LINK})"
+        "• Status       : LUNAS / MENUNGGU SCRIPT\n"
+        "----------------------------------------\n"
+        f"🚀 Hubungi Admin sekarang: {ADMIN_USERNAME}"
     )
-    bot.reply_to(message, res, parse_mode='Markdown', disable_web_page_preview=True)
+    bot.reply_to(message, res, disable_web_page_preview=True)
 
 @bot.message_handler(func=lambda message: True)
 def auto_reply(message):
@@ -589,9 +587,9 @@ def auto_reply(message):
     elif any(w in txt for w in ['pay', 'bayar', 'dana', 'gopay', 'saweria', 'testi', 'testimoni']):
         res_msg = "🌟 Cek menu /start untuk melihat Katalog VIP, Metode Pembayaran Lengkap, hingga Live Testimoni real-time pembeli!" if l == 'id' else "🌟 Type /start to view catalogue, payments, and live testimonials."
     else:
-        res_msg = f"Halo *{user.first_name}*! Silakan ketik /start untuk mengakses menu utama atau hubungi admin kami di [{ADMIN_USERNAME}]({ADMIN_LINK})." if l == 'id' else f"Hello *{user.first_name}*! Contact our admin at [{ADMIN_USERNAME}]({ADMIN_LINK})."
+        res_msg = f"Halo {user.first_name}! Silakan ketik /start untuk mengakses menu utama atau hubungi admin kami di {ADMIN_USERNAME}." if l == 'id' else f"Hello {user.first_name}! Contact our admin at {ADMIN_USERNAME}."
         
-    bot.reply_to(message, res_msg, parse_mode='Markdown', disable_web_page_preview=True)
+    bot.reply_to(message, res_msg, disable_web_page_preview=True)
 
-print("[INFO] Pakel MlbbStore VIP Edition (Public /testi & /push Command Enabled) Berhasil Dijalankan...")
+print("[INFO] Pakel MlbbStore VIP Edition (Markdown Safe & Clean) Berhasil Dijalankan...")
 bot.infinity_polling()
