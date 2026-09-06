@@ -9,12 +9,25 @@ from datetime import datetime, timezone, timedelta
 TOKEN = '8637403539:AAFyKck7U8POV3hzSw9UcF_sDDp0d_hKat0'
 bot = telebot.TeleBot(TOKEN)
 
-# Identitas Admin, Toko Resmi, & Link Grup Beserta ID Topik Khusus Testimoni
-ADMIN_TELEGRAM_ID = 8772023108
+# Identitas Toko Resmi & Link Grup Beserta ID Topik Khusus Testimoni
 ADMIN_USERNAME = "@PakelMlbbOfficial"
 ADMIN_LINK = "https://t.me/PakelMlbbOfficial"
 GROUP_CHAT_ID = "@PakelMlbb"  # Username grup utama lu
 GROUP_TOPIC_ID = 368          # ID Topik khusus di dalam grup untuk auto-post testi
+
+# File penyimpan ID Admin otomatis
+ADMIN_FILE = "admin_id.txt"
+
+def get_admin_id():
+    try:
+        with open(ADMIN_FILE, "r") as f:
+            return int(f.read().strip())
+    except FileNotFoundError:
+        return 8772023108  # Default ID cadangan
+
+def save_admin_id(new_id):
+    with open(ADMIN_FILE, "w") as f:
+        f.write(str(new_id))
 
 # Informasi Nomor Pembayaran Resmi (Tanpa QRIS)
 INFO_DANA = "089526466512"
@@ -58,7 +71,22 @@ def get_random_masked_name():
         "@Kevin_W***", "@Lukman_***", "@Maulana***", "@Naufal_***",
         "@Pratama***", "@Rafli_99***", "@Satria_***", "@Tegar_***",
         "@Vian_X***", "@Wahyu_***", "@YudaPrat***", "@Zaki_Mlf***",
-        "@Eka_Sltn***", "@Doni_Gmr***", "@Fikri_Dx***", "@Andi_99***"
+        "@Eka_Sltn***", "@Doni_Gmr***", "@Fikri_Dx***", "@Andi_99***",
+        "@Budi_St***", "@Coki_***", "@Dandi_***", "@Eko_Prast***",
+        "@Fandi_***", "@Guntur***", "@Hafiz_***", "@Imam_***",
+        "@Jefri_***", "@Kiki_***", "@Lutfi_***", "@Miko_***",
+        "@Nanda_***", "@Oky_***", "@Pandu_***", "@Qomar_***",
+        "@Rahmat***", "@Riki_***", "@Roni_***", "@Rudi_***",
+        "@Sandi_***", "@Toni_***", "@Udin_***", "@Vicky***",
+        "@Wahid***", "@Yadi_***", "@Zainal***", "@Adit_***",
+        "@Agus_***", "@Ahmad***", "@Akbar***", "@Alex_***",
+        "@Amri_***", "@Anang***", "@Angga***", "@Anton***",
+        "@Arya_***", "@Asep_***", "@Azka_***", "@Bagus***",
+        "@Basri***", "@Beni_***", "@Boy_***", "@Candra***",
+        "@Darma***", "@Dedi_***", "@Deny_***", "@Diki_***",
+        "@Egi_***", "@Eky_***", "@Fahri***", "@Fandi***",
+        "@Farhan***", "@Fauzi***", "@Febri***", "@Firman",
+        "@Fuat_***", "@Gani_***", "@Gerry***", "@Hadi_***"
     ]
     return random.choice(list_nama_tele)
 
@@ -124,12 +152,22 @@ def generate_fake_testimonials_list():
         )
     return testi_output
 
+# ==================== KLAIM ADMIN OTOMATIS VIA CHAT PRIBADI ====================
+@bot.message_handler(commands=['admin', 'setadmin'])
+def claim_admin(message):
+    if message.chat.type != 'private':
+        bot.reply_to(message, "⚠️ Silakan kirim perintah /admin di **chat pribadi (DM)** bot agar ID Telegram lu terekam sebagai Admin utama!")
+        return
+    
+    user_id = message.from_user.id
+    save_admin_id(user_id)
+    bot.reply_to(message, f"✅ Sukses! Akun lu ({message.from_user.first_name}) telah resmi didaftarkan sebagai **Admin Utama Pakel MlbbStore** (ID: `{user_id}`). Sekarang lu bebas pakai perintah `/push` atau `/testi`!")
+
 # ==================== BACKGROUND WORKER (AUTO-POST 10 - 25 MENIT SEKALI) ====================
 def background_auto_poster():
-    time.sleep(30)  # Tunggu bot siap
+    time.sleep(30)
     while True:
         try:
-            # Jeda waktu acak antara 600 detik (10 menit) sampai 1500 detik (25 menit)
             sleep_time = random.randint(600, 1500)
             time.sleep(sleep_time)
             
@@ -145,15 +183,15 @@ def background_auto_poster():
             print(f"[AUTO-POST ERROR]: {e}")
             time.sleep(60)
 
-# Jalankan background worker di thread terpisah
 poster_thread = threading.Thread(target=background_auto_poster, daemon=True)
 poster_thread.start()
 
 # ==================== COMMAND KHUSUS ADMIN BUAT PUSH TESTI INSTAN ====================
 @bot.message_handler(commands=['testi', 'push'])
 def admin_push_testi(message):
-    if message.from_user.id != ADMIN_TELEGRAM_ID:
-        bot.reply_to(message, "⚠️ Perintah ini khusus untuk Admin utama Pakel MlbbStore!")
+    current_admin_id = get_admin_id()
+    if message.from_user.id != current_admin_id:
+        bot.reply_to(message, f"⚠️ Perintah ini khusus untuk Admin utama! (ID lu: `{message.from_user.id}`). Kirim `/admin` di chat pribadi bot dulu kalau belum terdaftar.")
         return
     
     try:
@@ -281,7 +319,8 @@ def get_back_markup(l):
 # ==================== FITUR BROADCAST ADMIN ====================
 @bot.message_handler(commands=['bc', 'broadcast'])
 def broadcast_message(message):
-    if message.from_user.id != ADMIN_TELEGRAM_ID:
+    current_admin_id = get_admin_id()
+    if message.from_user.id != current_admin_id:
         bot.reply_to(message, "⚠️ Perintah ini khusus untuk Admin utama!")
         return
     
@@ -561,7 +600,7 @@ def handle_photo(message):
     res = (
         f"✅ *BUKTI PEMBAYARAN BERHASIL DIUNGGAH!*\n"
         f"Terima kasih banyak Kak *{user.first_name}* atas kepercayaannya berbelanja di Pakel MlbbStore 🙏✨\n\n"
-        f"🛡️ *Nomor Resi Unik Your:* `PKL-MLBB-{rs}`\n"
+        f"🛡️ *Nomor Resi Unik Anda:* `PKL-MLBB-{rs}`\n"
         f"⏱️ *Waktu Transaksi:* {dt_str} - {tm_str}\n\n"
         f"📋 *SALIN FORMAT DI BAWAH INI DAN KIRIM KE ADMIN:*\n"
         f"```text\n"
@@ -589,5 +628,5 @@ def auto_reply(message):
         
     bot.reply_to(message, rep, parse_mode='Markdown', disable_web_page_preview=True)
 
-print("[INFO] Pakel MlbbStore VIP Edition (Natural Auto-Post 10-25 Mins + Admin /testi) Berhasil Dijalankan...")
+print("[INFO] Pakel MlbbStore VIP Edition (Dynamic Admin Claim Enabled) Berhasil Dijalankan...")
 bot.infinity_polling()
