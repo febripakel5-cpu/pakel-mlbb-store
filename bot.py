@@ -23,14 +23,21 @@ INFO_SAWERIA = "https://saweria.co/pakelmlbbstore"
 # ==================== FUNGSI DATABASE USER & BROADCAST ====================
 def save_user(chat_id):
     try:
-        with open("users.txt", "r") as f:
-            users = f.read().splitlines()
-        if str(chat_id) not in users:
+        chat_id_str = str(chat_id).strip()
+        if not chat_id_str:
+            return
+        users = []
+        try:
+            with open("users.txt", "r") as f:
+                users = [line.strip() for line in f if line.strip()]
+        except FileNotFoundError:
+            pass
+            
+        if chat_id_str not in users:
             with open("users.txt", "a") as f:
-                f.write(str(chat_id) + "\n")
-    except FileNotFoundError:
-        with open("users.txt", "w") as f:
-            f.write(str(chat_id) + "\n")
+                f.write(chat_id_str + "\n")
+    except Exception as e:
+        print(f"[SAVE USER ERROR]: {e}")
 
 # ==================== WAKTU & SAPAAN OTOMATIS ====================
 def get_time_greeting():
@@ -48,7 +55,6 @@ def get_time_greeting():
 # ==================== LIST NAMA TELEGRAM SENSOR BINTANG ====================
 def get_random_masked_name():
     list_nama_tele = [
-        # --- KELOMPOK 1: UNDERSCORE & ANGKA HOKI ---
         "@R_Zky***", "@Alvinn_***", "@Dimas_99***", "@RezaPrat_***", 
         "@Bayu_Official***", "@Farel_X***", "@Yoga_Mlg***", "@DickyGez_***", 
         "@SuryaPratama***", "@RamaWicak***", "@Gilang_ID***", "@BagasKusn***",
@@ -74,8 +80,6 @@ def get_random_masked_name():
         "@Egi***", "@Eky***", "@Fahri***", "@Fandi***",
         "@Farhan***", "@Fauzi***", "@Febri***", "@Firman",
         "@Fuat***", "@Gani***", "@Gerry***", "@Hadi***",
-
-        # --- KELOMPOK 2: KOMBINASI TITIK & HURUF KAPITAL ---
         "@R.Zky***", "@Alvin.ID***", "@Dimas.Xyz***", "@Reza.Gaming***",
         "@Bayu.Pratama***", "@Farel.Official***", "@Yoga.Ganz***", "@Dicky.Dev***",
         "@Surya.ID***", "@Rama.ID***", "@Gilang.Mlg***", "@Bagas.X***",
@@ -85,66 +89,13 @@ def get_random_masked_name():
         "@Kevin.Bagas***", "@Lukman.Rizky***", "@Maulana.Dwi***", "@Naufal.Akbar***",
         "@Pratama.Putra***", "@Rafli.Maulana***", "@Satria.angga***", "@Tegar.Aditya***",
         "@Vian.Saputra***", "@Wahyu.Hidayat***", "@Yuda.Kurniawan***", "@Zaki.Mubarok***",
-        "@Eka.Yulianto***", "@Doni.Setiawan***", "@Fikri.Haikal***", "@Andi.Firmansyah***",
-        "@Budi.Hartono***", "@Coki.Siregar***", "@Dandi.Kusuma***", "@Eko.Purnomo***",
-        "@Fandi.Ahmad***", "@Guntur.Wicaksono***", "@Hafiz.Alatas***", "@Imam.Bonjol***",
-        "@Jefri.Nichol***", "@Kiki.Amalia***", "@Lutfi.Agung***", "@Miko.Tan***",
-        "@Nanda.Persada***", "@Oky.Jelly***", "@Pandu.Dewanata***", "@Qomar.Ben***",
-        "@Rahmat.Hidayat***", "@Riki.Martadinata***", "@Roni.Irawan***", "@Rudi.Tabuti***",
-        "@Sandi.Prakoso***", "@Toni.Montana***", "@Udin.Sedunia***", "@Vicky.Nitinegoro***",
-        "@Wahid.Hasyim***", "@Yadi.Mulyadi***", "@Zainal.Abidin***", "@Adit.Syafa***",
-        "@Agus.Salim***", "@Ahmad.Dhani***", "@Akbar.Tanjung***", "@Alex.Gozali***",
-        "@Amri.Tahir***", "@Anang.Hermansyah***", "@Angga.Purwa***", "@Anton.Medan***",
-        "@Arya.Veda***", "@Asep.Sunandar***", "@Azka.Corbuzier***", "@Bagus.Kahfi***",
-        "@Basri.Syam***", "@Beni.Mulya***", "@Boy.William***", "@Candra.Wijaya***",
-        "@Darma.Suteja***", "@Dedi.Mulyadi***", "@Deny.Sumargo***", "@Diki.Candra***",
-        "@Egi.Fauzi***", "@Eky.Pratama***", "@Fahri.Hamzah***", "@Fandi.Chow***",
-        "@Farhan.Basalamah***", "@Fauzi.Baadila***", "@Febri.Hariyadi***", "@Firman.Utina***",
-        "@Fuat.Bachtiar***", "@Gani.Djemat***", "@Gerry.Isak***", "@Hadi.Tjahjanto***",
-
-        # --- KELOMPOK 3: NAMA ASLI & AKUN PRIBADI MURNI ---
         "@Rizal_Ganz***", "@Maulana_ID***", "@Fikri_Ramadhan***", "@Ilham_Saputra***",
         "@Rezky_Pratama***", "@Rizky_Maulana***", "@Fauzan_Azima***", "@Zidan_Alfarizi***",
         "@Rafi_Ahmad***", "@Zaki_Mubarok***", "@Fathan_Haikal***", "@Rifki_Ananda***",
         "@Aditya_Pratama***", "@Bayu_Pamungkas***", "@Yoga_Prasetyo***", "@Dimas_Mahendra***",
-        "@Fajar_Sidik***", "@Galih_Prakoso***", "@Iqbal_Ramadhan***", "@Joko_Susilo***",
-        "@Kevin_Sanjaya***", "@Lukman_Hakim***", "@Naufal_Abqari***", "@Rafli_Awwal***",
-        "@Satria_Madura***", "@Tegar_Prakasa***", "@Vian_Saputra***", "@Wahyu_Kurniawan***",
-        "@Yuda_Pratama***", "@Eka_Saputra***", "@Doni_Aryanto***", "@Andi_Firmansyah***",
-        "@Budi_Santoso***", "@Coki_Pardede***", "@Dandi_Kusuma***", "@Eko_Wahyudi***",
-        "@Fandi_Ahmad***", "@Guntur_Wicaksono***", "@Hafiz_Alatas***", "@Imam_Syafiq***",
-        "@Jefri_Albuchori***", "@Kiki_Faris***", "@Lutfi_Agung***", "@Miko_Santoso***",
-        "@Nanda_Persada***", "@Oky_Prabowo***", "@Pandu_Dewanata***", "@Qomar_Bahar***",
-        "@Rahmat_Hidayat***", "@Riki_Martadinata***", "@Roni_Irawan***", "@Rudi_Tabuti***",
-        "@Sandi_Prakoso***", "@Toni_Montana***", "@Udin_Petot***", "@Vicky_Nitinegoro***",
-        "@Wahid_Hasyim***", "@Yadi_Mulyadi***", "@Zainal_Abidin***", "@Adit_Syafa***",
-
-        # --- KELOMPOK 4: KOMBINASI ANGKA ACAK & TAHUN ---
         "@R_Zky2026***", "@Alvinn123***", "@Dimas777***", "@Reza888***", 
         "@Bayu555***", "@Farel444***", "@Yoga333***", "@Dicky222***", 
-        "@Surya111***", "@Rama999***", "@Gilang000***", "@Bagas777***",
-        "@Arif666***", "@Dani555***", "@Hendra444***", "@Rian333***",
-        "@Aldi222***", "@Bintang111***", "@Candra000***", "@Dika888***",
-        "@Fajar777***", "@Galih666***", "@Iqbal555***", "@Joko444***",
-        "@Kevin333***", "@Lukman222***", "@Maulana111***", "@Naufal000***",
-        "@Pratama123***", "@Rafli456***", "@Satria789***", "@Tegar321***",
-        "@Vian654***", "@Wahyu987***", "@Yuda135***", "@Zaki246***",
-        "@Eka357***", "@Doni468***", "@Fikri579***", "@Andi802***",
-        "@Budi913***", "@Coki741***", "@Dandi852***", "@Eko963***",
-        "@Fandi159***", "@Guntur263***", "@Hafiz374***", "@Imam485***",
-        "@Jefri596***", "@Kiki607***", "@Lutfi718***", "@Miko829***",
-        "@Nanda930***", "@Oky142***", "@Pandu253***", "@Qomar364***",
-        "@Rahmat475***", "@Riki586***", "@Roni697***", "@Rudi708***",
-        "@Sandi819***", "@Toni920***", "@Udin134***", "@Vicky245***",
-        "@Wahid356***", "@Yadi467***", "@Zainal578***", "@Adit689***",
-        "@Agus790***", "@Ahmad801***", "@Akbar912***", "@Alex123***",
-        "@Amri234***", "@Anang345***", "@Angga456***", "@Anton567***",
-        "@Arya678***", "@Asep789***", "@Azka890***", "@Bagus135***",
-        "@Basri246***", "@Beni357***", "@Boy468***", "@Candra579***",
-        "@Darma680***", "@Dedi791***", "@Deny802***", "@Diki913***",
-        "@Egi124***", "@Eky235***", "@Fahri346***", "@Fandi457***",
-        "@Farhan568***", "@Fauzi679***", "@Febri780***", "@Firman891***",
-        "@Fuat902***", "@Gani123***", "@Gerry234***", "@Hadi345***"
+        "@Surya111***", "@Rama999***", "@Gilang000***", "@Bagas777***"
     ]
     return random.choice(list_nama_tele)
 
@@ -233,7 +184,7 @@ def background_auto_poster():
 poster_thread = threading.Thread(target=background_auto_poster, daemon=True)
 poster_thread.start()
 
-# ==================== COMMAND PUSH TESTI INSTAN (BEBAS DIAKSES DI GRUP) ====================
+# ==================== COMMAND PUSH TESTI INSTAN ====================
 @bot.message_handler(commands=['testi', 'push'])
 def admin_push_testi(message):
     try:
@@ -251,6 +202,7 @@ def admin_push_testi(message):
 # ==================== FITUR INTERAKTIF MANUAL /SC (8 PAKET LENGKAP) ====================
 @bot.message_handler(commands=['sc'])
 def cmd_sc_interactive(message):
+    save_user(message.chat.id)
     args = message.text.replace('/sc', '').strip()
     if not args:
         bot.reply_to(message, "⚠️ Format salah! Gunakan format:\nContoh: /sc @UsernamePembeli")
@@ -279,7 +231,6 @@ def cmd_sc_interactive(message):
         reply_markup=markup, 
         parse_mode="HTML"
     )
-
 # ==================== MASTER GLOBAL TRANSLATION ENGINE ====================
 TRANSLATIONS = {
     'id': {
@@ -388,9 +339,10 @@ def get_back_markup(l):
     markup.add(types.InlineKeyboardButton(text, callback_data='menu_utama'))
     return markup
 
-# ==================== FITUR BROADCAST ADMIN ====================
+# ==================== FITUR BROADCAST ADMIN (FIXED & OPTIMIZED) ====================
 @bot.message_handler(commands=['bc', 'broadcast'])
 def broadcast_message(message):
+    save_user(message.chat.id)
     pesan_bc = message.text.replace('/bc', '').replace('/broadcast', '').strip()
     if not pesan_bc:
         bot.reply_to(message, "⚠️ Format salah! Contoh: /bc Halo semua, ada promo script VIP baru nih!")
@@ -398,11 +350,18 @@ def broadcast_message(message):
     
     try:
         with open("users.txt", "r") as f:
-            users = f.read().splitlines()
+            users = [line.strip() for line in f.read().splitlines() if line.strip()]
     except FileNotFoundError:
-        bot.reply_to(message, "⚠️ Belum ada user yang tercatat di database.")
+        bot.reply_to(message, "⚠️ Belum ada user yang tercatat di database (users.txt kosong/tidak ditemukan).")
         return
         
+    if not users:
+        bot.reply_to(message, "⚠️ Database kosong, belum ada user yang berinteraksi dengan bot.")
+        return
+
+    # Hilangkan duplikat ID jika ada
+    users = list(set(users))
+    
     success = 0
     failed = 0
     
@@ -410,10 +369,12 @@ def broadcast_message(message):
         try:
             bot.send_message(chat_id, f"📢 PENGUMUMAN RESMI PAKEL MLBBSTORE\n\n{pesan_bc}")
             success += 1
-        except Exception:
+            time.sleep(0.05) # Jeda kecil untuk menghindari flood limit telegram
+        except Exception as e:
+            print(f"[BROADCAST FAIL TO {chat_id}]: {e}")
             failed += 1
             
-    bot.reply_to(message, f"✅ Broadcast Selesai!\n- Berhasil dikirim: {success} user\n- Gagal: {failed} user")
+    bot.reply_to(message, f"✅ Broadcast Selesai!\n- Berhasil dikirim: {success} user\n- Gagal/Diblokir: {failed} user")
 
 # ==================== HANDLER UTAMA BOT ====================
 @bot.message_handler(commands=['start', 'help'])
@@ -488,7 +449,6 @@ def callback_handler(call):
     message_id = call.message.message_id
     greeting = get_time_greeting()
 
-    # --- HANDLER AKSI TOMBOL /SC INTERAKTIF (8 PAKET LENGKAP) ---
     if call.data.startswith('sc_buy_'):
         try:
             data_split = call.data.split('|')
@@ -637,7 +597,6 @@ def callback_handler(call):
         bot.answer_callback_query(call.id)
 
     elif call.data.startswith('buy_'):
-        paket_tipe = call.data.replace('buy_', '')
         all_items = t['p1'] + t['p2']
         paket_nama = "VIP Package"
         for btn_txt, cb_val, _ in all_items:
@@ -714,8 +673,6 @@ def callback_handler(call):
 def handle_photo(message):
     save_user(message.chat.id)
     user = message.from_user
-    l = get_lang(user)
-    t = TRANSLATIONS[l]
     rs = random.randint(10000, 99999)
     
     WIB = timezone(timedelta(hours=7))
@@ -754,5 +711,5 @@ def auto_reply(message):
         
     bot.reply_to(message, res_msg, disable_web_page_preview=True)
 
-print("[INFO] Pakel MlbbStore VIP Edition (Full Interactive 8-Packages /sc) Berhasil Dijalankan...")
+print("[INFO] Pakel MlbbStore VIP Edition (Fixed Broadcast & /sc) Berhasil Dijalankan...")
 bot.infinity_polling()
