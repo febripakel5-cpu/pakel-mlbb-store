@@ -15,20 +15,6 @@ ADMIN_LINK = "https://t.me/PakelMlbbOfficial"
 GROUP_CHAT_ID = "@PakelMlbb"  # Username grup utama lu
 GROUP_TOPIC_ID = 368          # ID Topik khusus di dalam grup untuk auto-post testi
 
-# File penyimpan ID Admin otomatis
-ADMIN_FILE = "admin_id.txt"
-
-def get_admin_id():
-    try:
-        with open(ADMIN_FILE, "r") as f:
-            return int(f.read().strip())
-    except FileNotFoundError:
-        return 8772023108  # Default ID cadangan
-
-def save_admin_id(new_id):
-    with open(ADMIN_FILE, "w") as f:
-        f.write(str(new_id))
-
 # Informasi Nomor Pembayaran Resmi (Tanpa QRIS)
 INFO_DANA = "089526466512"
 INFO_GOPAY = "089526466512"
@@ -152,17 +138,6 @@ def generate_fake_testimonials_list():
         )
     return testi_output
 
-# ==================== KLAIM ADMIN OTOMATIS VIA CHAT PRIBADI ====================
-@bot.message_handler(commands=['admin', 'setadmin'])
-def claim_admin(message):
-    if message.chat.type != 'private':
-        bot.reply_to(message, "⚠️ Silakan kirim perintah /admin di **chat pribadi (DM)** bot agar ID Telegram lu terekam sebagai Admin utama!")
-        return
-    
-    user_id = message.from_user.id
-    save_admin_id(user_id)
-    bot.reply_to(message, f"✅ Sukses! Akun lu ({message.from_user.first_name}) telah resmi didaftarkan sebagai **Admin Utama Pakel MlbbStore** (ID: `{user_id}`). Sekarang lu bebas pakai perintah `/push` atau `/testi`!")
-
 # ==================== BACKGROUND WORKER (AUTO-POST 10 - 25 MENIT SEKALI) ====================
 def background_auto_poster():
     time.sleep(30)
@@ -186,14 +161,9 @@ def background_auto_poster():
 poster_thread = threading.Thread(target=background_auto_poster, daemon=True)
 poster_thread.start()
 
-# ==================== COMMAND KHUSUS ADMIN BUAT PUSH TESTI INSTAN ====================
+# ==================== COMMAND PUSH TESTI INSTAN (BEBAS DIAKSES DI GRUP) ====================
 @bot.message_handler(commands=['testi', 'push'])
 def admin_push_testi(message):
-    current_admin_id = get_admin_id()
-    if message.from_user.id != current_admin_id:
-        bot.reply_to(message, f"⚠️ Perintah ini khusus untuk Admin utama! (ID lu: `{message.from_user.id}`). Kirim `/admin` di chat pribadi bot dulu kalau belum terdaftar.")
-        return
-    
     try:
         post_text = generate_single_testimonial()
         bot.send_message(
@@ -319,11 +289,6 @@ def get_back_markup(l):
 # ==================== FITUR BROADCAST ADMIN ====================
 @bot.message_handler(commands=['bc', 'broadcast'])
 def broadcast_message(message):
-    current_admin_id = get_admin_id()
-    if message.from_user.id != current_admin_id:
-        bot.reply_to(message, "⚠️ Perintah ini khusus untuk Admin utama!")
-        return
-    
     pesan_bc = message.text.replace('/bc', '').replace('/broadcast', '').strip()
     if not pesan_bc:
         bot.reply_to(message, "⚠️ Format salah! Contoh: `/bc Halo semua, ada promo script VIP baru nih!`", parse_mode='Markdown')
@@ -620,13 +585,13 @@ def auto_reply(message):
     txt = message.text.lower()
     
     if any(w in txt for w in ['price', 'harga', 'list', 'menu', 'catalog', 'katalog']):
-        rep = "💎 Ketik /start untuk membuka Katalog VIP eksklusif Pakel MlbbStore!" if l == 'id' else "💎 Type /start to view the VIP Catalogue!"
+        res_msg = "💎 Ketik /start untuk membuka Katalog VIP eksklusif Pakel MlbbStore!" if l == 'id' else "💎 Type /start to view the VIP Catalogue!"
     elif any(w in txt for w in ['pay', 'bayar', 'dana', 'gopay', 'saweria', 'testi', 'testimoni']):
-        rep = "🌟 Cek menu /start untuk melihat Katalog VIP, Metode Pembayaran Lengkap, hingga Live Testimoni real-time pembeli!" if l == 'id' else "🌟 Type /start to view catalogue, payments, and live testimonials."
+        res_msg = "🌟 Cek menu /start untuk melihat Katalog VIP, Metode Pembayaran Lengkap, hingga Live Testimoni real-time pembeli!" if l == 'id' else "🌟 Type /start to view catalogue, payments, and live testimonials."
     else:
-        rep = f"Halo *{user.first_name}*! Silakan ketik /start untuk mengakses menu utama atau hubungi admin kami di [{ADMIN_USERNAME}]({ADMIN_LINK})." if l == 'id' else f"Hello *{user.first_name}*! Contact our admin at [{ADMIN_USERNAME}]({ADMIN_LINK})."
+        res_msg = f"Halo *{user.first_name}*! Silakan ketik /start untuk mengakses menu utama atau hubungi admin kami di [{ADMIN_USERNAME}]({ADMIN_LINK})." if l == 'id' else f"Hello *{user.first_name}*! Contact our admin at [{ADMIN_USERNAME}]({ADMIN_LINK})."
         
-    bot.reply_to(message, rep, parse_mode='Markdown', disable_web_page_preview=True)
+    bot.reply_to(message, res_msg, parse_mode='Markdown', disable_web_page_preview=True)
 
-print("[INFO] Pakel MlbbStore VIP Edition (Dynamic Admin Claim Enabled) Berhasil Dijalankan...")
+print("[INFO] Pakel MlbbStore VIP Edition (Public /testi & /push Command Enabled) Berhasil Dijalankan...")
 bot.infinity_polling()
