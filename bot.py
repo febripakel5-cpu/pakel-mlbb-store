@@ -16,13 +16,10 @@ ADMIN_LINK = "https://t.me/PakelMlbbOfficial"
 GROUP_CHAT_ID = "@PakelMlbb"  # Username grup utama lu
 GROUP_TOPIC_ID = 368          # ID Topik khusus di dalam grup untuk auto-post testi
 
-# Informasi Nomor Pembayaran Resmi (Atas Nama Lu)
+# Informasi Nomor Pembayaran Resmi (Tanpa QRIS)
 INFO_DANA = "089526466512"
 INFO_GOPAY = "089526466512"
 INFO_SAWERIA = "https://saweria.co/pakelmlbbstore"
-
-# Link URL Foto QRIS Bisnis Lu
-QRIS_IMAGE_URL = "https://ibb.co.com/Kxw4Nz51"
 
 # ==================== FUNGSI DATABASE USER & BROADCAST ====================
 def save_user(chat_id):
@@ -49,7 +46,7 @@ def get_time_greeting():
     else:
         return "Selamat Malam 🌙"
 
-# ==================== LIST NAMA TELEGRAM SENSOR BINTANG (SANGAT BANYAK) ====================
+# ==================== LIST NAMA TELEGRAM SENSOR BINTANG ====================
 def get_random_masked_name():
     list_nama_tele = [
         "@R_Zky***", "@Alvinn***", "@Dimas_***", "@RezaPrat***", 
@@ -61,22 +58,7 @@ def get_random_masked_name():
         "@Kevin_W***", "@Lukman_***", "@Maulana***", "@Naufal_***",
         "@Pratama***", "@Rafli_99***", "@Satria_***", "@Tegar_***",
         "@Vian_X***", "@Wahyu_***", "@YudaPrat***", "@Zaki_Mlf***",
-        "@Eka_Sltn***", "@Doni_Gmr***", "@Fikri_Dx***", "@Andi_99***",
-        "@Budi_St***", "@Coki_***", "@Dandi_***", "@Eko_Prast***",
-        "@Fandi_***", "@Guntur***", "@Hafiz_***", "@Imam_***",
-        "@Jefri_***", "@Kiki_***", "@Lutfi_***", "@Miko_***",
-        "@Nanda_***", "@Oky_***", "@Pandu_***", "@Qomar_***",
-        "@Rahmat***", "@Riki_***", "@Roni_***", "@Rudi_***",
-        "@Sandi_***", "@Toni_***", "@Udin_***", "@Vicky***",
-        "@Wahid***", "@Yadi_***", "@Zainal***", "@Adit_***",
-        "@Agus_***", "@Ahmad***", "@Akbar***", "@Alex_***",
-        "@Amri_***", "@Anang***", "@Angga***", "@Anton***",
-        "@Arya_***", "@Asep_***", "@Azka_***", "@Bagus***",
-        "@Basri***", "@Beni_***", "@Boy_***", "@Candra***",
-        "@Darma***", "@Dedi_***", "@Deny_***", "@Diki_***",
-        "@Egi_***", "@Eky_***", "@Fahri***", "@Fandi***",
-        "@Farhan***", "@Fauzi***", "@Febri***", "@Firman",
-        "@Fuat_***", "@Gani_***", "@Gerry***", "@Hadi_***"
+        "@Eka_Sltn***", "@Doni_Gmr***", "@Fikri_Dx***", "@Andi_99***"
     ]
     return random.choice(list_nama_tele)
 
@@ -94,7 +76,7 @@ def generate_single_testimonial():
     
     nama = get_random_masked_name()
     paket, harga = random.choice(list_paket)
-    menit_lalu = random.randint(2, 55)
+    menit_lalu = random.randint(2, 45)
     
     current_hour = datetime.now(timezone(timedelta(hours=7))).hour
     if 4 <= current_hour < 11:
@@ -133,7 +115,7 @@ def generate_fake_testimonials_list():
     for i in range(1, 6):
         nama = get_random_masked_name()
         paket, harga = random.choice(list_paket)
-        menit_lalu = random.randint(2, 55)
+        menit_lalu = random.randint(2, 45)
         testi_output += (
             f"✅ *{i}. Buyer ID:* `{nama}`\n"
             f"   • *Dibeli:* `{paket}` ({harga})\n"
@@ -142,17 +124,16 @@ def generate_fake_testimonials_list():
         )
     return testi_output
 
-# ==================== BACKGROUND WORKER (AUTO-POST KE TOPIK GRUP) ====================
+# ==================== BACKGROUND WORKER (AUTO-POST 10 - 25 MENIT SEKALI) ====================
 def background_auto_poster():
-    time.sleep(15)  # Tunggu bot siap
+    time.sleep(30)  # Tunggu bot siap
     while True:
         try:
-            # Jeda waktu acak antara 10 sampai 25 menit sekali secara otomatis
+            # Jeda waktu acak antara 600 detik (10 menit) sampai 1500 detik (25 menit)
             sleep_time = random.randint(600, 1500)
             time.sleep(sleep_time)
             
             post_text = generate_single_testimonial()
-            # Kirim pesan otomatis langsung masuk ke dalam Topik ID 368
             bot.send_message(
                 chat_id=GROUP_CHAT_ID, 
                 text=post_text, 
@@ -162,11 +143,31 @@ def background_auto_poster():
             )
         except Exception as e:
             print(f"[AUTO-POST ERROR]: {e}")
-            time.sleep(30)
+            time.sleep(60)
 
 # Jalankan background worker di thread terpisah
 poster_thread = threading.Thread(target=background_auto_poster, daemon=True)
 poster_thread.start()
+
+# ==================== COMMAND KHUSUS ADMIN BUAT PUSH TESTI INSTAN ====================
+@bot.message_handler(commands=['testi', 'push'])
+def admin_push_testi(message):
+    if message.from_user.id != ADMIN_TELEGRAM_ID:
+        bot.reply_to(message, "⚠️ Perintah ini khusus untuk Admin utama Pakel MlbbStore!")
+        return
+    
+    try:
+        post_text = generate_single_testimonial()
+        bot.send_message(
+            chat_id=GROUP_CHAT_ID, 
+            text=post_text, 
+            parse_mode='Markdown', 
+            message_thread_id=GROUP_TOPIC_ID, 
+            disable_web_page_preview=True
+        )
+        bot.reply_to(message, "✅ Berhasil! Testimoni real-time baru saja dikirim ke topik grup.")
+    except Exception as e:
+        bot.reply_to(message, f"⚠️ Gagal mengirim testimoni: {e}")
 
 # ==================== MASTER GLOBAL TRANSLATION ENGINE ====================
 TRANSLATIONS = {
@@ -221,15 +222,12 @@ TRANSLATIONS = {
         'prev_2': "◀️ Kembali ke Katalog Bagian 1",
         'inv_title': "🛒 *INVOICE PEMESANAN RESMI VIP* (Kak *{name}*) 🧾",
         'pay_info': (
-            "💳 *SILAKAN SCAN QRIS ATAU PILIH TRANSFER DI BAWAH INI:*\n\n"
-            "1️⃣ **QRIS NASIONAL (Instant Scan):**\n"
-            "   • Scan QRIS di atas\n"
-            "   • Merchant: **PakelMlbbStore** | NMID: `ID102655249321`\n\n"
-            "2️⃣ **TRANSFER DANA / GOPAY:**\n"
+            "💳 *SILAKAN PILIH METODE TRANSFER DI BAWAH INI:*\n\n"
+            "1️⃣ **TRANSFER DANA / GOPAY:**\n"
             f"   • **Nomor DANA:** `{INFO_DANA}`\n"
             f"   • **Nomor GoPay:** `{INFO_GOPAY}`\n\n"
-            "3️⃣ **SAWERIA (Dukungan Donasi / Kartu / E-Wallet):**\n"
-            f"   • Link Donasi/Bayar: {INFO_SAWERIA}\n"
+            "2️⃣ **SAWERIA (Support Kartu, QRIS, E-Wallet):**\n"
+            f"   • Link Pembayaran: {INFO_SAWERIA}\n"
         ),
         'confirm_instr': "🛡️ *INSTRUKSI KONFIRMASI PEMBAYARAN:*\nSetelah sukses melakukan pembayaran via metode apapun, silakan kirim **Screenshot Bukti Transfer** ke bot ini untuk mendapatkan Nomor Resi Unik Anda.",
     },
@@ -261,7 +259,7 @@ TRANSLATIONS = {
         'next_1': "▶️ Next: Catalog Part 2 (One Hit)",
         'prev_2': "◀️ Back to Catalog Part 1",
         'inv_title': "🛒 *AUTOMATED VIP ORDER INVOICE* ( *{name}*) 🧾",
-        'pay_info': "💳 *CHOOSE YOUR PAYMENT METHOD:*\n1. QRIS\n2. DANA / GoPay\n3. Saweria",
+        'pay_info': "💳 *CHOOSE YOUR PAYMENT METHOD:*\n1. DANA / GoPay\n2. Saweria",
         'confirm_instr': "🛡️ *CONFIRMATION INSTRUCTION:*\nAfter successful payment, send your **Transfer Proof Screenshot** to this bot.",
     }
 }
@@ -499,16 +497,8 @@ def callback_handler(call):
             pass
             
         markup_inv = get_back_markup(l)
-        
-        if QRIS_IMAGE_URL:
-            try:
-                bot.send_photo(chat_id, QRIS_IMAGE_URL, caption=invoice_text, parse_mode='Markdown', reply_markup=markup_inv)
-            except Exception:
-                bot.send_message(chat_id, invoice_text, parse_mode='Markdown', reply_markup=markup_inv, disable_web_page_preview=True)
-        else:
-            bot.send_message(chat_id, invoice_text, parse_mode='Markdown', reply_markup=markup_inv, disable_web_page_preview=True)
-            
-        bot.answer_callback_query(call.id, text="Invoice & Payment Options Generated!")
+        bot.send_message(chat_id, invoice_text, parse_mode='Markdown', reply_markup=markup_inv, disable_web_page_preview=True)
+        bot.answer_callback_query(call.id, text="Invoice Generated!")
 
     elif call.data == 'menu_cara_order':
         if l == 'id':
@@ -516,12 +506,12 @@ def callback_handler(call):
                 "❓ *PANDUAN CARA ORDER DI PAKEL MLBBSTORE*\n\n"
                 "1️⃣ Pilih paket script VIP impian Anda melalui menu *Katalog*.\n"
                 "2️⃣ Klik tombol beli pada paket yang diinginkan untuk mendapatkan *Nomor Resi Unik* & daftar metode pembayaran.\n"
-                "3️⃣ Lakukan pembayaran via metode pilihan Anda: **QRIS Nasional, DANA, GoPay, atau Saweria**.\n"
+                "3️⃣ Lakukan pembayaran via metode pilihan Anda: **DANA, GoPay, atau Saweria**.\n"
                 "4️⃣ Kirimkan screenshot bukti transfer beserta Nomor Resi ke bot ini atau langsung ke Admin utama.\n"
                 "5️⃣ Admin akan memverifikasi dan mengirimkan file script beserta panduan lengkapnya detik itu juga!"
             )
         else:
-            text = "❓ *HOW TO ORDER*\n1️⃣ Select package & click Buy.\n2️⃣ Choose payment (QRIS, DANA, GoPay, Saweria).\n3️⃣ Pay & send proof to admin."
+            text = "❓ *HOW TO ORDER*\n1️⃣ Select package & click Buy.\n2️⃣ Choose payment (DANA, GoPay, Saweria).\n3️⃣ Pay & send proof to admin."
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, parse_mode='Markdown', reply_markup=get_back_markup(l), disable_web_page_preview=True)
         bot.answer_callback_query(call.id)
 
@@ -530,18 +520,15 @@ def callback_handler(call):
             text = (
                 "💳 *METODE PEMBAYARAN LENGKAP PAKEL MLBBSTORE*\n\n"
                 "Bebas pilih metode pembayaran yang paling nyaman untuk Anda:\n\n"
-                "1️⃣ **QRIS NASIONAL (Instant Scan):**\n"
-                "   • Scan QRIS resmi toko kami\n"
-                "   • Merchant: **PakelMlbbStore** | NMID: `ID102655249321`\n\n"
-                "2️⃣ **TRANSFER DANA / GOPAY:**\n"
+                "1️⃣ **TRANSFER DANA / GOPAY:**\n"
                 f"   • **Nomor DANA:** `{INFO_DANA}`\n"
                 f"   • **Nomor GoPay:** `{INFO_GOPAY}`\n\n"
-                "3️⃣ **SAWERIA (Dukungan Donasi / Kartu / E-Wallet):**\n"
+                "2️⃣ **SAWERIA (Dukungan Donasi / Kartu / E-Wallet):**\n"
                 f"   • Link Pembayaran: {INFO_SAWERIA}\n\n"
                 "📌 *Catatan:* Silakan pilih paket di katalog lalu klik beli untuk memunculkan instruksi pembayaran lengkap, atau langsung hubungi [{ADMIN_USERNAME}]({ADMIN_LINK})."
             )
         else:
-            text = f"💳 *ALL PAYMENT METHODS*\n\n1. QRIS\n2. DANA / GoPay\n3. Saweria\n📌 Confirm to [{ADMIN_USERNAME}]({ADMIN_LINK})."
+            text = f"💳 *ALL PAYMENT METHODS*\n\n1. DANA / GoPay\n2. Saweria\n📌 Confirm to [{ADMIN_USERNAME}]({ADMIN_LINK})."
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, parse_mode='Markdown', reply_markup=get_back_markup(l), disable_web_page_preview=True)
         bot.answer_callback_query(call.id)
 
@@ -551,7 +538,7 @@ def callback_handler(call):
             text = (
                 f"✅ *KONFIRMASI PEMBAYARAN & KLAIM SCRIPT*\n\n"
                 f"Contoh Format Resi Anda: `PKL-MLBB-{rs}`\n\n"
-                f"Silakan kirim screenshot bukti transfer pembayaran Anda (baik dari QRIS, DANA, GoPay, maupun Saweria) ke chat ini atau langsung ke Admin untuk segera diproses."
+                f"Silakan kirim screenshot bukti transfer pembayaran Anda (baik dari DANA, GoPay, maupun Saweria) ke chat ini atau langsung ke Admin untuk segera diproses."
             )
         else:
             text = f"✅ *PAYMENT CONFIRMATION*\nExample Receipt: `PKL-MLBB-{rs}`\nSend transfer screenshot to admin."
@@ -574,7 +561,7 @@ def handle_photo(message):
     res = (
         f"✅ *BUKTI PEMBAYARAN BERHASIL DIUNGGAH!*\n"
         f"Terima kasih banyak Kak *{user.first_name}* atas kepercayaannya berbelanja di Pakel MlbbStore 🙏✨\n\n"
-        f"🛡️ *Nomor Resi Unik Anda:* `PKL-MLBB-{rs}`\n"
+        f"🛡️ *Nomor Resi Unik Your:* `PKL-MLBB-{rs}`\n"
         f"⏱️ *Waktu Transaksi:* {dt_str} - {tm_str}\n\n"
         f"📋 *SALIN FORMAT DI BAWAH INI DAN KIRIM KE ADMIN:*\n"
         f"```text\n"
@@ -595,12 +582,12 @@ def auto_reply(message):
     
     if any(w in txt for w in ['price', 'harga', 'list', 'menu', 'catalog', 'katalog']):
         rep = "💎 Ketik /start untuk membuka Katalog VIP eksklusif Pakel MlbbStore!" if l == 'id' else "💎 Type /start to view the VIP Catalogue!"
-    elif any(w in txt for w in ['pay', 'bayar', 'qris', 'dana', 'gopay', 'saweria', 'testi', 'testimoni']):
+    elif any(w in txt for w in ['pay', 'bayar', 'dana', 'gopay', 'saweria', 'testi', 'testimoni']):
         rep = "🌟 Cek menu /start untuk melihat Katalog VIP, Metode Pembayaran Lengkap, hingga Live Testimoni real-time pembeli!" if l == 'id' else "🌟 Type /start to view catalogue, payments, and live testimonials."
     else:
         rep = f"Halo *{user.first_name}*! Silakan ketik /start untuk mengakses menu utama atau hubungi admin kami di [{ADMIN_USERNAME}]({ADMIN_LINK})." if l == 'id' else f"Hello *{user.first_name}*! Contact our admin at [{ADMIN_USERNAME}]({ADMIN_LINK})."
         
     bot.reply_to(message, rep, parse_mode='Markdown', disable_web_page_preview=True)
 
-print("[INFO] Bot Pakel MlbbStore VIP Edition (Full Catalog & Massive Masked Names) Berhasil Dijalankan...")
+print("[INFO] Pakel MlbbStore VIP Edition (Natural Auto-Post 10-25 Mins + Admin /testi) Berhasil Dijalankan...")
 bot.infinity_polling()
