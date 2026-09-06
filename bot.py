@@ -48,7 +48,6 @@ def get_time_greeting():
 # ==================== LIST NAMA TELEGRAM SENSOR BINTANG ====================
 def get_random_masked_name():
     list_nama_tele = [
-        # --- KELOMPOK 1: UNDERSCORE & ANGKA HOKI ---
         "@R_Zky***", "@Alvinn_***", "@Dimas_99***", "@RezaPrat_***", 
         "@Bayu_Official***", "@Farel_X***", "@Yoga_Mlg***", "@DickyGez_***", 
         "@SuryaPratama***", "@RamaWicak***", "@Gilang_ID***", "@BagasKusn***",
@@ -74,8 +73,6 @@ def get_random_masked_name():
         "@Egi***", "@Eky***", "@Fahri***", "@Fandi***",
         "@Farhan***", "@Fauzi***", "@Febri***", "@Firman",
         "@Fuat***", "@Gani***", "@Gerry***", "@Hadi***",
-
-        # --- KELOMPOK 2: KOMBINASI TITIK & HURUF KAPITAL ---
         "@R.Zky***", "@Alvin.ID***", "@Dimas.Xyz***", "@Reza.Gaming***",
         "@Bayu.Pratama***", "@Farel.Official***", "@Yoga.Ganz***", "@Dicky.Dev***",
         "@Surya.ID***", "@Rama.ID***", "@Gilang.Mlg***", "@Bagas.X***",
@@ -85,66 +82,13 @@ def get_random_masked_name():
         "@Kevin.Bagas***", "@Lukman.Rizky***", "@Maulana.Dwi***", "@Naufal.Akbar***",
         "@Pratama.Putra***", "@Rafli.Maulana***", "@Satria.angga***", "@Tegar.Aditya***",
         "@Vian.Saputra***", "@Wahyu.Hidayat***", "@Yuda.Kurniawan***", "@Zaki.Mubarok***",
-        "@Eka.Yulianto***", "@Doni.Setiawan***", "@Fikri.Haikal***", "@Andi.Firmansyah***",
-        "@Budi.Hartono***", "@Coki.Siregar***", "@Dandi.Kusuma***", "@Eko.Purnomo***",
-        "@Fandi.Ahmad***", "@Guntur.Wicaksono***", "@Hafiz.Alatas***", "@Imam.Bonjol***",
-        "@Jefri.Nichol***", "@Kiki.Amalia***", "@Lutfi.Agung***", "@Miko.Tan***",
-        "@Nanda.Persada***", "@Oky.Jelly***", "@Pandu.Dewanata***", "@Qomar.Ben***",
-        "@Rahmat.Hidayat***", "@Riki.Martadinata***", "@Roni.Irawan***", "@Rudi.Tabuti***",
-        "@Sandi.Prakoso***", "@Toni.Montana***", "@Udin.Sedunia***", "@Vicky.Nitinegoro***",
-        "@Wahid.Hasyim***", "@Yadi.Mulyadi***", "@Zainal.Abidin***", "@Adit.Syafa***",
-        "@Agus.Salim***", "@Ahmad.Dhani***", "@Akbar.Tanjung***", "@Alex.Gozali***",
-        "@Amri.Tahir***", "@Anang.Hermansyah***", "@Angga.Purwa***", "@Anton.Medan***",
-        "@Arya.Veda***", "@Asep.Sunandar***", "@Azka.Corbuzier***", "@Bagus.Kahfi***",
-        "@Basri.Syam***", "@Beni.Mulya***", "@Boy.William***", "@Candra.Wijaya***",
-        "@Darma.Suteja***", "@Dedi.Mulyadi***", "@Deny.Sumargo***", "@Diki.Candra***",
-        "@Egi.Fauzi***", "@Eky.Pratama***", "@Fahri.Hamzah***", "@Fandi.Chow***",
-        "@Farhan.Basalamah***", "@Fauzi.Baadila***", "@Febri.Hariyadi***", "@Firman.Utina***",
-        "@Fuat.Bachtiar***", "@Gani.Djemat***", "@Gerry.Isak***", "@Hadi.Tjahjanto***",
-
-        # --- KELOMPOK 3: NAMA ASLI & AKUN PRIBADI MURNI ---
         "@Rizal_Ganz***", "@Maulana_ID***", "@Fikri_Ramadhan***", "@Ilham_Saputra***",
         "@Rezky_Pratama***", "@Rizky_Maulana***", "@Fauzan_Azima***", "@Zidan_Alfarizi***",
         "@Rafi_Ahmad***", "@Zaki_Mubarok***", "@Fathan_Haikal***", "@Rifki_Ananda***",
         "@Aditya_Pratama***", "@Bayu_Pamungkas***", "@Yoga_Prasetyo***", "@Dimas_Mahendra***",
-        "@Fajar_Sidik***", "@Galih_Prakoso***", "@Iqbal_Ramadhan***", "@Joko_Susilo***",
-        "@Kevin_Sanjaya***", "@Lukman_Hakim***", "@Naufal_Abqari***", "@Rafli_Awwal***",
-        "@Satria_Madura***", "@Tegar_Prakasa***", "@Vian_Saputra***", "@Wahyu_Kurniawan***",
-        "@Yuda_Pratama***", "@Eka_Saputra***", "@Doni_Aryanto***", "@Andi_Firmansyah***",
-        "@Budi_Santoso***", "@Coki_Pardede***", "@Dandi_Kusuma***", "@Eko_Wahyudi***",
-        "@Fandi_Ahmad***", "@Guntur_Wicaksono***", "@Hafiz_Alatas***", "@Imam_Syafiq***",
-        "@Jefri_Albuchori***", "@Kiki_Faris***", "@Lutfi_Agung***", "@Miko_Santoso***",
-        "@Nanda_Persada***", "@Oky_Prabowo***", "@Pandu_Dewanata***", "@Qomar_Bahar***",
-        "@Rahmat_Hidayat***", "@Riki_Martadinata***", "@Roni_Irawan***", "@Rudi_Tabuti***",
-        "@Sandi_Prakoso***", "@Toni_Montana***", "@Udin_Petot***", "@Vicky_Nitinegoro***",
-        "@Wahid_Hasyim***", "@Yadi_Mulyadi***", "@Zainal_Abidin***", "@Adit_Syafa***",
-
-        # --- KELOMPOK 4: KOMBINASI ANGKA ACAK & TAHUN ---
         "@R_Zky2026***", "@Alvinn123***", "@Dimas777***", "@Reza888***", 
         "@Bayu555***", "@Farel444***", "@Yoga333***", "@Dicky222***", 
-        "@Surya111***", "@Rama999***", "@Gilang000***", "@Bagas777***",
-        "@Arif666***", "@Dani555***", "@Hendra444***", "@Rian333***",
-        "@Aldi222***", "@Bintang111***", "@Candra000***", "@Dika888***",
-        "@Fajar777***", "@Galih666***", "@Iqbal555***", "@Joko444***",
-        "@Kevin333***", "@Lukman222***", "@Maulana111***", "@Naufal000***",
-        "@Pratama123***", "@Rafli456***", "@Satria789***", "@Tegar321***",
-        "@Vian654***", "@Wahyu987***", "@Yuda135***", "@Zaki246***",
-        "@Eka357***", "@Doni468***", "@Fikri579***", "@Andi802***",
-        "@Budi913***", "@Coki741***", "@Dandi852***", "@Eko963***",
-        "@Fandi159***", "@Guntur263***", "@Hafiz374***", "@Imam485***",
-        "@Jefri596***", "@Kiki607***", "@Lutfi718***", "@Miko829***",
-        "@Nanda930***", "@Oky142***", "@Pandu253***", "@Qomar364***",
-        "@Rahmat475***", "@Riki586***", "@Roni697***", "@Rudi708***",
-        "@Sandi819***", "@Toni920***", "@Udin134***", "@Vicky245***",
-        "@Wahid356***", "@Yadi467***", "@Zainal578***", "@Adit689***",
-        "@Agus790***", "@Ahmad801***", "@Akbar912***", "@Alex123***",
-        "@Amri234***", "@Anang345***", "@Angga456***", "@Anton567***",
-        "@Arya678***", "@Asep789***", "@Azka890***", "@Bagus135***",
-        "@Basri246***", "@Beni357***", "@Boy468***", "@Candra579***",
-        "@Darma680***", "@Dedi791***", "@Deny802***", "@Diki913***",
-        "@Egi124***", "@Eky235***", "@Fahri346***", "@Fandi457***",
-        "@Farhan568***", "@Fauzi679***", "@Febri780***", "@Firman891***",
-        "@Fuat902***", "@Gani123***", "@Gerry234***", "@Hadi345***"
+        "@Surya111***", "@Rama999***", "@Gilang000***", "@Bagas777***"
     ]
     return random.choice(list_nama_tele)
 
@@ -248,38 +192,171 @@ def admin_push_testi(message):
     except Exception as e:
         bot.reply_to(message, f"⚠️ Gagal mengirim testimoni: {e}")
 
-# ==================== FITUR INTERAKTIF MANUAL /SC (8 PAKET LENGKAP) ====================
-@bot.message_handler(commands=['sc'])
-def cmd_sc_interactive(message):
-    args = message.text.replace('/sc', '').strip()
+# ==================== ROBLOX-STYLE ADMIN PANEL ENGINE (/sc ATAU /panel) ====================
+# Temporary memory buat nyimpen pilihan paket admin per session
+admin_panel_sessions = {}
+
+@bot.message_handler(commands=['sc', 'panel'])
+def cmd_roblox_admin_panel(message):
+    args = message.text.replace('/sc', '').replace('/panel', '').strip()
     if not args:
         bot.reply_to(message, "⚠️ Format salah! Gunakan format:\nContoh: /sc @UsernamePembeli")
         return
     
     target_buyer = args if args.startswith('@') else f"@{args}"
+    chat_id = message.chat.id
+    
+    # Simpan status awal sesi panel admin (Belum pilih paket)
+    admin_panel_sessions[chat_id] = {
+        'buyer': target_buyer,
+        'package': None,
+        'price': None,
+        'key': None
+    }
+    
+    render_roblox_panel(message.chat.id, message.message_id, is_new=True)
+
+def render_roblox_panel(chat_id, message_id, is_new=False):
+    session = admin_panel_sessions.get(chat_id, {'buyer': '@Customer', 'package': 'Belum Dipilih', 'price': '-'})
+    
+    buyer = session['buyer']
+    pkg = session['package'] if session['package'] else "❌ Belum Dipilih (Silakan Klik di Bawah)"
+    prc = session['price'] if session['price'] else "-"
+    
+    # Layout Frame Roblox Studio (Text Box Screen)
+    panel_text = (
+        "🖥️ ━━━━━━━━━━━━━━━━━━━━━ 🖥️\n"
+        "     <b>[ PAKEL ROBLOX ADMIN STUDIO ]</b>\n"
+        "🖥️ ━━━━━━━━━━━━━━━━━━━━━ 🖥️\n\n"
+        f"👤 <b>Target Buyer :</b> <code>{buyer}</code>\n"
+        f"📦 <b>Selected Item:</b> <b>{pkg}</b>\n"
+        f"💵 <b>Price Value  :</b> <code>{prc}</code>\n"
+        f"⚙️ <b>Panel Status :</b> <code>READY TO DISPATCH</code>\n\n"
+        "👇 <i>Gunakan Scrolling Frame di bawah untuk memilih paket, lalu tekan tombol Kirim:</i>"
+    )
     
     markup = types.InlineKeyboardMarkup(row_width=1)
-    packages = [
-        ("💎 Natural Balance (30 Hari)", "sc_buy_natural"),
-        ("⚡ Light VIP + Drone (30 Hari)", "sc_buy_light"),
-        ("🛡️ Semi-Safe 14 Hari", "sc_buy_semisafe"),
-        ("👑 Lifetime Safe Permanent", "sc_buy_lifetimesafe"),
-        ("💥 Sultan One Hit 100% (30 Hari)", "sc_buy_sultan"),
-        ("⚡ VIP Pro One Hit 80% (30 Hari)", "sc_buy_pro"),
-        ("🔒 Semi-Private 14 Hari", "sc_buy_semiprivate"),
-        ("🏆 Permanent Legend (Lifetime)", "sc_buy_permanent")
+    
+    # 8 Pilihan Paket (Scrolling Frame Simulation Buttons)
+    packages_btn = [
+        ("💎 Natural Balance (30 Hari) [120k]", "rbx_pkg|natural|Natural Balance (30 Hari)|Rp 120.000"),
+        ("⚡ Light VIP + Drone (30 Hari) [95k]", "rbx_pkg|light|Light VIP + Drone (30 Hari)|Rp 95.000"),
+        ("🛡️ Semi-Safe 14 Hari [75k]", "rbx_pkg|semisafe|Semi-Safe 14 Hari|Rp 75.000"),
+        ("👑 Lifetime Safe Permanent [200k]", "rbx_pkg|lifetimesafe|Lifetime Safe Permanent|Rp 200.000"),
+        ("💥 Sultan One Hit 100% (30 Hari) [150k]", "rbx_pkg|sultan|Sultan One Hit 100% (30 Hari)|Rp 150.000"),
+        ("⚡ VIP Pro One Hit 80% (30 Hari) [100k]", "rbx_pkg|pro|VIP Pro One Hit 80% (30 Hari)|Rp 100.000"),
+        ("🔒 Semi-Private 14 Hari [75k]", "rbx_pkg|semiprivate|Semi-Private 14 Hari|Rp 75.000"),
+        ("🏆 Permanent Legend (Lifetime) [250k]", "rbx_pkg|permanent|Permanent Legend (Lifetime)|Rp 250.000")
     ]
     
-    for btn_text, cb_data in packages:
-        markup.add(types.InlineKeyboardButton(btn_text, callback_data=f"{cb_data}|{target_buyer}"))
-    
-    bot.reply_to(
-        message, 
-        f"🎯 Target Pembeli: <b>{target_buyer}</b>\n👇 Silakan pilih paket script yang dibeli:", 
-        reply_markup=markup, 
-        parse_mode="HTML"
+    for text_b, cb_b in packages_btn:
+        # Cek centang jika paket ini sedang dipilih
+        active_mark = " ✅" if session['key'] in cb_b else ""
+        markup.add(types.InlineKeyboardButton(text_b + active_mark, callback_data=cb_b))
+        
+    # Tombol Aksi di Baris Bawah (Action Buttons Layout)
+    markup.row(
+        types.InlineKeyboardButton("🚀 Kirim Testi / Done", callback_data="rbx_action|send"),
+        types.InlineKeyboardButton("🔄 Reset", callback_data="rbx_action|reset")
     )
+    
+    if is_new:
+        bot.send_message(chat_id, panel_text, reply_markup=markup, parse_mode="HTML")
+    else:
+        try:
+            bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=panel_text, reply_markup=markup, parse_mode="HTML")
+        except Exception:
+            pass
 
+@bot.callback_query_handler(func=lambda call: call.data.startswith('rbx_'))
+def callback_roblox_panel(call):
+    chat_id = call.message.chat.id
+    message_id = call.message.message_id
+    
+    if chat_id not in admin_panel_sessions:
+        admin_panel_sessions[chat_id] = {'buyer': '@Customer', 'package': None, 'price': None, 'key': None}
+        
+    data_split = call.data.split('|')
+    action_type = data_split[0]
+    
+    if action_type == 'rbx_pkg':
+        pkg_key = data_split[1]
+        pkg_name = data_split[2]
+        pkg_price = data_split[3]
+        
+        admin_panel_sessions[chat_id]['key'] = pkg_key
+        admin_panel_sessions[chat_id]['package'] = pkg_name
+        admin_panel_sessions[chat_id]['price'] = pkg_price
+        
+        render_roblox_panel(chat_id, message_id, is_new=False)
+        bot.answer_callback_query(call.id, text=f"Dipilih: {pkg_name}")
+        
+    elif action_type == 'rbx_action':
+        sub_action = data_split[1]
+        
+        if sub_action == 'reset':
+            admin_panel_sessions[chat_id]['package'] = None
+            admin_panel_sessions[chat_id]['price'] = None
+            admin_panel_sessions[chat_id]['key'] = None
+            render_roblox_panel(chat_id, message_id, is_new=False)
+            bot.answer_callback_query(call.id, text="Panel direset!")
+            
+        elif sub_action == 'send':
+            session = admin_panel_sessions[chat_id]
+            if not session['package']:
+                bot.answer_callback_query(call.id, text="⚠️ Pilih dulu paket script-nya di scrolling frame!", show_alert=True)
+                return
+                
+            buyer_name = session['buyer']
+            paket_nama = session['package']
+            harga = session['price']
+            menit_lalu = random.randint(1, 5)
+            
+            current_hour = datetime.now(timezone(timedelta(hours=7))).hour
+            if 4 <= current_hour < 11:
+                waktu_ket = "pagi ini"
+            elif 11 <= current_hour < 15:
+                waktu_ket = "siang ini"
+            elif 15 <= current_hour < 18:
+                waktu_ket = "sore ini"
+            else:
+                waktu_ket = "malam ini"
+                
+            post_text = (
+                "🚨 REAL-TIME TRANSACTION REPORT 🚨\n\n"
+                f"✅ Buyer ID: {buyer_name}\n"
+                f"📦 Item Purchased: {paket_nama}\n"
+                f"💵 Price: {harga}\n"
+                f"⏱️ Time: {menit_lalu} menit yang lalu ({waktu_ket})\n"
+                f"🔒 Status: SUCCESS & SCRIPT DELIVERED\n\n"
+                "🔥 Terima kasih telah berbelanja di Official Pakel MlbbStore! Aman, lancar, & anti-detect. Mau order juga? Langsung sikat ke bot ya! 👇\n"
+                f"🤖 Bot Store: @{bot.get_me().username}"
+            )
+            
+            # Tembak langsung ke grup target topik ID 368
+            bot.send_message(
+                chat_id=GROUP_CHAT_ID, 
+                text=post_text, 
+                message_thread_id=GROUP_TOPIC_ID, 
+                disable_web_page_preview=True
+            )
+            
+            # Update panel jadi status sukses
+            bot.edit_message_text(
+                chat_id=chat_id,
+                message_id=message_id,
+                text=(
+                    "🖥️ ━━━━━━━━━━━━━━━━━━━━━ 🖥️\n"
+                    "     <b>[ ROBLOX PANEL: SUCCESS ]</b>\n"
+                    "🖥️ ━━━━━━━━━━━━━━━━━━━━━ 🖥️\n\n"
+                    f"✅ <b>BERHASIL DIKIRIM KE GRUP!</b>\n"
+                    f"• Pembeli: <code>{buyer_name}</code>\n"
+                    f"• Paket: <b>{paket_nama}</b>\n"
+                    f"• Harga: <code>{harga}</code>"
+                ),
+                parse_mode="HTML"
+            )
+            bot.answer_callback_query(call.id, text="Testimoni sukses dikirim ke grup!")
 # ==================== MASTER GLOBAL TRANSLATION ENGINE ====================
 TRANSLATIONS = {
     'id': {
@@ -488,65 +565,6 @@ def callback_handler(call):
     message_id = call.message.message_id
     greeting = get_time_greeting()
 
-    # --- HANDLER AKSI TOMBOL /SC INTERAKTIF (8 PAKET LENGKAP) ---
-    if call.data.startswith('sc_buy_'):
-        try:
-            data_split = call.data.split('|')
-            action = data_split[0]
-            buyer_name = data_split[1]
-            
-            paket_map = {
-                'sc_buy_natural': ("Natural Balance (30 Hari)", "Rp 120.000"),
-                'sc_buy_light': ("Light VIP + Drone (30 Hari)", "Rp 95.000"),
-                'sc_buy_semisafe': ("Semi-Safe 14 Hari", "Rp 75.000"),
-                'sc_buy_lifetimesafe': ("Lifetime Safe Permanent", "Rp 200.000"),
-                'sc_buy_sultan': ("Sultan One Hit 100% (30 Hari)", "Rp 150.000"),
-                'sc_buy_pro': ("VIP Pro One Hit 80% (30 Hari)", "Rp 100.000"),
-                'sc_buy_semiprivate': ("Semi-Private 14 Hari", "Rp 75.000"),
-                'sc_buy_permanent': ("Permanent Legend (Lifetime)", "Rp 250.000")
-            }
-            
-            paket_nama, harga = paket_map.get(action, ("VIP Package", "Rp 100.000"))
-            menit_lalu = random.randint(1, 5)
-            
-            current_hour = datetime.now(timezone(timedelta(hours=7))).hour
-            if 4 <= current_hour < 11:
-                waktu_ket = "pagi ini"
-            elif 11 <= current_hour < 15:
-                waktu_ket = "siang ini"
-            elif 15 <= current_hour < 18:
-                waktu_ket = "sore ini"
-            else:
-                waktu_ket = "malam ini"
-                
-            post_text = (
-                "🚨 REAL-TIME TRANSACTION REPORT 🚨\n\n"
-                f"✅ Buyer ID: {buyer_name}\n"
-                f"📦 Item Purchased: {paket_nama}\n"
-                f"💵 Price: {harga}\n"
-                f"⏱️ Time: {menit_lalu} menit yang lalu ({waktu_ket})\n"
-                f"🔒 Status: SUCCESS & SCRIPT DELIVERED\n\n"
-                "🔥 Terima kasih telah berbelanja di Official Pakel MlbbStore! Aman, lancar, & anti-detect. Mau order juga? Langsung sikat ke bot ya! 👇\n"
-                f"🤖 Bot Store: @{bot.get_me().username}"
-            )
-            
-            bot.send_message(
-                chat_id=GROUP_CHAT_ID, 
-                text=post_text, 
-                message_thread_id=GROUP_TOPIC_ID, 
-                disable_web_page_preview=True
-            )
-            
-            bot.edit_message_text(
-                chat_id=chat_id,
-                message_id=message_id,
-                text=f"✅ **BERHASIL DIKIRIM KE GRUP!**\n\n• Pembeli: {buyer_name}\n• Paket: {paket_nama} ({harga})"
-            )
-            bot.answer_callback_query(call.id, text="Testimoni sukses terkirim ke grup!")
-        except Exception as e:
-            bot.answer_callback_query(call.id, text=f"Gagal: {e}", show_alert=True)
-        return
-
     if call.data == 'menu_utama':
         markup = types.InlineKeyboardMarkup(row_width=1)
         markup.add(
@@ -637,7 +655,6 @@ def callback_handler(call):
         bot.answer_callback_query(call.id)
 
     elif call.data.startswith('buy_'):
-        paket_tipe = call.data.replace('buy_', '')
         all_items = t['p1'] + t['p2']
         paket_nama = "VIP Package"
         for btn_txt, cb_val, _ in all_items:
@@ -715,7 +732,6 @@ def handle_photo(message):
     save_user(message.chat.id)
     user = message.from_user
     l = get_lang(user)
-    t = TRANSLATIONS[l]
     rs = random.randint(10000, 99999)
     
     WIB = timezone(timedelta(hours=7))
@@ -754,5 +770,5 @@ def auto_reply(message):
         
     bot.reply_to(message, res_msg, disable_web_page_preview=True)
 
-print("[INFO] Pakel MlbbStore VIP Edition (Full Interactive 8-Packages /sc) Berhasil Dijalankan...")
+print("[INFO] Pakel MlbbStore Roblox Studio Panel Edition Berhasil Dijalankan...")
 bot.infinity_polling()
