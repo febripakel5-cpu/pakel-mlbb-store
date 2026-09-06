@@ -147,7 +147,6 @@ def get_random_masked_name():
         "@Fuat902***", "@Gani123***", "@Gerry234***", "@Hadi345***"
     ]
     return random.choice(list_nama_tele)
-
 # ==================== GENERATOR TESTIMONI LIVE ====================
 def generate_single_testimonial():
     list_paket = [
@@ -618,7 +617,6 @@ def callback_handler(call):
             text = f"✅ PAYMENT CONFIRMATION\nExample Receipt: PKL-MLBB-{rs}\nSend transfer screenshot to admin."
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, reply_markup=get_back_markup(l), disable_web_page_preview=True)
         bot.answer_callback_query(call.id)
-
 @bot.message_handler(content_types=['photo'])
 def handle_photo(message):
     save_user(message.chat.id)
