@@ -9,17 +9,20 @@ from datetime import datetime, timezone, timedelta
 TOKEN = '8637403539:AAFyKck7U8POV3hzSw9UcF_sDDp0d_hKat0'
 bot = telebot.TeleBot(TOKEN)
 
-# Identitas Admin, Toko Resmi, & Link Grup Beserta Topik Khusus Testimoni
+# Identitas Admin, Toko Resmi, & Link Grup Beserta ID Topik Khusus Testimoni
 ADMIN_TELEGRAM_ID = 8772023108
 ADMIN_USERNAME = "@PakelMlbbOfficial"
 ADMIN_LINK = "https://t.me/PakelMlbbOfficial"
 GROUP_CHAT_ID = "@PakelMlbb"  # Username grup utama lu
-GROUP_TOPIC_ID = 368          # ID Topik khusus untuk auto-post testimoni
+GROUP_TOPIC_ID = 368          # ID Topik khusus di dalam grup untuk auto-post testi
 
 # Informasi Nomor Pembayaran Resmi (Atas Nama Lu)
 INFO_DANA = "089526466512"
 INFO_GOPAY = "089526466512"
 INFO_SAWERIA = "https://saweria.co/pakelmlbbstore"
+
+# Link URL Foto QRIS Bisnis Lu
+QRIS_IMAGE_URL = "https://ibb.co.com/Kxw4Nz51"
 
 # ==================== FUNGSI DATABASE USER & BROADCAST ====================
 def save_user(chat_id):
@@ -46,15 +49,39 @@ def get_time_greeting():
     else:
         return "Selamat Malam 🌙"
 
-# ==================== GENERATOR TESTIMONI LIVE RANDOM ====================
-def generate_single_testimonial():
-    list_nama = [
+# ==================== LIST NAMA TELEGRAM SENSOR BINTANG (SANGAT BANYAK) ====================
+def get_random_masked_name():
+    list_nama_tele = [
         "@R_Zky***", "@Alvinn***", "@Dimas_***", "@RezaPrat***", 
         "@Bayu_99***", "@Farel_***", "@YogaMlg***", "@DickyGez***", 
         "@Surya_***", "@RamaWic***", "@Gilang***", "@BagasKus***",
         "@Arif_W***", "@DaniPrat***", "@Hendra_***", "@Rian_Xyz***",
-        "@Aldi_07***", "@Bintang***", "@Candra_***", "@DikaPras***"
+        "@Aldi_07***", "@Bintang***", "@Candra_***", "@DikaPras***",
+        "@Fajar_01***", "@Galih_***", "@Iqbal_M***", "@JokoPras***",
+        "@Kevin_W***", "@Lukman_***", "@Maulana***", "@Naufal_***",
+        "@Pratama***", "@Rafli_99***", "@Satria_***", "@Tegar_***",
+        "@Vian_X***", "@Wahyu_***", "@YudaPrat***", "@Zaki_Mlf***",
+        "@Eka_Sltn***", "@Doni_Gmr***", "@Fikri_Dx***", "@Andi_99***",
+        "@Budi_St***", "@Coki_***", "@Dandi_***", "@Eko_Prast***",
+        "@Fandi_***", "@Guntur***", "@Hafiz_***", "@Imam_***",
+        "@Jefri_***", "@Kiki_***", "@Lutfi_***", "@Miko_***",
+        "@Nanda_***", "@Oky_***", "@Pandu_***", "@Qomar_***",
+        "@Rahmat***", "@Riki_***", "@Roni_***", "@Rudi_***",
+        "@Sandi_***", "@Toni_***", "@Udin_***", "@Vicky***",
+        "@Wahid***", "@Yadi_***", "@Zainal***", "@Adit_***",
+        "@Agus_***", "@Ahmad***", "@Akbar***", "@Alex_***",
+        "@Amri_***", "@Anang***", "@Angga***", "@Anton***",
+        "@Arya_***", "@Asep_***", "@Azka_***", "@Bagus***",
+        "@Basri***", "@Beni_***", "@Boy_***", "@Candra***",
+        "@Darma***", "@Dedi_***", "@Deny_***", "@Diki_***",
+        "@Egi_***", "@Eky_***", "@Fahri***", "@Fandi***",
+        "@Farhan***", "@Fauzi***", "@Febri***", "@Firman",
+        "@Fuat_***", "@Gani_***", "@Gerry***", "@Hadi_***"
     ]
+    return random.choice(list_nama_tele)
+
+# ==================== GENERATOR TESTIMONI LIVE ====================
+def generate_single_testimonial():
     list_paket = [
         ("Natural Balance (30 Hari)", "Rp 120.000"),
         ("Light VIP + Drone (30 Hari)", "Rp 95.000"),
@@ -65,9 +92,9 @@ def generate_single_testimonial():
         ("Permanent Legend", "Rp 250.000")
     ]
     
-    nama = random.choice(list_nama)
+    nama = get_random_masked_name()
     paket, harga = random.choice(list_paket)
-    menit_lalu = random.randint(2, 45)
+    menit_lalu = random.randint(2, 55)
     
     current_hour = datetime.now(timezone(timedelta(hours=7))).hour
     if 4 <= current_hour < 11:
@@ -92,12 +119,6 @@ def generate_single_testimonial():
     return text
 
 def generate_fake_testimonials_list():
-    list_nama = [
-        "@R_Zky***", "@Alvinn***", "@Dimas_***", "@RezaPrat***", 
-        "@Bayu_99***", "@Farel_***", "@YogaMlg***", "@DickyGez***", 
-        "@Surya_***", "@RamaWic***", "@Gilang***", "@BagasKus***",
-        "@Aldi_07***", "@Bintang***", "@Candra_***", "@DikaPras***"
-    ]
     list_paket = [
         ("Natural Balance", "Rp 120.000"),
         ("Light VIP + Drone", "Rp 95.000"),
@@ -108,13 +129,13 @@ def generate_fake_testimonials_list():
         ("Permanent Legend", "Rp 250.000")
     ]
     
-    selected = random.sample(list_nama, 5)
     testi_output = ""
-    for i, nama in enumerate(selected):
+    for i in range(1, 6):
+        nama = get_random_masked_name()
         paket, harga = random.choice(list_paket)
-        menit_lalu = random.randint(2, 50)
+        menit_lalu = random.randint(2, 55)
         testi_output += (
-            f"✅ *{i+1}. Buyer ID:* `{nama}`\n"
+            f"✅ *{i}. Buyer ID:* `{nama}`\n"
             f"   • *Dibeli:* `{paket}` ({harga})\n"
             f"   • *Status:* `LUNAS & SCRIPT TERKIRIM`\n"
             f"   • *Waktu:* `{menit_lalu} menit yang lalu`\n\n"
@@ -126,12 +147,12 @@ def background_auto_poster():
     time.sleep(15)  # Tunggu bot siap
     while True:
         try:
-            # Jeda waktu acak antara 10 sampai 25 menit sekali biar natural & tidak dicurigai bot spam
+            # Jeda waktu acak antara 10 sampai 25 menit sekali secara otomatis
             sleep_time = random.randint(600, 1500)
             time.sleep(sleep_time)
             
             post_text = generate_single_testimonial()
-            # Mengirim pesan otomatis langsung ke Topik Khusus (message_thread_id=368)
+            # Kirim pesan otomatis langsung masuk ke dalam Topik ID 368
             bot.send_message(
                 chat_id=GROUP_CHAT_ID, 
                 text=post_text, 
@@ -141,7 +162,7 @@ def background_auto_poster():
             )
         except Exception as e:
             print(f"[AUTO-POST ERROR]: {e}")
-            time.sleep(60)
+            time.sleep(30)
 
 # Jalankan background worker di thread terpisah
 poster_thread = threading.Thread(target=background_auto_poster, daemon=True)
@@ -200,14 +221,14 @@ TRANSLATIONS = {
         'prev_2': "◀️ Kembali ke Katalog Bagian 1",
         'inv_title': "🛒 *INVOICE PEMESANAN RESMI VIP* (Kak *{name}*) 🧾",
         'pay_info': (
-            "💳 *SILAKAN PILIH SALAH SATU METODE PEMBAYARAN DI BAWAH INI:*\n\n"
-            "1️⃣ **QRIS NASIONAL (Instant & All Payment):**\n"
-            "   • Scan QRIS di gambar sebelumnya (Support DANA, OVO, GoPay, BCA, Mandiri, ShopeePay, dll)\n"
+            "💳 *SILAKAN SCAN QRIS ATAU PILIH TRANSFER DI BAWAH INI:*\n\n"
+            "1️⃣ **QRIS NASIONAL (Instant Scan):**\n"
+            "   • Scan QRIS di atas\n"
             "   • Merchant: **PakelMlbbStore** | NMID: `ID102655249321`\n\n"
             "2️⃣ **TRANSFER DANA / GOPAY:**\n"
             f"   • **Nomor DANA:** `{INFO_DANA}`\n"
             f"   • **Nomor GoPay:** `{INFO_GOPAY}`\n\n"
-            "3️⃣ **SAWERIA (Support Kartu, QRIS, E-Wallet):**\n"
+            "3️⃣ **SAWERIA (Dukungan Donasi / Kartu / E-Wallet):**\n"
             f"   • Link Donasi/Bayar: {INFO_SAWERIA}\n"
         ),
         'confirm_instr': "🛡️ *INSTRUKSI KONFIRMASI PEMBAYARAN:*\nSetelah sukses melakukan pembayaran via metode apapun, silakan kirim **Screenshot Bukti Transfer** ke bot ini untuk mendapatkan Nomor Resi Unik Anda.",
@@ -478,7 +499,15 @@ def callback_handler(call):
             pass
             
         markup_inv = get_back_markup(l)
-        bot.send_message(chat_id, invoice_text, parse_mode='Markdown', reply_markup=markup_inv, disable_web_page_preview=True)
+        
+        if QRIS_IMAGE_URL:
+            try:
+                bot.send_photo(chat_id, QRIS_IMAGE_URL, caption=invoice_text, parse_mode='Markdown', reply_markup=markup_inv)
+            except Exception:
+                bot.send_message(chat_id, invoice_text, parse_mode='Markdown', reply_markup=markup_inv, disable_web_page_preview=True)
+        else:
+            bot.send_message(chat_id, invoice_text, parse_mode='Markdown', reply_markup=markup_inv, disable_web_page_preview=True)
+            
         bot.answer_callback_query(call.id, text="Invoice & Payment Options Generated!")
 
     elif call.data == 'menu_cara_order':
@@ -502,7 +531,7 @@ def callback_handler(call):
                 "💳 *METODE PEMBAYARAN LENGKAP PAKEL MLBBSTORE*\n\n"
                 "Bebas pilih metode pembayaran yang paling nyaman untuk Anda:\n\n"
                 "1️⃣ **QRIS NASIONAL (Instant Scan):**\n"
-                "   • Support Semua E-Wallet & Bank (DANA, OVO, GoPay, BCA, Mandiri, BRI, dll)\n"
+                "   • Scan QRIS resmi toko kami\n"
                 "   • Merchant: **PakelMlbbStore** | NMID: `ID102655249321`\n\n"
                 "2️⃣ **TRANSFER DANA / GOPAY:**\n"
                 f"   • **Nomor DANA:** `{INFO_DANA}`\n"
@@ -573,5 +602,5 @@ def auto_reply(message):
         
     bot.reply_to(message, rep, parse_mode='Markdown', disable_web_page_preview=True)
 
-print("[INFO] Bot Pakel MlbbStore VIP Edition (Topic Auto-Post Enabled) Berhasil Dijalankan...")
+print("[INFO] Bot Pakel MlbbStore VIP Edition (Full Catalog & Massive Masked Names) Berhasil Dijalankan...")
 bot.infinity_polling()
