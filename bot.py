@@ -18,7 +18,7 @@ GROUP_TOPIC_ID = 368          # ID Topik khusus di dalam grup untuk auto-post te
 # Informasi Nomor Pembayaran Resmi (Tanpa QRIS)
 INFO_DANA = "089526466512"
 INFO_GOPAY = "089526466512"
-INFO_SAWERIA = "https://saweria.co/pakelmlbbstore"
+INFO_SAWERIA = "https://saweria.co/PakelMlbb"
 
 # ==================== FUNGSI DATABASE USER & BROADCAST ====================
 def save_user(chat_id):
@@ -162,12 +162,13 @@ def generate_fake_testimonials_list():
             f"   • Waktu: {menit_lalu} menit yang lalu\n\n"
         )
     return testi_output
-# ==================== BACKGROUND WORKER (AUTO-POST 10 - 25 MENIT SEKALI) ====================
+# ==================== BACKGROUND WORKER (AUTO-POST JEDA ACAK) ====================
 def background_auto_poster():
-    time.sleep(30)
+    time.sleep(60) 
     while True:
         try:
-            sleep_time = random.randint(600, 1500)
+            pilihan_waktu = [1500, 3600, 7200, 10800]
+            sleep_time = random.choice(pilihan_waktu)
             time.sleep(sleep_time)
             
             post_text = generate_single_testimonial()
@@ -339,7 +340,7 @@ def get_back_markup(l):
     markup.add(types.InlineKeyboardButton(text, callback_data='menu_utama'))
     return markup
 
-# ==================== FITUR BROADCAST ADMIN (FIXED & OPTIMIZED) ====================
+# ==================== FITUR BROADCAST ADMIN (KIRIM KE DM SEMUA MEMBER) ====================
 @bot.message_handler(commands=['bc', 'broadcast'])
 def broadcast_message(message):
     save_user(message.chat.id)
@@ -352,29 +353,30 @@ def broadcast_message(message):
         with open("users.txt", "r") as f:
             users = [line.strip() for line in f.read().splitlines() if line.strip()]
     except FileNotFoundError:
-        bot.reply_to(message, "⚠️ Belum ada user yang tercatat di database (users.txt kosong/tidak ditemukan).")
+        bot.reply_to(message, "⚠️ Belum ada user yang tercatat di database (users.txt kosong).")
         return
         
     if not users:
-        bot.reply_to(message, "⚠️ Database kosong, belum ada user yang berinteraksi dengan bot.")
+        bot.reply_to(message, "⚠️ Database kosong, belum ada user yang berinteraksi.")
         return
 
-    # Hilangkan duplikat ID jika ada
     users = list(set(users))
     
     success = 0
     failed = 0
     
+    bot.reply_to(message, f"🚀 Memulai broadcast pengumuman ke {len(users)} member via DM...")
+    
     for chat_id in users:
         try:
-            bot.send_message(chat_id, f"📢 PENGUMUMAN RESMI PAKEL MLBBSTORE\n\n{pesan_bc}")
+            bot.send_message(chat_id, f"📢 <b>PENGUMUMAN RESMI PAKEL MLBBSTORE</b>\n\n{pesan_bc}", parse_mode="HTML")
             success += 1
-            time.sleep(0.05) # Jeda kecil untuk menghindari flood limit telegram
+            time.sleep(0.05)
         except Exception as e:
             print(f"[BROADCAST FAIL TO {chat_id}]: {e}")
             failed += 1
             
-    bot.reply_to(message, f"✅ Broadcast Selesai!\n- Berhasil dikirim: {success} user\n- Gagal/Diblokir: {failed} user")
+    bot.send_message(message.chat.id, f"✅ Broadcast Selesai!\n- Berhasil dikirim ke DM: {success} member\n- Gagal/Diblokir: {failed} member")
 
 # ==================== HANDLER UTAMA BOT ====================
 @bot.message_handler(commands=['start', 'help'])
@@ -711,5 +713,6 @@ def auto_reply(message):
         
     bot.reply_to(message, res_msg, disable_web_page_preview=True)
 
-print("[INFO] Pakel MlbbStore VIP Edition (Fixed Broadcast & /sc) Berhasil Dijalankan...")
+print("[INFO] Pakel MlbbStore Master Ultimate Edition Berhasil Dijalankan...")
 bot.infinity_polling()
+
