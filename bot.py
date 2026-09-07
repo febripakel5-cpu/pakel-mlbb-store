@@ -50,8 +50,10 @@ def get_time_greeting():
         return "Selamat Sore 🌇"
     else:
         return "Selamat Malam 🌙"
+
 def get_random_masked_name():
     list_nama_tele = [
+        # --- INDONESIA ---
         "@R_Zky***", "@Alvinn_***", "@Dimas_99***", "@RezaPrat_***", 
         "@Bayu_Official***", "@Farel_X***", "@Yoga_Mlg***", "@DickyGez_***", 
         "@SuryaPratama***", "@RamaWicak***", "@Gilang_ID***", "@BagasKusn***",
@@ -75,24 +77,59 @@ def get_random_masked_name():
         "@Basri***", "@Beni***", "@Boy***", "@Candra***",
         "@Darma***", "@Dedi***", "@Deny***", "@Diki***",
         "@Egi***", "@Eky***", "@Fahri***", "@Fandi***",
-        "@Farhan***", "@Fauzi***", "@Febri***", "@Firman",
+        "@Farhan***", "@Fauzi***", "@Febri***", "@Firman***",
         "@Fuat***", "@Gani***", "@Gerry***", "@Hadi***",
-        "@R.Zky***", "@Alvin.ID***", "@Dimas.Xyz***", "@Reza.Gaming***",
-        "@Bayu.Pratama***", "@Farel.Official***", "@Yoga.Ganz***", "@Dicky.Dev***",
-        "@Surya.ID***", "@Rama.ID***", "@Gilang.Mlg***", "@Bagas.X***",
-        "@Arif.Prat***", "@Dani.Gmr***", "@Hendra.Sultan***", "@Rian.Wicak***",
-        "@Aldi.Pro***", "@Bintang.Gz***", "@Candra.07***", "@Dika.Wahyudi***",
-        "@Fajar.Sltn***", "@Galih.Xtrem***", "@Iqbal.Farel***", "@Joko.Santoso***",
-        "@Kevin.Bagas***", "@Lukman.Rizky***", "@Maulana.Dwi***", "@Naufal.Akbar***",
-        "@Pratama.Putra***", "@Rafli.Maulana***", "@Satria.angga***", "@Tegar.Aditya***",
-        "@Vian.Saputra***", "@Wahyu.Hidayat***", "@Yuda.Kurniawan***", "@Zaki.Mubarok***",
+        "@Bayu_Pratama***", "@Farel_Official***", "@Yoga_Ganz***", "@Dicky_Dev***",
+        "@Surya_ID***", "@Rama_ID***", "@Gilang_Mlg***", "@Bagas_X***",
+        "@Arif_Prat***", "@Dani_Gmr***", "@Hendra_Sultan***", "@Rian_Wicak***",
+        "@Aldi_Pro***", "@Bintang_Gz***", "@Candra_07***", "@Dika_Wahyudi***",
+        "@Fajar_Sltn***", "@Galih_Xtrem***", "@Iqbal_Farel***", "@Joko_Santoso***",
+        "@Kevin_Bagas***", "@Lukman_Rizky***", "@Maulana_Dwi***", "@Naufal_Akbar***",
+        "@Pratama_Putra***", "@Rafli_Maulana***", "@Satria_angga***", "@Tegar_Aditya***",
+        "@Vian_Saputra***", "@Wahyu_Hidayat***", "@Yuda_Kurniawan***", "@Zaki_Mubarok***",
         "@Rizal_Ganz***", "@Maulana_ID***", "@Fikri_Ramadhan***", "@Ilham_Saputra***",
         "@Rezky_Pratama***", "@Rizky_Maulana***", "@Fauzan_Azima***", "@Zidan_Alfarizi***",
         "@Rafi_Ahmad***", "@Zaki_Mubarok***", "@Fathan_Haikal***", "@Rifki_Ananda***",
         "@Aditya_Pratama***", "@Bayu_Pamungkas***", "@Yoga_Prasetyo***", "@Dimas_Mahendra***",
         "@R_Zky2026***", "@Alvinn123***", "@Dimas777***", "@Reza888***", 
         "@Bayu555***", "@Farel444***", "@Yoga333***", "@Dicky222***", 
-        "@Surya111***", "@Rama999***", "@Gilang000***", "@Bagas777***"
+        "@Surya111***", "@Rama999***", "@Gilang000***", "@Bagas777***",
+        "@Den_Bagusk***", "@Reyhan_X***", "@Akmal_Store***", "@Zul_Fikar***",
+        "@Pandu_Gans***", "@Radit_Pratama***", "@Gibran_ID***", "@Baim_Wong***",
+        "@Ibnu_Sina***", "@Fahru_Nzi***", "@Nabil_Store***", "@Wildan_Xyz***",
+        "@Erlangga_99***", "@Devan_Gmr***", "@Mahesa_Wk***", "@Ary_Satria***",
+
+        # --- MALAYSIA ---
+        "@Amirul_My***", "@Haikal_Iskandar***", "@Farhan_Zul***", "@Aiman_Badri***",
+        "@Aqil_Danial***", "@Syahmi_Zain***", "@Luqman_Hakim***", "@Zulhelmi_My***",
+        "@Azril_Anuar***", "@Izzat_Mukhriz***", "@Faris_Najmi***", "@Hazim_Zikri***",
+        "@Nabil_Hakimi***", "@Danial_Fitri***", "@Amir_Syazwan***", "@Firdaus_Rosli***",
+        "@Hakim_Azman***", "@Imran_Danish***", "@Khairul_Anwar***", "@Zack_Malaya***",
+        "@Syafiq_Amsyar***", "@Aidil_Azhar***", "@Faiz_Mokhtar***", "@Megat_Zul***",
+        "@Tarmizi_My***", "@Azlan_Shah***", "@Shahrul_Nizam***", "@Rizman_Azrai***",
+
+        # --- INGGRIS & WESTERN / INTERNASIONAL ---
+        "@Alex_Walker***", "@Liam_Smith***", "@Noah_Miller***", "@Oliver_Davis***",
+        "@Elijah_Wilson***", "@James_Taylor***", "@William_Anderson***", "@Lucas_Thomas***",
+        "@Mason_Moore***", "@Ethan_Jackson***", "@Logan_Martin***", "@Benjamin_Lee***",
+        "@Lucas_White***", "@Alexander_Harris***", "@Henry_Clark***", "@Sebastian_Lewis***",
+        "@Jack_Robinson***", "@Owen_Walker***", "@Theodore_Perez***", "@Aiden_Hall***",
+        "@Samuel_Young***", "@Joseph_King***", "@John_Wright***", "@David_Scott***",
+        "@Wyatt_Green***", "@Matthew_Baker***", "@Luke_Adams***", "@Asher_Nelson***",
+        "@Carter_Carter***", "@Julian_Mitchell***", "@Grayson_Perez***", "@Leo_Roberts***",
+        "@Jayden_Turner***", "@Gabriel_Phillips***", "@Isaac_Campbell***", "@Caleb_Parker***",
+        "@Anthony_Evans***", "@Lincoln_Edwards***", "@Jaxon_Collins***", "@Mateo_Stewart***",
+        "@Hudson_Sanchez***", "@Theodore_Morris***", "@Thomas_Rogers***", "@Connor_Reed***",
+        "@Eli_Cook***", "@Aaron_Morgan***", "@Ezra_Bell***", "@Landon_Murphy***",
+        "@Adrian_Bailey***", "@Jonathan_Rivera***", "@Nolan_Cooper***", "@Easton_Richardson***",
+        "@Ezekiel_Cox***", "@Milton_Howard***", "@Cole_Ward***", "@Carson_Torres***",
+
+        # --- TAMBAHAN TRENDING GAMER ---
+        "@Sultan_Mlbb***", "@Anjay_Mabar***", "@Gacor_Gaming***", "@TopGlobal_1***",
+        "@Mythic_Immortal***", "@ProPlayer_Indo***", "@Epep_Bapakmu***", "@Bocil_Kematian***",
+        "@Wibu_Gariskeras***", "@Beban_Tim***", "@Jagoan_Emak***", "@Peler_Jawa***",
+        "@Raja_Turu***", "@Bapak_Gamer***", "@Anak_Sultan***", "@Wong_Kito***",
+        "@Ank_Nongkrong***", "@Wibu_Hunter***", "@Savage_Everyday***", "@Maniac_Lord***"
     ]
     return random.choice(list_nama_tele)
 
