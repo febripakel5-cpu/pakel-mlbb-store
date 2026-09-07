@@ -20,7 +20,8 @@ GROUP_TOPIC_ID = 368          # ID Topik khusus di dalam grup untuk auto-post te
 INFO_DANA = "089526466512"
 INFO_GOPAY = "089526466512"
 INFO_SAWERIA = "https://saweria.co/PakelMlbb"
-QRIS_FILENAME = "/storage/emulated/0/qris.jpeg"    # Sesuai path direktori penyimpanan foto qris lu
+QRIS_FILENAME = "qris.jpeg"
+# Sesuai path direktori penyimpanan foto qris lu
 
 # ==================== FUNGSI DATABASE USER & BROADCAST ====================
 def save_user(chat_id):
