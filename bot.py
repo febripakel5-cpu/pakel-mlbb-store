@@ -10,6 +10,10 @@ import os
 TOKEN = '8637403539:AAFyKck7U8POV3hzSw9UcF_sDDp0d_hKat0'
 bot = telebot.TeleBot(TOKEN)
 
+# Otomatis mendeteksi folder tempat bot.py berada agar qris.jpeg terbaca akurat
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+QRIS_FILENAME = os.path.join(BASE_DIR, "qris.jpeg")
+
 # Identitas Toko Resmi & Link Grup Beserta ID Topik Khusus Testimoni
 ADMIN_USERNAME = "@PakelMlbbOfficial"
 ADMIN_LINK = "https://t.me/PakelMlbbOfficial"
@@ -20,8 +24,6 @@ GROUP_TOPIC_ID = 368          # ID Topik khusus di dalam grup untuk auto-post te
 INFO_DANA = "089526466512"
 INFO_GOPAY = "089526466512"
 INFO_SAWERIA = "https://saweria.co/PakelMlbb"
-QRIS_FILENAME = "qris.jpeg"
-# Sesuai path direktori penyimpanan foto qris lu
 
 # ==================== FUNGSI DATABASE USER & BROADCAST ====================
 def save_user(chat_id):
@@ -465,7 +467,7 @@ def callback_handler(call):
                     )
                 bot.answer_callback_query(call.id, "QRIS berhasil dimuat!")
             else:
-                bot.answer_callback_query(call.id, "⚠️ File qris.jpeg tidak ditemukan di folder Download!", show_alert=True)
+                bot.answer_callback_query(call.id, "⚠️ File qris.jpeg tidak ditemukan di direktori bot!", show_alert=True)
         except Exception as e:
             bot.answer_callback_query(call.id, f"Gagal memuat QRIS: {e}", show_alert=True)
         return
