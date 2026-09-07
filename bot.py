@@ -4,6 +4,7 @@ import random
 import time
 import threading
 from datetime import datetime, timezone, timedelta
+import os
 
 # Token bot lu yang aktif dan siap tempur
 TOKEN = '8637403539:AAFyKck7U8POV3hzSw9UcF_sDDp0d_hKat0'
@@ -15,10 +16,11 @@ ADMIN_LINK = "https://t.me/PakelMlbbOfficial"
 GROUP_CHAT_ID = "@PakelMlbb"  # Username grup utama lu
 GROUP_TOPIC_ID = 368          # ID Topik khusus di dalam grup untuk auto-post testi
 
-# Informasi Nomor Pembayaran Resmi (Tanpa QRIS)
+# Informasi Nomor Pembayaran Resmi & QRIS
 INFO_DANA = "089526466512"
 INFO_GOPAY = "089526466512"
 INFO_SAWERIA = "https://saweria.co/PakelMlbb"
+QRIS_FILENAME = "/storage/emulated/0/Download/qris.jpeg"    # Sesuai path direktori penyimpanan foto qris lu
 
 # ==================== FUNGSI DATABASE USER & BROADCAST ====================
 def save_user(chat_id):
@@ -51,7 +53,6 @@ def get_time_greeting():
         return "Selamat Sore 🌇"
     else:
         return "Selamat Malam 🌙"
-
 # ==================== LIST NAMA TELEGRAM SENSOR BINTANG ====================
 def get_random_masked_name():
     list_nama_tele = [
@@ -99,7 +100,6 @@ def get_random_masked_name():
     ]
     return random.choice(list_nama_tele)
 
-# ==================== GENERATOR TESTIMONI LIVE (8 PAKET) ====================
 def generate_single_testimonial():
     list_paket = [
         ("Natural Balance (30 Hari)", "Rp 120.000"),
@@ -162,7 +162,7 @@ def generate_fake_testimonials_list():
             f"   • Waktu: {menit_lalu} menit yang lalu\n\n"
         )
     return testi_output
-# ==================== BACKGROUND WORKER (AUTO-POST JEDA ACAK) ====================
+
 def background_auto_poster():
     time.sleep(60) 
     while True:
@@ -185,7 +185,6 @@ def background_auto_poster():
 poster_thread = threading.Thread(target=background_auto_poster, daemon=True)
 poster_thread.start()
 
-# ==================== COMMAND PUSH TESTI INSTAN ====================
 @bot.message_handler(commands=['testi', 'push'])
 def admin_push_testi(message):
     try:
@@ -200,7 +199,6 @@ def admin_push_testi(message):
     except Exception as e:
         bot.reply_to(message, f"⚠️ Gagal mengirim testimoni: {e}")
 
-# ==================== FITUR INTERAKTIF MANUAL /SC (8 PAKET LENGKAP) ====================
 @bot.message_handler(commands=['sc'])
 def cmd_sc_interactive(message):
     save_user(message.chat.id)
@@ -232,7 +230,6 @@ def cmd_sc_interactive(message):
         reply_markup=markup, 
         parse_mode="HTML"
     )
-# ==================== MASTER GLOBAL TRANSLATION ENGINE ====================
 TRANSLATIONS = {
     'id': {
         'btn_katalog': "💎 Katalog VIP & Harga Paket",
@@ -285,14 +282,16 @@ TRANSLATIONS = {
         'prev_2': "◀️ Kembali ke Katalog Bagian 1",
         'inv_title': "🛒 INVOICE PEMESANAN RESMI VIP (Kak {name}) 🧾",
         'pay_info': (
-            "💳 SILAKAN PILIH METODE TRANSFER DI BAWAH INI:\n\n"
-            "1️⃣ TRANSFER DANA / GOPAY:\n"
+            "💳 SILAKAN PILIH METODE PEMBAYARAN DI BAWAH INI:\n\n"
+            "1️⃣ QRIS (Scan Otomatis Semua Bank / E-Wallet / Cross-Border):\n"
+            "   👉 Klik tombol di bawah untuk memunculkan QRIS!\n\n"
+            "2️⃣ TRANSFER MANUAL DANA / GOPAY:\n"
             f"   • Nomor DANA: {INFO_DANA}\n"
             f"   • Nomor GoPay: {INFO_GOPAY}\n\n"
-            "2️⃣ SAWERIA (Support Kartu, QRIS, E-Wallet):\n"
-            f"   • Link Pembayaran: {INFO_SAWERIA}\n"
+            "3️⃣ SAWERIA (Support Kartu & E-Wallet):\n"
+            f"   • Link: {INFO_SAWERIA}\n"
         ),
-        'confirm_instr': "🛡️ INSTRUKSI KONFIRMASI PEMBAYARAN:\nSetelah sukses melakukan pembayaran via metode apapun, silakan kirim Screenshot Bukti Transfer ke bot ini untuk mendapatkan Nomor Resi Unik Anda.",
+        'confirm_instr': "🛡️ INSTRUKSI KONFIRMASI PEMBAYARAN:\nSetelah sukses membayar via QRIS atau metode lainnya, silakan kirim Screenshot Bukti Transfer ke bot ini untuk mendapatkan Nomor Resi Unik Anda.",
     },
     'en': {
         'btn_katalog': "💎 VIP Catalogue & Pricing",
@@ -322,10 +321,11 @@ TRANSLATIONS = {
         'next_1': "▶️ Next: Catalog Part 2 (One Hit)",
         'prev_2': "◀️ Back to Catalog Part 1",
         'inv_title': "🛒 AUTOMATED VIP ORDER INVOICE ({name}) 🧾",
-        'pay_info': "💳 CHOOSE YOUR PAYMENT METHOD:\n1. DANA / GoPay\n2. Saweria",
+        'pay_info': "💳 CHOOSE YOUR PAYMENT METHOD:\n1. QRIS (Click button below)\n2. DANA / GoPay\n3. Saweria",
         'confirm_instr': "🛡️ CONFIRMATION INSTRUCTION:\nAfter successful payment, send your Transfer Proof Screenshot to this bot.",
     }
 }
+
 def get_lang(user):
     code = getattr(user, 'language_code', 'en')
     if code:
@@ -340,7 +340,6 @@ def get_back_markup(l):
     markup.add(types.InlineKeyboardButton(text, callback_data='menu_utama'))
     return markup
 
-# ==================== FITUR BROADCAST ADMIN (KIRIM KE DM SEMUA MEMBER) ====================
 @bot.message_handler(commands=['bc', 'broadcast'])
 def broadcast_message(message):
     save_user(message.chat.id)
@@ -361,7 +360,6 @@ def broadcast_message(message):
         return
 
     users = list(set(users))
-    
     success = 0
     failed = 0
     
@@ -377,8 +375,6 @@ def broadcast_message(message):
             failed += 1
             
     bot.send_message(message.chat.id, f"✅ Broadcast Selesai!\n- Berhasil dikirim ke DM: {success} member\n- Gagal/Diblokir: {failed} member")
-
-# ==================== HANDLER UTAMA BOT ====================
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
     user = message.from_user
@@ -450,6 +446,28 @@ def callback_handler(call):
     chat_id = call.message.chat.id
     message_id = call.message.message_id
     greeting = get_time_greeting()
+
+    if call.data == 'pilih_metode_qris':
+        caption_text = (
+            "<b>[ PAKEL MLBB STORE - QRIS PAYMENT ]</b>\n\n"
+            "Silakan scan QRIS di atas menggunakan aplikasi pembayaran apa saja (DANA, M-Banking, E-Wallet, atau QRIS Cross-Border luar negeri).\n\n"
+            "💡 <i>Pastikan nominal sesuai tagihan, lalu kirimkan bukti transaksi (resit) ke chat ini ya, boss!</i>"
+        )
+        try:
+            if os.path.exists(QRIS_FILENAME):
+                with open(QRIS_FILENAME, 'rb') as photo:
+                    bot.send_photo(
+                        chat_id=chat_id,
+                        photo=photo,
+                        caption=caption_text,
+                        parse_mode='HTML'
+                    )
+                bot.answer_callback_query(call.id, "QRIS berhasil dimuat!")
+            else:
+                bot.answer_callback_query(call.id, "⚠️ File qris.jpeg tidak ditemukan di folder Download!", show_alert=True)
+        except Exception as e:
+            bot.answer_callback_query(call.id, f"Gagal memuat QRIS: {e}", show_alert=True)
+        return
 
     if call.data.startswith('sc_buy_'):
         try:
@@ -617,12 +635,15 @@ def callback_handler(call):
             f"👉 Kirim bukti transfer & resi ke admin: {ADMIN_USERNAME}"
         )
         
+        markup_inv = types.InlineKeyboardMarkup(row_width=1)
+        markup_inv.add(types.InlineKeyboardButton("💳 Klik Disini Untuk Munculkan QRIS", callback_data='pilih_metode_qris'))
+        markup_inv.add(types.InlineKeyboardButton(t['back'], callback_data='menu_utama'))
+        
         try:
             bot.delete_message(chat_id=chat_id, message_id=message_id)
         except Exception:
             pass
             
-        markup_inv = get_back_markup(l)
         bot.send_message(chat_id, invoice_text, reply_markup=markup_inv, disable_web_page_preview=True)
         bot.answer_callback_query(call.id, text="Invoice Generated!")
 
@@ -632,30 +653,35 @@ def callback_handler(call):
                 "❓ PANDUAN CARA ORDER DI PAKEL MLBBSTORE\n\n"
                 "1️⃣ Pilih paket script VIP impian Anda melalui menu Katalog.\n"
                 "2️⃣ Klik tombol beli pada paket yang diinginkan untuk mendapatkan Nomor Resi Unik & daftar metode pembayaran.\n"
-                "3️⃣ Lakukan pembayaran via metode pilihan Anda: DANA, GoPay, atau Saweria.\n"
+                "3️⃣ Lakukan pembayaran via metode pilihan Anda: QRIS (Scan otomatis semua bank/e-wallet), DANA, GoPay, atau Saweria.\n"
                 "4️⃣ Kirimkan screenshot bukti transfer beserta Nomor Resi ke bot ini atau langsung ke Admin utama.\n"
                 "5️⃣ Admin akan memverifikasi dan mengirimkan file script beserta panduan lengkapnya detik itu juga!"
             )
         else:
-            text = "❓ HOW TO ORDER\n1️⃣ Select package & click Buy.\n2️⃣ Choose payment (DANA, GoPay, Saweria).\n3️⃣ Pay & send proof to admin."
+            text = "❓ HOW TO ORDER\n1️⃣ Select package & click Buy.\n2️⃣ Choose payment (QRIS, DANA, GoPay, Saweria).\n3️⃣ Pay & send proof to admin."
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, reply_markup=get_back_markup(l), disable_web_page_preview=True)
         bot.answer_callback_query(call.id)
 
     elif call.data == 'menu_bayar':
+        markup_bayar = types.InlineKeyboardMarkup(row_width=1)
+        markup_bayar.add(types.InlineKeyboardButton("💳 Munculkan Gambar QRIS", callback_data='pilih_metode_qris'))
+        markup_bayar.add(types.InlineKeyboardButton(t['back'], callback_data='menu_utama'))
+
         if l == 'id':
             text = (
                 "💳 METODE PEMBAYARAN LENGKAP PAKEL MLBBSTORE\n\n"
                 "Bebas pilih metode pembayaran yang paling nyaman untuk Anda:\n\n"
-                "1️⃣ TRANSFER DANA / GOPAY:\n"
+                "1️⃣ QRIS (SCAN OTOMATIS SEMUA BANK & E-WALLET / LUAR NEGERI):\n"
+                "   👉 Klik tombol di bawah untuk menampilkan gambar QRIS resmi store!\n\n"
+                "2️⃣ TRANSFER DANA / GOPAY:\n"
                 f"   • Nomor DANA: {INFO_DANA}\n"
                 f"   • Nomor GoPay: {INFO_GOPAY}\n\n"
-                "2️⃣ SAWERIA (Dukungan Donasi / Kartu / E-Wallet):\n"
-                f"   • Link Pembayaran: {INFO_SAWERIA}\n\n"
-                "📌 Catatan: Silakan pilih paket di katalog lalu klik beli untuk memunculkan instruksi pembayaran lengkap, atau langsung hubungi {ADMIN_USERNAME}."
+                "3️⃣ SAWERIA (Dukungan Donasi / Kartu / E-Wallet):\n"
+                f"   • Link Pembayaran: {INFO_SAWERIA}\n"
             )
         else:
-            text = f"💳 ALL PAYMENT METHODS\n\n1. DANA / GoPay\n2. Saweria\n📌 Confirm to {ADMIN_USERNAME}."
-        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, reply_markup=get_back_markup(l), disable_web_page_preview=True)
+            text = f"💳 ALL PAYMENT METHODS\n\n1. QRIS (Click button below)\n2. DANA / GoPay\n3. Saweria"
+        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, reply_markup=markup_bayar, disable_web_page_preview=True)
         bot.answer_callback_query(call.id)
 
     elif call.data == 'menu_konfirmasi':
@@ -664,7 +690,7 @@ def callback_handler(call):
             text = (
                 "✅ KONFIRMASI PEMBAYARAN & KLAIM SCRIPT\n\n"
                 f"Contoh Format Resi Anda: PKL-MLBB-{rs}\n\n"
-                "Silakan kirim screenshot bukti transfer pembayaran Anda (baik dari DANA, GoPay, maupun Saweria) ke chat ini atau langsung ke Admin untuk segera diproses."
+                "Silakan kirim screenshot bukti transfer pembayaran Anda (baik dari QRIS, DANA, GoPay, maupun Saweria) ke chat ini atau langsung ke Admin untuk segera diproses."
             )
         else:
             text = f"✅ PAYMENT CONFIRMATION\nExample Receipt: PKL-MLBB-{rs}\nSend transfer screenshot to admin."
@@ -706,8 +732,8 @@ def auto_reply(message):
     
     if any(w in txt for w in ['price', 'harga', 'list', 'menu', 'catalog', 'katalog']):
         res_msg = "💎 Ketik /start untuk membuka Katalog VIP eksklusif Pakel MlbbStore!" if l == 'id' else "💎 Type /start to view the VIP Catalogue!"
-    elif any(w in txt for w in ['pay', 'bayar', 'dana', 'gopay', 'saweria', 'testi', 'testimoni']):
-        res_msg = "🌟 Cek menu /start untuk melihat Katalog VIP, Metode Pembayaran Lengkap, hingga Live Testimoni real-time pembeli!" if l == 'id' else "🌟 Type /start to view catalogue, payments, and live testimonials."
+    elif any(w in txt for w in ['pay', 'bayar', 'dana', 'gopay', 'saweria', 'qris', 'testi', 'testimoni']):
+        res_msg = "🌟 Cek menu /start untuk melihat Katalog VIP, Metode Pembayaran QRIS / Manual, hingga Live Testimoni real-time pembeli!" if l == 'id' else "🌟 Type /start to view catalogue, payments, and live testimonials."
     else:
         res_msg = f"Halo {user.first_name}! Silakan ketik /start untuk mengakses menu utama atau hubungi admin kami di {ADMIN_USERNAME}." if l == 'id' else f"Hello {user.first_name}! Contact our admin at {ADMIN_USERNAME}."
         
@@ -715,4 +741,3 @@ def auto_reply(message):
 
 print("[INFO] Pakel MlbbStore Master Ultimate Edition Berhasil Dijalankan...")
 bot.infinity_polling()
-
