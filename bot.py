@@ -13,7 +13,6 @@ bot = telebot.TeleBot(TOKEN)
 ADMIN_USERNAME = "@PakelMlbbOfficial"
 ADMIN_LINK = "https://t.me/PakelMlbbOfficial"
 CHANNEL_TESTI_LINK = "https://t.me/PakelMlbb/368"
-# Ganti link channel testi lu jika ada
 GROUP_CHAT_ID = "@PakelMlbb"
 GROUP_TOPIC_ID = 368
 
@@ -41,6 +40,49 @@ def save_user(chat_id):
     except Exception as e:
         print(f"[SAVE USER ERROR]: {e}")
 
+# Fungsi Pencatat Riwayat Pesanan Otomatis ke database orders.txt
+def save_order(chat_id, paket_nama, harga, resi):
+    try:
+        WIB = timezone(timedelta(hours=7))
+        now = datetime.now(WIB)
+        tanggal_str = now.strftime('%d-%m-%Y')
+        jam_str = now.strftime('%H:%M:%S WIB')
+        
+        # Format hari dalam bahasa Indonesia
+        days_indo = {
+            'Mon': 'Senin', 'Tue': 'Selasa', 'Wed': 'Rabu', 
+            'Thu': 'Kamis', 'Fri': 'Jumat', 'Sat': 'Sabtu', 'Sun': 'Minggu'
+        }
+        hari_en = now.strftime('%a')
+        hari_str = days_indo.get(hari_en, hari_en)
+        
+        order_line = f"{chat_id}|{tanggal_str}|{hari_str}|{jam_str}|{paket_nama}|{harga}|{resi}|PENDING\n"
+        
+        with open("orders.txt", "a") as f:
+            f.write(order_line)
+    except Exception as e:
+        print(f"[SAVE ORDER ERROR]: {e}")
+
+def get_user_orders(chat_id):
+    orders = []
+    try:
+        with open("orders.txt", "r") as f:
+            for line in f:
+                parts = line.strip().split('|')
+                if len(parts) == 8 and parts[0] == str(chat_id):
+                    orders.append({
+                        'tanggal': parts[1],
+                        'hari': parts[2],
+                        'jam': parts[3],
+                        'paket': parts[4],
+                        'harga': parts[5],
+                        'resi': parts[6],
+                        'status': parts[7]
+                    })
+    except FileNotFoundError:
+        pass
+    return orders
+
 def get_time_greeting():
     WIB = timezone(timedelta(hours=7))
     hour = datetime.now(WIB).hour
@@ -57,7 +99,6 @@ def get_time_greeting():
 def check_store_status():
     WIB = timezone(timedelta(hours=7))
     hour = datetime.now(WIB).hour
-    # Toko istirahat jam 00:00 sampai 07:00 pagi WIB
     if 0 <= hour < 7:
         return False, "⚠️ <b>INFO OPERASIONAL TOKO:</b>\nHalo Kak! Saat ini toko sedang istirahat (Offline) jam 00:00 - 07:00 WIB. Pesanan dan pembayaran tetap bisa dilakukan lewat bot, namun proses pengiriman script dan verifikasi resi akan dilanjutkan pagi ini mulai pukul 07:00 WIB ya! 🙏✨"
     return True, ""
@@ -272,6 +313,7 @@ TRANSLATIONS = {
     'id': {
         'btn_katalog': "💎 Katalog VIP & Harga Paket",
         'btn_testi': "🌟 Testimoni & Real-Time Bukti Order",
+        'btn_riwayat': "📦 Cek Riwayat & Status Pesanan Saya",
         'btn_promo': "🎁 Klaim Promo Member Baru",
         'btn_cara_order': "❓ Panduan Cara Order",
         'btn_bayar': "💳 Metode Pembayaran Lengkap",
@@ -312,6 +354,7 @@ TRANSLATIONS = {
     'en': {
         'btn_katalog': "💎 VIP Catalogue & Pricing",
         'btn_testi': "🌟 Live Testimonials",
+        'btn_riwayat': "📦 My Order History & Status",
         'btn_promo': "🎁 Claim New Member Promo",
         'btn_cara_order': "❓ How to Order Guide",
         'btn_bayar': "💳 All Payment Methods",
@@ -401,6 +444,7 @@ def send_welcome(message):
     markup.add(
         types.InlineKeyboardButton(t['btn_katalog'], callback_data='menu_katalog'),
         types.InlineKeyboardButton(t['btn_testi'], callback_data='menu_testi'),
+        types.InlineKeyboardButton(t['btn_riwayat'], callback_data='menu_riwayat'),
         types.InlineKeyboardButton(t['btn_promo'], callback_data='menu_promo'),
         types.InlineKeyboardButton(t['btn_cara_order'], callback_data='menu_cara_order'),
         types.InlineKeyboardButton(t['btn_bayar'], callback_data='menu_bayar'),
@@ -423,6 +467,30 @@ def send_welcome(message):
         welcome_text = f"🔥 {greeting}, {user.first_name}! Welcome to Official Pakel MlbbStore 🙏✨\n\n👇 Please select a menu below:"
         
     bot.send_message(message.chat.id, welcome_text, reply_markup=markup, parse_mode="HTML")
+
+@bot.message_handler(commands=['riwayat', 'history'])
+def cmd_riwayat(message):
+    save_user(message.chat.id)
+    user = message.from_user
+    l = get_lang(user)
+    chat_id = message.chat.id
+    
+    orders = get_user_orders(chat_id)
+    if not orders:
+        text = f"📋 RIWAYAT PESANAN SAYA (Kak {user.first_name})\n\n❌ Belum ada riwayat pesanan tercatat.\n💡 Silakan pilih paket di /katalog untuk melakukan pemesanan baru!"
+    else:
+        text = f"📋 <b>RIWAYAT PESANAN SAYA (Kak {user.first_name})</b>\n\n"
+        for idx, o in enumerate(orders[-5:], 1): # Menampilkan 5 pesanan terakhir
+            text += (
+                f"<b>{idx}. {o['paket']}</b>\n"
+                f"   • Harga: {o['harga']}\n"
+                f"   • No Resi: <code>{o['resi']}</code>\n"
+                f"   • Waktu: {o['hari']}, {o['tanggal']} ({o['jam']})\n"
+                f"   • Status: ⏳ {o['status']}\n\n"
+            )
+        text += "💡 <i>Kirim bukti transfer jika belum dikonfirmasi admin!</i>"
+
+    bot.reply_to(message, text, reply_markup=get_back_markup(l), parse_mode="HTML", disable_web_page_preview=True)
 
 @bot.message_handler(commands=['cekresi', 'resi'])
 def cmd_cekresi(message):
@@ -505,6 +573,7 @@ def callback_handler(call):
         markup.add(
             types.InlineKeyboardButton(t['btn_katalog'], callback_data='menu_katalog'),
             types.InlineKeyboardButton(t['btn_testi'], callback_data='menu_testi'),
+            types.InlineKeyboardButton(t['btn_riwayat'], callback_data='menu_riwayat'),
             types.InlineKeyboardButton(t['btn_promo'], callback_data='menu_promo'),
             types.InlineKeyboardButton(t['btn_cara_order'], callback_data='menu_cara_order'),
             types.InlineKeyboardButton(t['btn_bayar'], callback_data='menu_bayar'),
@@ -534,6 +603,25 @@ def callback_handler(call):
         
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=testi_text, reply_markup=markup_testi, disable_web_page_preview=True)
         bot.answer_callback_query(call.id, text="Testimoni diperbarui!")
+
+    elif call.data == 'menu_riwayat':
+        orders = get_user_orders(chat_id)
+        if not orders:
+            riw_text = f"📋 RIWAYAT PESANAN SAYA (Kak {user.first_name})\n\n❌ Belum ada riwayat pesanan tercatat.\n💡 Silakan pilih paket di katalog untuk membuat pesanan baru!"
+        else:
+            riw_text = f"📋 <b>RIWAYAT PESANAN SAYA (Kak {user.first_name})</b>\n\n"
+            for idx, o in enumerate(orders[-5:], 1):
+                riw_text += (
+                    f"<b>{idx}. {o['paket']}</b>\n"
+                    f"   • Harga: {o['harga']}\n"
+                    f"   • No Resi: <code>{o['resi']}</code>\n"
+                    f"   • Waktu: {o['hari']}, {o['tanggal']} ({o['jam']})\n"
+                    f"   • Status: ⏳ {o['status']}\n\n"
+                )
+            riw_text += "💡 <i>Kirim bukti transfer jika belum dikonfirmasi admin!</i>"
+            
+        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=riw_text, reply_markup=get_back_markup(l), parse_mode="HTML", disable_web_page_preview=True)
+        bot.answer_callback_query(call.id, text="Riwayat dimuat!")
 
     elif call.data == 'menu_promo':
         promo_text = f"🎁 PROMO EKSKLUSIF (Kak {user.first_name})\n\n🎟️ KODE KUPON: WELCOMEPAKEL\n💰 Potongan harga spesial pembelian pertama!"
@@ -570,24 +658,34 @@ def callback_handler(call):
     elif call.data.startswith('buy_'):
         all_items = t['p1'] + t['p2']
         paket_nama = "VIP Package"
-        for btn_txt, cb_val, _ in all_items:
+        harga_paket = "Rp 100.000"
+        for btn_txt, cb_val, desc_val in all_items:
             if cb_val == call.data:
                 paket_nama = btn_txt.replace("🛒 Buy: ", "").replace("🛒 Beli: ", "")
+                if "— " in desc_val:
+                    harga_paket = desc_val.split("— ")[1].split("\n")[0]
+                break
                 
         random_serial = random.randint(10000, 99999)
+        resi_unik = f"PKL-MLBB-{random_serial}"
+        
+        # Simpan pesanan secara otomatis ke database orders.txt
+        save_order(chat_id, paket_nama, harga_paket, resi_unik)
+        
         invoice_text = (
             f"{t['inv_title']}\n\n"
             f"📦 Paket Dipilih: {paket_nama}\n"
-            f"🔢 Nomor Resi Unik: PKL-MLBB-{random_serial}\n"
+            f"💵 Harga: {harga_paket}\n"
+            f"🔢 Nomor Resi Unik: <code>{resi_unik}</code>\n"
             f"⏱️ Batas Waktu: 15 Menit\n\n"
             f"{t['pay_info']}\n\n"
             f"{t['confirm_instr']}\n"
             f"👉 Admin: {ADMIN_USERNAME}"
         )
         
-        # Tombol URL Langsung Membuka Link Gambar QRIS Imgbb
         markup_inv = types.InlineKeyboardMarkup(row_width=1)
         markup_inv.add(types.InlineKeyboardButton("💳 Buka Gambar QRIS Pembayaran", url=QRIS_WEB_LINK))
+        markup_inv.add(types.InlineKeyboardButton("📦 Cek Riwayat Pesanan Saya", callback_data='menu_riwayat'))
         markup_inv.add(types.InlineKeyboardButton(t['back'], callback_data='menu_utama'))
         
         try:
@@ -595,8 +693,8 @@ def callback_handler(call):
         except Exception:
             pass
             
-        bot.send_message(chat_id, invoice_text, reply_markup=markup_inv, disable_web_page_preview=True)
-        bot.answer_callback_query(call.id, text="Invoice Generated!")
+        bot.send_message(chat_id, invoice_text, reply_markup=markup_inv, parse_mode="HTML", disable_web_page_preview=True)
+        bot.answer_callback_query(call.id, text="Invoice & Riwayat Tercatat Otomatis!")
 
     elif call.data == 'menu_cara_order':
         text = "❓ PANDUAN CARA ORDER\n1. Pilih paket di katalog.\n2. Klik beli untuk dapat nomor resi & tombol link QRIS.\n3. Bayar & kirim bukti transfer."
@@ -644,12 +742,12 @@ def auto_reply(message):
     
     if any(w in txt for w in ['price', 'harga', 'list', 'menu', 'catalog', 'katalog']):
         res_msg = "💎 Ketik /start untuk membuka Katalog VIP!"
-    elif any(w in txt for w in ['pay', 'bayar', 'dana', 'gopay', 'saweria', 'qris', 'testi']):
-        res_msg = "🌟 Cek menu /start untuk melihat metode pembayaran QRIS & katalog lengkap!"
+    elif any(w in txt for w in ['pay', 'bayar', 'dana', 'gopay', 'saweria', 'qris', 'testi', 'riwayat']):
+        res_msg = "🌟 Cek menu /start untuk melihat metode pembayaran QRIS, riwayat pesanan, & katalog lengkap!"
     else:
         res_msg = f"Halo {user.first_name}! Ketik /start untuk membuka menu utama atau hubungi {ADMIN_USERNAME}."
         
     bot.reply_to(message, res_msg, disable_web_page_preview=True)
 
-print("[INFO] Pakel MlbbStore Master Edition Berhasil Dijalankan...")
+print("[INFO] Pakel MlbbStore Master Ultimate Edition Berhasil Dijalankan...")
 bot.infinity_polling()
