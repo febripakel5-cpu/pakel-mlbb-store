@@ -12,7 +12,8 @@ bot = telebot.TeleBot(TOKEN)
 # Identitas Toko Resmi & Link Terkait
 ADMIN_USERNAME = "@PakelMlbbOfficial"
 ADMIN_LINK = "https://t.me/PakelMlbbOfficial"
-CHANNEL_TESTI_LINK = "https://t.me/PakelMlbb"  # Ganti link channel testi lu jika ada
+CHANNEL_TESTI_LINK = "https://t.me/PakelMlbb/368"
+# Ganti link channel testi lu jika ada
 GROUP_CHAT_ID = "@PakelMlbb"
 GROUP_TOPIC_ID = 368
 
