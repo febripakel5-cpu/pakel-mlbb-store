@@ -9,9 +9,10 @@ from datetime import datetime, timezone, timedelta
 TOKEN = '8637403539:AAFyKck7U8POV3hzSw9UcF_sDDp0d_hKat0'
 bot = telebot.TeleBot(TOKEN)
 
-# Identitas Toko Resmi & Link QRIS Imgbb Lu
+# Identitas Toko Resmi & Link Terkait
 ADMIN_USERNAME = "@PakelMlbbOfficial"
 ADMIN_LINK = "https://t.me/PakelMlbbOfficial"
+CHANNEL_TESTI_LINK = "https://t.me/PakelMlbb"  # Ganti link channel testi lu jika ada
 GROUP_CHAT_ID = "@PakelMlbb"
 GROUP_TOPIC_ID = 368
 
@@ -19,7 +20,7 @@ GROUP_TOPIC_ID = 368
 INFO_DANA = "089526466512"
 INFO_GOPAY = "089526466512"
 INFO_SAWERIA = "https://saweria.co/PakelMlbb"
-QRIS_WEB_LINK = "https://ibb.co.com/cX2J28kj"  # Link QRIS lu yang otomatis kebuka
+QRIS_WEB_LINK = "https://ibb.co.com/cX2J28kj"
 
 def save_user(chat_id):
     try:
@@ -51,6 +52,14 @@ def get_time_greeting():
     else:
         return "Selamat Malam 🌙"
 
+# Pengecekan Jam Operasional Toko (Tengah malam / Dini hari istirahat)
+def check_store_status():
+    WIB = timezone(timedelta(hours=7))
+    hour = datetime.now(WIB).hour
+    # Toko istirahat jam 00:00 sampai 07:00 pagi WIB
+    if 0 <= hour < 7:
+        return False, "⚠️ <b>INFO OPERASIONAL TOKO:</b>\nHalo Kak! Saat ini toko sedang istirahat (Offline) jam 00:00 - 07:00 WIB. Pesanan dan pembayaran tetap bisa dilakukan lewat bot, namun proses pengiriman script dan verifikasi resi akan dilanjutkan pagi ini mulai pukul 07:00 WIB ya! 🙏✨"
+    return True, ""
 def get_random_masked_name():
     list_nama_tele = [
         # --- INDONESIA ---
@@ -399,16 +408,20 @@ def send_welcome(message):
         types.InlineKeyboardButton(t['btn_admin'], url=ADMIN_LINK)
     )
     
+    is_open, store_msg = check_store_status()
+    
     if l == 'id':
         welcome_text = (
             f"🔥 {greeting}, Kak {user.first_name}! Selamat datang di Official Pakel MlbbStore 🙏✨\n\n"
             "Pusat layanan script cheat Mobile Legends premium terpercaya, anti-detect kelas atas, server lag panel, & drone view paling stabil se-Indonesia.\n\n"
-            "👇 Silakan pilih menu di bawah ini untuk mulai berbelanja:"
         )
+        if not is_open:
+            welcome_text += f"{store_msg}\n\n"
+        welcome_text += "👇 Silakan pilih menu di bawah ini untuk mulai berbelanja:"
     else:
         welcome_text = f"🔥 {greeting}, {user.first_name}! Welcome to Official Pakel MlbbStore 🙏✨\n\n👇 Please select a menu below:"
         
-    bot.send_message(message.chat.id, welcome_text, reply_markup=markup)
+    bot.send_message(message.chat.id, welcome_text, reply_markup=markup, parse_mode="HTML")
 
 @bot.message_handler(commands=['cekresi', 'resi'])
 def cmd_cekresi(message):
@@ -498,19 +511,24 @@ def callback_handler(call):
             types.InlineKeyboardButton(t['btn_konfirmasi'], callback_data='menu_konfirmasi'),
             types.InlineKeyboardButton(t['btn_admin'], url=ADMIN_LINK)
         )
-        text = f"🔥 {greeting}! Silakan pilih menu utama Pakel MlbbStore:" if l == 'id' else f"🔥 {greeting}! Main Menu:"
+        is_open, store_msg = check_store_status()
+        text = f"🔥 {greeting}! Silakan pilih menu utama Pakel MlbbStore:\n\n" if l == 'id' else f"🔥 {greeting}! Main Menu:\n\n"
+        if not is_open and l == 'id':
+            text += f"{store_msg}\n\n"
+            
         try:
-            bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, reply_markup=markup)
+            bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, reply_markup=markup, parse_mode="HTML")
         except Exception:
-            bot.send_message(chat_id=chat_id, text=text, reply_markup=markup)
+            bot.send_message(chat_id=chat_id, text=text, reply_markup=markup, parse_mode="HTML")
         bot.answer_callback_query(call.id)
 
     elif call.data == 'menu_testi':
         fake_data = generate_fake_testimonials_list()
-        testi_text = f"🌟 LIVE TESTIMONI & TRANSAKSI SUKSES (Kak {user.first_name})\n\n{fake_data}💡 Toko 100% amanah! 🚀" if l == 'id' else f"🌟 LIVE TESTIMONIALS\n\n{fake_data}"
+        testi_text = f"🌟 LIVE TESTIMONI & TRANSAKSI SUKSES (Kak {user.first_name})\n\n{fake_data}💡 Toko 100% amanah & terpercaya! 🚀" if l == 'id' else f"🌟 LIVE TESTIMONIALS\n\n{fake_data}"
         
         markup_testi = types.InlineKeyboardMarkup(row_width=1)
         markup_testi.add(types.InlineKeyboardButton("🔄 Refresh Testimoni Terbaru", callback_data='menu_testi'))
+        markup_testi.add(types.InlineKeyboardButton("🌟 Lihat Ratusan Testi di Channel", url=CHANNEL_TESTI_LINK))
         markup_testi.add(types.InlineKeyboardButton(t['back'], callback_data='menu_utama'))
         
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=testi_text, reply_markup=markup_testi, disable_web_page_preview=True)
@@ -632,5 +650,5 @@ def auto_reply(message):
         
     bot.reply_to(message, res_msg, disable_web_page_preview=True)
 
-print("[INFO] Pakel MlbbStore Imgbb QRIS Edition Berhasil Dijalankan...")
+print("[INFO] Pakel MlbbStore Master Edition Berhasil Dijalankan...")
 bot.infinity_polling()
