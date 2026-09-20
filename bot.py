@@ -350,7 +350,6 @@ def get_back_markup(l):
     text = TRANSLATIONS.get(l, TRANSLATIONS['en'])['back']
     markup.add(types.InlineKeyboardButton(text, callback_data='menu_utama'))
     return markup
-
 @bot.message_handler(commands=['bc', 'broadcast'])
 def broadcast_message(message):
     save_user(message.chat.id)
@@ -674,14 +673,27 @@ def handle_photo(message):
     WIB = timezone(timedelta(hours=7))
     now = datetime.now(WIB)
     
-    res = (
+    res_to_buyer = (
         "✅ BUKTI PEMBAYARAN BERHASIL DIUNGGAH!\n"
         f"Terima kasih Kak {user.first_name} 🙏\n\n"
         f"🛡️ No Resi Unik: PKL-MLBB-{rs}\n"
         f"⏱️ Waktu: {now.strftime('%d-%m-%Y %H:%M:%S WIB')}\n\n"
-        f"📋 Kirim format ini ke Admin: {ADMIN_USERNAME}"
+        f"📋 Silakan tunggu verifikasi dari Admin: {ADMIN_USERNAME}"
     )
-    bot.reply_to(message, res, disable_web_page_preview=True)
+    bot.reply_to(message, res_to_buyer, disable_web_page_preview=True)
+    
+    try:
+        caption_admin = (
+            "🚨 <b>ADA BUKTI TRANSFER MASUK!</b> 🚨\n\n"
+            f"👤 Dari User: @{user.username if user.username else user.first_name} (ID: <code>{user.id}</code>)\n"
+            f"⏱️ Waktu: {now.strftime('%d-%m-%Y %H:%M:%S WIB')}\n"
+            f"🔑 No Resi Unik: PKL-MLBB-{rs}\n\n"
+            "👇 <i>Silakan cek mutasi e-wallet lu (DANA/GoPay) lalu kirim script ke pembeli!</i>"
+        )
+        bot.forward_message(chat_id=GROUP_CHAT_ID, from_chat_id=message.chat.id, message_id=message.message_id)
+        bot.send_message(chat_id=GROUP_CHAT_ID, text=caption_admin, parse_mode="HTML")
+    except Exception as e:
+        print(f"[FORWARD PHOTO ERROR]: {e}")
 
 @bot.message_handler(func=lambda message: True)
 def auto_reply(message):
