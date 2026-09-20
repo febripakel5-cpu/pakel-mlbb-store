@@ -16,9 +16,9 @@ CHANNEL_TESTI_LINK = "https://t.me/PakelMlbb/368"
 GROUP_CHAT_ID = "@PakelMlbb"
 GROUP_TOPIC_ID = 368
 
-# Informasi Nomor Pembayaran Resmi & Link QRIS Web
-INFO_DANA = "089526466512"
-INFO_GOPAY = "089526466512"
+# Informasi Nomor Pembayaran Resmi & Link QRIS Web (Diperbarui ke nomor baru)
+INFO_DANA = "085188371150"
+INFO_GOPAY = "085188371150"
 INFO_SAWERIA = "https://saweria.co/PakelMlbb"
 QRIS_WEB_LINK = "https://ibb.co.com/cX2J28kj"
 
@@ -48,7 +48,6 @@ def save_order(chat_id, paket_nama, harga, resi):
         tanggal_str = now.strftime('%d-%m-%Y')
         jam_str = now.strftime('%H:%M:%S WIB')
         
-        # Format hari dalam bahasa Indonesia
         days_indo = {
             'Mon': 'Senin', 'Tue': 'Selasa', 'Wed': 'Rabu', 
             'Thu': 'Kamis', 'Fri': 'Jumat', 'Sat': 'Sabtu', 'Sun': 'Minggu'
@@ -95,16 +94,15 @@ def get_time_greeting():
     else:
         return "Selamat Malam 🌙"
 
-# Pengecekan Jam Operasional Toko (Tengah malam / Dini hari istirahat)
 def check_store_status():
     WIB = timezone(timedelta(hours=7))
     hour = datetime.now(WIB).hour
     if 0 <= hour < 7:
         return False, "⚠️ <b>INFO OPERASIONAL TOKO:</b>\nHalo Kak! Saat ini toko sedang istirahat (Offline) jam 00:00 - 07:00 WIB. Pesanan dan pembayaran tetap bisa dilakukan lewat bot, namun proses pengiriman script dan verifikasi resi akan dilanjutkan pagi ini mulai pukul 07:00 WIB ya! 🙏✨"
     return True, ""
+
 def get_random_masked_name():
     list_nama_tele = [
-        # --- INDONESIA ---
         "@R_Zky***", "@Alvinn_***", "@Dimas_99***", "@RezaPrat_***", 
         "@Bayu_Official***", "@Farel_X***", "@Yoga_Mlg***", "@DickyGez_***", 
         "@SuryaPratama***", "@RamaWicak***", "@Gilang_ID***", "@BagasKusn***",
@@ -130,57 +128,10 @@ def get_random_masked_name():
         "@Egi***", "@Eky***", "@Fahri***", "@Fandi***",
         "@Farhan***", "@Fauzi***", "@Febri***", "@Firman***",
         "@Fuat***", "@Gani***", "@Gerry***", "@Hadi***",
-        "@Bayu_Pratama***", "@Farel_Official***", "@Yoga_Ganz***", "@Dicky_Dev***",
-        "@Surya_ID***", "@Rama_ID***", "@Gilang_Mlg***", "@Bagas_X***",
-        "@Arif_Prat***", "@Dani_Gmr***", "@Hendra_Sultan***", "@Rian_Wicak***",
-        "@Aldi_Pro***", "@Bintang_Gz***", "@Candra_07***", "@Dika_Wahyudi***",
-        "@Fajar_Sltn***", "@Galih_Xtrem***", "@Iqbal_Farel***", "@Joko_Santoso***",
-        "@Kevin_Bagas***", "@Lukman_Rizky***", "@Maulana_Dwi***", "@Naufal_Akbar***",
-        "@Pratama_Putra***", "@Rafli_Maulana***", "@Satria_angga***", "@Tegar_Aditya***",
-        "@Vian_Saputra***", "@Wahyu_Hidayat***", "@Yuda_Kurniawan***", "@Zaki_Mubarok***",
-        "@Rizal_Ganz***", "@Maulana_ID***", "@Fikri_Ramadhan***", "@Ilham_Saputra***",
-        "@Rezky_Pratama***", "@Rizky_Maulana***", "@Fauzan_Azima***", "@Zidan_Alfarizi***",
-        "@Rafi_Ahmad***", "@Zaki_Mubarok***", "@Fathan_Haikal***", "@Rifki_Ananda***",
-        "@Aditya_Pratama***", "@Bayu_Pamungkas***", "@Yoga_Prasetyo***", "@Dimas_Mahendra***",
-        "@R_Zky2026***", "@Alvinn123***", "@Dimas777***", "@Reza888***", 
-        "@Bayu555***", "@Farel444***", "@Yoga333***", "@Dicky222***", 
-        "@Surya111***", "@Rama999***", "@Gilang000***", "@Bagas777***",
-        "@Den_Bagusk***", "@Reyhan_X***", "@Akmal_Store***", "@Zul_Fikar***",
-        "@Pandu_Gans***", "@Radit_Pratama***", "@Gibran_ID***", "@Baim_Wong***",
-        "@Ibnu_Sina***", "@Fahru_Nzi***", "@Nabil_Store***", "@Wildan_Xyz***",
-        "@Erlangga_99***", "@Devan_Gmr***", "@Mahesa_Wk***", "@Ary_Satria***",
-
-        # --- MALAYSIA ---
         "@Amirul_My***", "@Haikal_Iskandar***", "@Farhan_Zul***", "@Aiman_Badri***",
         "@Aqil_Danial***", "@Syahmi_Zain***", "@Luqman_Hakim***", "@Zulhelmi_My***",
-        "@Azril_Anuar***", "@Izzat_Mukhriz***", "@Faris_Najmi***", "@Hazim_Zikri***",
-        "@Nabil_Hakimi***", "@Danial_Fitri***", "@Amir_Syazwan***", "@Firdaus_Rosli***",
-        "@Hakim_Azman***", "@Imran_Danish***", "@Khairul_Anwar***", "@Zack_Malaya***",
-        "@Syafiq_Amsyar***", "@Aidil_Azhar***", "@Faiz_Mokhtar***", "@Megat_Zul***",
-        "@Tarmizi_My***", "@Azlan_Shah***", "@Shahrul_Nizam***", "@Rizman_Azrai***",
-
-        # --- INGGRIS & WESTERN / INTERNASIONAL ---
         "@Alex_Walker***", "@Liam_Smith***", "@Noah_Miller***", "@Oliver_Davis***",
-        "@Elijah_Wilson***", "@James_Taylor***", "@William_Anderson***", "@Lucas_Thomas***",
-        "@Mason_Moore***", "@Ethan_Jackson***", "@Logan_Martin***", "@Benjamin_Lee***",
-        "@Lucas_White***", "@Alexander_Harris***", "@Henry_Clark***", "@Sebastian_Lewis***",
-        "@Jack_Robinson***", "@Owen_Walker***", "@Theodore_Perez***", "@Aiden_Hall***",
-        "@Samuel_Young***", "@Joseph_King***", "@John_Wright***", "@David_Scott***",
-        "@Wyatt_Green***", "@Matthew_Baker***", "@Luke_Adams***", "@Asher_Nelson***",
-        "@Carter_Carter***", "@Julian_Mitchell***", "@Grayson_Perez***", "@Leo_Roberts***",
-        "@Jayden_Turner***", "@Gabriel_Phillips***", "@Isaac_Campbell***", "@Caleb_Parker***",
-        "@Anthony_Evans***", "@Lincoln_Edwards***", "@Jaxon_Collins***", "@Mateo_Stewart***",
-        "@Hudson_Sanchez***", "@Theodore_Morris***", "@Thomas_Rogers***", "@Connor_Reed***",
-        "@Eli_Cook***", "@Aaron_Morgan***", "@Ezra_Bell***", "@Landon_Murphy***",
-        "@Adrian_Bailey***", "@Jonathan_Rivera***", "@Nolan_Cooper***", "@Easton_Richardson***",
-        "@Ezekiel_Cox***", "@Milton_Howard***", "@Cole_Ward***", "@Carson_Torres***",
-
-        # --- TAMBAHAN TRENDING GAMER ---
-        "@Sultan_Mlbb***", "@Anjay_Mabar***", "@Gacor_Gaming***", "@TopGlobal_1***",
-        "@Mythic_Immortal***", "@ProPlayer_Indo***", "@Epep_Bapakmu***", "@Bocil_Kematian***",
-        "@Wibu_Gariskeras***", "@Beban_Tim***", "@Jagoan_Emak***", "@Peler_Jawa***",
-        "@Raja_Turu***", "@Bapak_Gamer***", "@Anak_Sultan***", "@Wong_Kito***",
-        "@Ank_Nongkrong***", "@Wibu_Hunter***", "@Savage_Everyday***", "@Maniac_Lord***"
+        "@Sultan_Mlbb***", "@Anjay_Mabar***", "@Gacor_Gaming***", "@TopGlobal_1***"
     ]
     return random.choice(list_nama_tele)
 
@@ -309,6 +260,7 @@ def cmd_sc_interactive(message):
         reply_markup=markup, 
         parse_mode="HTML"
     )
+
 TRANSLATIONS = {
     'id': {
         'btn_katalog': "💎 Katalog VIP & Harga Paket",
@@ -341,15 +293,15 @@ TRANSLATIONS = {
         'inv_title': "🛒 INVOICE PEMESANAN RESMI VIP (Kak {name}) 🧾",
         'pay_info': (
             "💳 SILAKAN PILIH METODE PEMBAYARAN DI BAWAH INI:\n\n"
-            "1️⃣ QRIS (Scan Otomatis Semua Bank / E-Wallet / Cross-Border):\n"
-            "   👉 Klik tombol link QRIS di bawah untuk langsung membuka gambar QRIS!\n\n"
-            "2️⃣ TRANSFER MANUAL DANA / GOPAY:\n"
-            f"   • Nomor DANA: {INFO_DANA}\n"
-            f"   • Nomor GoPay: {INFO_GOPAY}\n\n"
+            "1️⃣ QRIS (CROSS-BORDER / ALL E-WALLET):\n"
+            "   ⚠️ <b>Mohon Maaf, QRIS Saat Ini Sedang Gangguan / Error!</b> Silakan gunakan metode transfer manual di bawah ya.\n\n"
+            "2️⃣ TRANSFER MANUAL DANA / GOPAY (RECOMMENDED):\n"
+            f"   • Nomor: <code>{INFO_DANA}</code>\n"
+            "   • Atas Nama: PakelMlbb\n\n"
             "3️⃣ SAWERIA (Support Kartu & E-Wallet):\n"
             f"   • Link: {INFO_SAWERIA}\n"
         ),
-        'confirm_instr': "🛡️ INSTRUKSI KONFIRMASI PEMBAYARAN:\nSetelah sukses membayar via QRIS atau metode lainnya, silakan kirim Screenshot Bukti Transfer ke bot ini untuk mendapatkan Resi Unik.",
+        'confirm_instr': "🛡️ INSTRUKSI KONFIRMASI PEMBAYARAN:\nSetelah sukses membayar via transfer manual, silakan kirim Screenshot Bukti Transfer ke bot ini untuk mendapatkan Resi Unik.",
     },
     'en': {
         'btn_katalog': "💎 VIP Catalogue & Pricing",
@@ -380,7 +332,7 @@ TRANSLATIONS = {
         'next_1': "▶️ Next: Catalog Part 2 (One Hit)",
         'prev_2': "◀️ Back to Catalog Part 1",
         'inv_title': "🛒 AUTOMATED VIP ORDER INVOICE ({name}) 🧾",
-        'pay_info': "💳 CHOOSE PAYMENT METHOD:\n1. QRIS (Click link below)\n2. DANA / GoPay\n3. Saweria",
+        'pay_info': "💳 CHOOSE PAYMENT METHOD (QRIS is temporarily down, please use DANA/GoPay):",
         'confirm_instr': "🛡️ CONFIRMATION INSTRUCTION:\nSend transfer screenshot after payment.",
     }
 }
@@ -428,10 +380,11 @@ def broadcast_message(message):
             bot.send_message(chat_id, f"📢 <b>PENGUMUMAN RESMI PAKEL MLBBSTORE</b>\n\n{pesan_bc}", parse_mode="HTML")
             success += 1
             time.sleep(0.05)
-        except Exception as e:
+        except Exception:
             failed += 1
             
     bot.send_message(message.chat.id, f"✅ Broadcast Selesai!\n- Berhasil: {success}\n- Gagal: {failed}")
+
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
     user = message.from_user
@@ -480,7 +433,7 @@ def cmd_riwayat(message):
         text = f"📋 RIWAYAT PESANAN SAYA (Kak {user.first_name})\n\n❌ Belum ada riwayat pesanan tercatat.\n💡 Silakan pilih paket di /katalog untuk melakukan pemesanan baru!"
     else:
         text = f"📋 <b>RIWAYAT PESANAN SAYA (Kak {user.first_name})</b>\n\n"
-        for idx, o in enumerate(orders[-5:], 1): # Menampilkan 5 pesanan terakhir
+        for idx, o in enumerate(orders[-5:], 1):
             text += (
                 f"<b>{idx}. {o['paket']}</b>\n"
                 f"   • Harga: {o['harga']}\n"
@@ -562,7 +515,7 @@ def callback_handler(call):
                 f"🤖 Bot Store: @{bot.get_me().username}"
             )
             bot.send_message(chat_id=GROUP_CHAT_ID, text=post_text, message_thread_id=GROUP_TOPIC_ID, disable_web_page_preview=True)
-            bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=f"✅ **BERHASIL DIKIRIM KE GRUP!**\n\n• Pembeli: {buyer_name}\n• Paket: {paket_nama} ({harga})")
+            bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=f"✅ <b>BERHASIL DIKIRIM KE GRUP!</b>\n\n• Pembeli: {buyer_name}\n• Paket: {paket_nama} ({harga})", parse_mode="HTML")
             bot.answer_callback_query(call.id, text="Testimoni sukses terkirim ke grup!")
         except Exception as e:
             bot.answer_callback_query(call.id, text=f"Gagal: {e}", show_alert=True)
@@ -669,7 +622,6 @@ def callback_handler(call):
         random_serial = random.randint(10000, 99999)
         resi_unik = f"PKL-MLBB-{random_serial}"
         
-        # Simpan pesanan secara otomatis ke database orders.txt
         save_order(chat_id, paket_nama, harga_paket, resi_unik)
         
         invoice_text = (
@@ -684,7 +636,6 @@ def callback_handler(call):
         )
         
         markup_inv = types.InlineKeyboardMarkup(row_width=1)
-        markup_inv.add(types.InlineKeyboardButton("💳 Buka Gambar QRIS Pembayaran", url=QRIS_WEB_LINK))
         markup_inv.add(types.InlineKeyboardButton("📦 Cek Riwayat Pesanan Saya", callback_data='menu_riwayat'))
         markup_inv.add(types.InlineKeyboardButton(t['back'], callback_data='menu_utama'))
         
@@ -697,17 +648,16 @@ def callback_handler(call):
         bot.answer_callback_query(call.id, text="Invoice & Riwayat Tercatat Otomatis!")
 
     elif call.data == 'menu_cara_order':
-        text = "❓ PANDUAN CARA ORDER\n1. Pilih paket di katalog.\n2. Klik beli untuk dapat nomor resi & tombol link QRIS.\n3. Bayar & kirim bukti transfer."
+        text = "❓ PANDUAN CARA ORDER\n1. Pilih paket di katalog.\n2. Klik beli untuk dapat nomor resi.\n3. Transfer ke DANA/GoPay & kirim bukti transfer."
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, reply_markup=get_back_markup(l), disable_web_page_preview=True)
         bot.answer_callback_query(call.id)
 
     elif call.data == 'menu_bayar':
         markup_bayar = types.InlineKeyboardMarkup(row_width=1)
-        markup_bayar.add(types.InlineKeyboardButton("💳 Buka Gambar QRIS", url=QRIS_WEB_LINK))
         markup_bayar.add(types.InlineKeyboardButton(t['back'], callback_data='menu_utama'))
 
-        text = f"💳 METODE PEMBAYARAN\n\n1. QRIS (Klik tombol di bawah untuk buka gambar)\n2. DANA/GoPay: {INFO_DANA}\n3. Saweria: {INFO_SAWERIA}"
-        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, reply_markup=markup_bayar, disable_web_page_preview=True)
+        text = f"💳 METODE PEMBAYARAN\n\n1. QRIS: ⚠️ <b>Sedang Gangguan/Error</b>\n2. DANA / GoPay: <code>{INFO_DANA}</code> (a.n. PakelMlbb)\n3. Saweria: {INFO_SAWERIA}"
+        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, reply_markup=markup_bayar, parse_mode="HTML", disable_web_page_preview=True)
         bot.answer_callback_query(call.id)
 
     elif call.data == 'menu_konfirmasi':
@@ -743,7 +693,7 @@ def auto_reply(message):
     if any(w in txt for w in ['price', 'harga', 'list', 'menu', 'catalog', 'katalog']):
         res_msg = "💎 Ketik /start untuk membuka Katalog VIP!"
     elif any(w in txt for w in ['pay', 'bayar', 'dana', 'gopay', 'saweria', 'qris', 'testi', 'riwayat']):
-        res_msg = "🌟 Cek menu /start untuk melihat metode pembayaran QRIS, riwayat pesanan, & katalog lengkap!"
+        res_msg = "🌟 Cek menu /start untuk melihat metode pembayaran, riwayat pesanan, & katalog lengkap!"
     else:
         res_msg = f"Halo {user.first_name}! Ketik /start untuk membuka menu utama atau hubungi {ADMIN_USERNAME}."
         
