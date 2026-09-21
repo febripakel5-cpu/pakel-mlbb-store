@@ -10,7 +10,7 @@ TOKEN = '8455547902:AAFN3_el-rrdqacd0DsgHT8LH96bZ1Emw5U'
 
 bot = telebot.TeleBot(TOKEN)
 
-# Hapus webhook yang nyangkut biar tidak error 409 Conflict
+# Pembersih webhook otomatis agar terhindar dari Error 409 Conflict
 try:
     bot.remove_webhook()
 except Exception:
@@ -388,7 +388,6 @@ def get_back_markup(l):
     text = TRANSLATIONS.get(l, TRANSLATIONS['en'])['back']
     markup.add(types.InlineKeyboardButton(text, callback_data='menu_utama'))
     return markup
-
 @bot.message_handler(commands=['bc', 'broadcast'])
 def broadcast_message(message):
     save_user(message.chat.id)
@@ -510,7 +509,6 @@ def cmd_katalog(message):
 
     katalog_text = f"{t['cat_title_1'].format(name=user.first_name)}\n\n{t['bonus_txt']}\n\n" + "\n\n".join([desc for _, _, desc in t['p1']])
     bot.send_message(message.chat.id, katalog_text, reply_markup=markup)
-
 @bot.callback_query_handler(func=lambda call: True)
 def callback_handler(call):
     save_user(call.message.chat.id)
@@ -645,6 +643,7 @@ def callback_handler(call):
         return
 
     if call.data == 'menu_utama':
+        bot.answer_callback_query(call.id)
         markup = types.InlineKeyboardMarkup(row_width=1)
         markup.add(
             types.InlineKeyboardButton(t['btn_katalog'], callback_data='menu_katalog'),
@@ -666,9 +665,9 @@ def callback_handler(call):
             bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, reply_markup=markup, parse_mode="HTML")
         except Exception:
             bot.send_message(chat_id=chat_id, text=text, reply_markup=markup, parse_mode="HTML")
-        bot.answer_callback_query(call.id)
 
     elif call.data == 'menu_testi':
+        bot.answer_callback_query(call.id, text="Testimoni diperbarui!")
         fake_data = generate_fake_testimonials_list()
         testi_text = f"🌟 LIVE TESTIMONI & TRANSAKSI SUKSES (Kak {user.first_name})\n\n{fake_data}💡 Toko 100% amanah & terpercaya! 🚀" if l == 'id' else f"🌟 LIVE TESTIMONIALS\n\n{fake_data}"
         
@@ -678,9 +677,9 @@ def callback_handler(call):
         markup_testi.add(types.InlineKeyboardButton(t['back'], callback_data='menu_utama'))
         
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=testi_text, reply_markup=markup_testi, disable_web_page_preview=True)
-        bot.answer_callback_query(call.id, text="Testimoni diperbarui!")
 
     elif call.data == 'menu_riwayat':
+        bot.answer_callback_query(call.id, text="Riwayat dimuat!")
         orders = get_user_orders(chat_id)
         if not orders:
             riw_text = f"📋 RIWAYAT PESANAN SAYA (Kak {user.first_name})\n\n❌ Belum ada riwayat pesanan tercatat.\n💡 Silakan pilih paket di katalog untuk membuat pesanan baru!"
@@ -698,19 +697,19 @@ def callback_handler(call):
             riw_text += "💡 <i>Kirim bukti transfer jika belum dikonfirmasi admin!</i>"
             
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=riw_text, reply_markup=get_back_markup(l), parse_mode="HTML", disable_web_page_preview=True)
-        bot.answer_callback_query(call.id, text="Riwayat dimuat!")
 
     elif call.data == 'menu_promo':
+        bot.answer_callback_query(call.id)
         promo_text = f"🎁 PROMO EKSKLUSIF (Kak {user.first_name})\n\n🎟️ KODE KUPON: WELCOMEPAKEL\n💰 Potongan harga spesial pembelian pertama!"
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=promo_text, reply_markup=get_back_markup(l))
-        bot.answer_callback_query(call.id)
 
     elif call.data == 'menu_faq':
+        bot.answer_callback_query(call.id)
         faq_text = "💡 FAQ PAKEL MLBBSTORE\n\n❓ Aman dari banned? 💬 A: Sangat aman, enkripsi anti-detect tinggi."
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=faq_text, reply_markup=get_back_markup(l))
-        bot.answer_callback_query(call.id)
 
     elif call.data == 'menu_katalog' or call.data == 'katalog_part1':
+        bot.answer_callback_query(call.id)
         markup = types.InlineKeyboardMarkup(row_width=1)
         for btn_text, callback_val, _ in t['p1']:
             markup.add(types.InlineKeyboardButton(btn_text, callback_data=callback_val))
@@ -719,9 +718,9 @@ def callback_handler(call):
 
         katalog_text = f"{t['cat_title_1'].format(name=user.first_name)}\n\n{t['bonus_txt']}\n\n" + "\n\n".join([desc for _, _, desc in t['p1']])
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=katalog_text, reply_markup=markup, disable_web_page_preview=True)
-        bot.answer_callback_query(call.id)
 
     elif call.data == 'katalog_part2':
+        bot.answer_callback_query(call.id)
         markup = types.InlineKeyboardMarkup(row_width=1)
         for btn_text, callback_val, _ in t['p2']:
             markup.add(types.InlineKeyboardButton(btn_text, callback_data=callback_val))
@@ -730,9 +729,9 @@ def callback_handler(call):
 
         katalog_text = f"{t['cat_title_2'].format(name=user.first_name)}\n\n" + "\n\n".join([desc for _, _, desc in t['p2']])
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=katalog_text, reply_markup=markup, disable_web_page_preview=True)
-        bot.answer_callback_query(call.id)
 
     elif call.data.startswith('buy_'):
+        bot.answer_callback_query(call.id, text="Invoice & Riwayat Tercatat Otomatis!")
         all_items = t['p1'] + t['p2']
         paket_nama = "VIP Package"
         harga_paket = "Rp 100.000"
@@ -769,26 +768,25 @@ def callback_handler(call):
             pass
             
         bot.send_message(chat_id, invoice_text, reply_markup=markup_inv, parse_mode="HTML", disable_web_page_preview=True)
-        bot.answer_callback_query(call.id, text="Invoice & Riwayat Tercatat Otomatis!")
 
     elif call.data == 'menu_cara_order':
+        bot.answer_callback_query(call.id)
         text = "❓ PANDUAN CARA ORDER\n1. Pilih paket di katalog.\n2. Klik beli untuk dapat nomor resi.\n3. Transfer ke DANA/GoPay & kirim bukti transfer."
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, reply_markup=get_back_markup(l), disable_web_page_preview=True)
-        bot.answer_callback_query(call.id)
 
     elif call.data == 'menu_bayar':
+        bot.answer_callback_query(call.id)
         markup_bayar = types.InlineKeyboardMarkup(row_width=1)
         markup_bayar.add(types.InlineKeyboardButton(t['back'], callback_data='menu_utama'))
 
         text = f"💳 METODE PEMBAYARAN\n\n1. QRIS: ⚠️ <b>Sedang Gangguan/Error</b>\n2. DANA / GoPay: <code>{INFO_DANA}</code> (a.n. PakelMlbb)\n3. Saweria: {INFO_SAWERIA}"
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, reply_markup=markup_bayar, parse_mode="HTML", disable_web_page_preview=True)
-        bot.answer_callback_query(call.id)
 
     elif call.data == 'menu_konfirmasi':
+        bot.answer_callback_query(call.id)
         rs = random.randint(10000, 99999)
         text = f"✅ KONFIRMASI PEMBAYARAN\n\nKirim screenshot bukti transfer Anda dengan menyertakan Nomor Resi (misal: PKL-MLBB-{rs}) ke admin."
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, reply_markup=get_back_markup(l), disable_web_page_preview=True)
-        bot.answer_callback_query(call.id)
 
 @bot.message_handler(content_types=['photo'])
 def handle_photo(message):
