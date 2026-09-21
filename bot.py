@@ -382,6 +382,7 @@ def get_back_markup(l):
     text = TRANSLATIONS.get(l, TRANSLATIONS['en'])['back']
     markup.add(types.InlineKeyboardButton(text, callback_data='menu_utama'))
     return markup
+
 @bot.message_handler(commands=['bc', 'broadcast'])
 def broadcast_message(message):
     save_user(message.chat.id)
@@ -503,6 +504,7 @@ def cmd_katalog(message):
 
     katalog_text = f"{t['cat_title_1'].format(name=user.first_name)}\n\n{t['bonus_txt']}\n\n" + "\n\n".join([desc for _, _, desc in t['p1']])
     bot.send_message(message.chat.id, katalog_text, reply_markup=markup)
+
 @bot.callback_query_handler(func=lambda call: True)
 def callback_handler(call):
     save_user(call.message.chat.id)
@@ -549,7 +551,7 @@ def callback_handler(call):
                 except Exception:
                     pass
 
-                # Template teks yang otomatis bisa di-tap/copy oleh pembeli
+                # Template teks bersih tanpa duplikasi teks/BUTTON_COPY
                 template_chat_admin = (
                     "🔥 KONFIRMASI KLAIM SCRIPT VIP 🔥\n"
                     f"📦 Paket: {detail_paket}\n"
