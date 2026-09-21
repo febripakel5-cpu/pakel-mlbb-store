@@ -6,7 +6,7 @@ import threading
 from datetime import datetime, timezone, timedelta
 
 # Token bot lu yang aktif dan siap tempur
-TOKEN = '8455547902:AAFN3_el-rrdqacd0DsgHT8LH96bZ1Emw5U'
+TOKEN = '8614166487:AAFt6SzB6mP6sA31fXU7QUsz9uH8KdIEiFo'
 
 bot = telebot.TeleBot(TOKEN)
 
