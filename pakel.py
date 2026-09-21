@@ -97,7 +97,7 @@ def save_order(chat_id, paket_nama, harga, resi):
         now = datetime.now(WIB)
         tanggal_str = now.strftime('%d-%m-%Y')
         jam_str = now.strftime('%H:%M:%S WIB')
-        timestamp_epoch = int(now.timestamp()) # Diperlukan untuk sistem Timeout 15 Menit
+        timestamp_epoch = int(now.timestamp())
         
         days_indo = {
             'Mon': 'Senin', 'Tue': 'Selasa', 'Wed': 'Rabu', 
@@ -149,7 +149,6 @@ def update_order_status_by_resi(resi_target, status_baru):
                 if status_baru == "BERHASIL":
                     set_user_coupon_status(target_chat_id, "USED")
                 elif status_baru == "DITOLAK" or status_baru == "EXPIRED":
-                    # Jika ditolak atau expired, kupon dikembalikan aktif
                     set_user_coupon_status(target_chat_id, "AVAILABLE")
                     
             return True
@@ -178,7 +177,6 @@ def get_user_orders(chat_id):
     return orders
 
 def get_latest_user_order_data(chat_id):
-    """Mengambil data detail pesanan terakhir user untuk pengecekan Timeout 15 Menit"""
     try:
         WIB = timezone(timedelta(hours=7))
         current_time = int(datetime.now(WIB).timestamp())
@@ -195,7 +193,6 @@ def get_latest_user_order_data(chat_id):
             status = last_order[7]
             timestamp_epoch = int(last_order[8]) if len(last_order) > 8 else current_time
             
-            # Cek apakah sudah lebih dari 15 menit (900 detik) dan status masih PENDING
             if status == "PENDING" and (current_time - timestamp_epoch > 900):
                 update_order_status_by_resi(resi, "EXPIRED")
                 return resi, "EXPIRED"
@@ -383,7 +380,6 @@ def cmd_sc_interactive(message):
         reply_markup=markup, 
         parse_mode="HTML"
     )
-
 TRANSLATIONS = {
     'id': {
         'btn_katalog': "💎 Katalog VIP & Harga Paket",
@@ -406,10 +402,10 @@ TRANSLATIONS = {
             ("🛒 Beli: Lifetime Safe Permanent (Rp 200k)", "buy_lifetimesafe", "• 👑 Lifetime Safe (Permanent) — Rp 200.000\n  └ 🎯 Fungsi: Akses permanen seumur hidup + update gratis.")
         ],
         'p1_promo': [
-            ("🛒 Beli: Natural Balance <s>Rp 120k</s> <b>Rp 110k</b> (-8%)", "buy_natural", "• 💎 Natural Balance (30 Hari) — <s>Rp 120.000</s> <b>Rp 110.000</b> (Hemat Rp 10.000!)\n  └ 🎯 Fungsi: Script penyetara damage halus, aman anti-detect untuk tier Mythic."),
-            ("🛒 Beli: Light VIP + Drone <s>Rp 95k</s> <b>Rp 85k</b> (-10%)", "buy_light", "• ⚡ Light VIP + Drone (30 Hari) — <s>Rp 95.000</s> <b>Rp 85.000</b> (Hemat Rp 10.000!)\n  └ 🎯 Fungsi: Boost damage ringan + map vision luas (drone view)."),
-            ("🛒 Beli: Semi-Safe 14 Hari <s>Rp 75k</s> <b>Rp 65k</b> (-13%)", "buy_semisafe", "• 🛡️ Semi-Safe (14 Hari) — <s>Rp 75.000</s> <b>Rp 65.000</b> (Hemat Rp 10.000!)\n  └ 🎯 Fungsi: Solusi cepat push rank akhir season."),
-            ("🛒 Beli: Lifetime Safe Permanent <s>Rp 200k</s> <b>Rp 190k</b> (-5%)", "buy_lifetimesafe", "• 👑 Lifetime Safe (Permanent) — <s>Rp 200.000</s> <b>Rp 190.000</b> (Hemat Rp 10.000!)\n  └ 🎯 Fungsi: Akses permanen seumur hidup + update gratis.")
+            ("🛒 Natural Balance (Rp 110k - Hemat 10k)", "buy_natural", "• 💎 Natural Balance (30 Hari) — <s>Rp 120.000</s> <b>Rp 110.000</b> (Hemat Rp 10.000!)\n  └ 🎯 Fungsi: Script penyetara damage halus, aman anti-detect untuk tier Mythic."),
+            ("🛒 Light VIP + Drone (Rp 85k - Hemat 10k)", "buy_light", "• ⚡ Light VIP + Drone (30 Hari) — <s>Rp 95.000</s> <b>Rp 85.000</b> (Hemat Rp 10.000!)\n  └ 🎯 Fungsi: Boost damage ringan + map vision luas (drone view)."),
+            ("🛒 Semi-Safe 14 Hari (Rp 65k - Hemat 10k)", "buy_semisafe", "• 🛡️ Semi-Safe (14 Hari) — <s>Rp 75.000</s> <b>Rp 65.000</b> (Hemat Rp 10.000!)\n  └ 🎯 Fungsi: Solusi cepat push rank akhir season."),
+            ("🛒 Lifetime Safe (Rp 190k - Hemat 10k)", "buy_lifetimesafe", "• 👑 Lifetime Safe (Permanent) — <s>Rp 200.000</s> <b>Rp 190.000</b> (Hemat Rp 10.000!)\n  └ 🎯 Fungsi: Akses permanen seumur hidup + update gratis.")
         ],
         'p2_normal': [
             ("🛒 Beli: Sultan One Hit 100% (Rp 150k)", "buy_sultan", "• 💥 Sultan One Hit 100% (30 Hari) — Rp 150.000\n  └ 🎯 Fungsi: One hit kill mutlak untuk dominasi total."),
@@ -418,10 +414,10 @@ TRANSLATIONS = {
             ("🛒 Beli: Permanent Legend (Rp 250k)", "buy_permanent", "• 🏆 Permanent Legend (Lifetime) — Rp 250.000\n  └ 🎯 Fungsi: Paket elit permanen seumur hidup.")
         ],
         'p2_promo': [
-            ("🛒 Beli: Sultan One Hit 100% <s>Rp 150k</s> <b>Rp 140k</b> (-7%)", "buy_sultan", "• 💥 Sultan One Hit 100% (30 Hari) — <s>Rp 150.000</s> <b>Rp 140.000</b> (Hemat Rp 10.000!)\n  └ 🎯 Fungsi: One hit kill mutlak untuk dominasi total."),
-            ("🛒 Beli: VIP Pro One Hit 80% <s>Rp 100k</s> <b>Rp 90k</b> (-10%)", "buy_pro", "• ⚡ VIP Pro One Hit 80% (30 Hari) — <s>Rp 100.000</s> <b>Rp 90.000</b> (Hemat Rp 10.000!)\n  └ 🎯 Fungsi: Keseimbangan kekuatan dan keamanan akun."),
-            ("🛒 Beli: Semi-Private 14 Hari <s>Rp 75k</s> <b>Rp 65k</b> (-13%)", "buy_semiprivate", "• 🔒 Semi-Private (14 Hari) — <s>Rp 75.000</s> <b>Rp 65.000</b> (Hemat Rp 10.000!)\n  └ 🎯 Fungsi: Script privat eksklusif 2 minggu."),
-            ("🛒 Beli: Permanent Legend <s>Rp 250k</s> <b>Rp 240k</b> (-4%)", "buy_permanent", "• 🏆 Permanent Legend (Lifetime) — <s>Rp 250.000</s> <b>Rp 240.000</b> (Hemat Rp 10.000!)\n  └ 🎯 Fungsi: Paket elit permanen seumur hidup.")
+            ("🛒 Sultan One Hit (Rp 140k - Hemat 10k)", "buy_sultan", "• 💥 Sultan One Hit 100% (30 Hari) — <s>Rp 150.000</s> <b>Rp 140.000</b> (Hemat Rp 10.000!)\n  └ 🎯 Fungsi: One hit kill mutlak untuk dominasi total."),
+            ("🛒 VIP Pro One Hit (Rp 90k - Hemat 10k)", "buy_pro", "• ⚡ VIP Pro One Hit 80% (30 Hari) — <s>Rp 100.000</s> <b>Rp 90.000</b> (Hemat Rp 10.000!)\n  └ 🎯 Fungsi: Keseimbangan kekuatan dan keamanan akun."),
+            ("🛒 Semi-Private 14 Hari (Rp 65k - Hemat 10k)", "buy_semiprivate", "• 🔒 Semi-Private (14 Hari) — <s>Rp 75.000</s> <b>Rp 65.000</b> (Hemat Rp 10.000!)\n  └ 🎯 Fungsi: Script privat eksklusif 2 minggu."),
+            ("🛒 Permanent Legend (Rp 240k - Hemat 10k)", "buy_permanent", "• 🏆 Permanent Legend (Lifetime) — <s>Rp 250.000</s> <b>Rp 240.000</b> (Hemat Rp 10.000!)\n  └ 🎯 Fungsi: Paket elit permanen seumur hidup.")
         ],
         'next_1': "▶️ Lanjut ke Katalog Bagian 2 (Sultan One Hit)",
         'prev_2': "◀️ Kembali ke Katalog Bagian 1",
@@ -459,10 +455,10 @@ TRANSLATIONS = {
             ("🛒 Buy: Lifetime Permanent ($13 / Rp 200k)", "buy_lifetimesafe", "• 👑 Lifetime Permanent — $13 / Rp 200k")
         ],
         'p1_promo': [
-            ("🛒 Buy: Natural Balance <s>$8</s> <b>$7.3</b>", "buy_natural", "• 💎 Natural Balance (30 Days) — <s>$8</s> <b>$7.3</b> (Promo Member Baru!)"),
-            ("🛒 Buy: Light VIP + Drone <s>$6</s> <b>$5.3</b>", "buy_light", "• ⚡ Light VIP + Drone (30 Days) — <s>$6</s> <b>$5.3</b> (Promo Member Baru!)"),
-            ("🛒 Buy: Semi-Safe 14 Days <s>$5</s> <b>$4.3</b>", "buy_semisafe", "• 🛡️ Semi-Safe (14 Days) — <s>$5</s> <b>$4.3</b> (Promo Member Baru!)"),
-            ("🛒 Buy: Lifetime Permanent <s>$13</s> <b>$12.3</b>", "buy_lifetimesafe", "• 👑 Lifetime Permanent — <s>$13</s> <b>$12.3</b> (Promo Member Baru!)")
+            ("🛒 Buy: Natural Balance ($7.3)", "buy_natural", "• 💎 Natural Balance (30 Days) — <s>$8</s> <b>$7.3</b> (Promo Member Baru!)"),
+            ("🛒 Buy: Light VIP + Drone ($5.3)", "buy_light", "• ⚡ Light VIP + Drone (30 Days) — <s>$6</s> <b>$5.3</b> (Promo Member Baru!)"),
+            ("🛒 Buy: Semi-Safe 14 Days ($4.3)", "buy_semisafe", "• 🛡️ Semi-Safe (14 Days) — <s>$5</s> <b>$4.3</b> (Promo Member Baru!)"),
+            ("🛒 Buy: Lifetime Permanent ($12.3)", "buy_lifetimesafe", "• 👑 Lifetime Permanent — <s>$13</s> <b>$12.3</b> (Promo Member Baru!)")
         ],
         'p2_normal': [
             ("🛒 Buy: Sultan One Hit 100% ($10 / Rp 150k)", "buy_sultan", "• 💥 Sultan One Hit 100% — $10 / Rp 150k"),
@@ -471,10 +467,10 @@ TRANSLATIONS = {
             ("🛒 Buy: Permanent Legend ($16 / Rp 250k)", "buy_permanent", "• 🏆 Permanent Legend — $16 / Rp 250k")
         ],
         'p2_promo': [
-            ("🛒 Buy: Sultan One Hit 100% <s>$10</s> <b>$9.3</b>", "buy_sultan", "• 💥 Sultan One Hit 100% — <s>$10</s> <b>$9.3</b> (Promo Member Baru!)"),
-            ("🛒 Buy: VIP Pro One Hit 80% <s>$7</s> <b>$6.3</b>", "buy_pro", "• ⚡ VIP Pro One Hit 80% — <s>$7</s> <b>$6.3</b> (Promo Member Baru!)"),
-            ("🛒 Buy: Semi-Private 14 Days <s>$5</s> <b>$4.3</b>", "buy_semiprivate", "• 🔒 Semi-Private (14 Days) — <s>$5</s> <b>$4.3</b> (Promo Member Baru!)"),
-            ("🛒 Buy: Permanent Legend <s>$16</s> <b>$15.3</b>", "buy_permanent", "• 🏆 Permanent Legend — <s>$16</s> <b>$15.3</b> (Promo Member Baru!)")
+            ("🛒 Buy: Sultan One Hit ($9.3)", "buy_sultan", "• 💥 Sultan One Hit 100% — <s>$10</s> <b>$9.3</b> (Promo Member Baru!)"),
+            ("🛒 Buy: VIP Pro One Hit ($6.3)", "buy_pro", "• ⚡ VIP Pro One Hit 80% — <s>$7</s> <b>$6.3</b> (Promo Member Baru!)"),
+            ("🛒 Buy: Semi-Private 14 Days ($4.3)", "buy_semiprivate", "• 🔒 Semi-Private (14 Days) — <s>$5</s> <b>$4.3</b> (Promo Member Baru!)"),
+            ("🛒 Buy: Permanent Legend ($15.3)", "buy_permanent", "• 🏆 Permanent Legend — <s>$16</s> <b>$15.3</b> (Promo Member Baru!)")
         ],
         'next_1': "▶️ Next: Catalog Part 2 (One Hit)",
         'prev_2': "◀️ Back to Catalog Part 1",
@@ -613,7 +609,6 @@ def cmd_riwayat(message):
     l = get_lang(user)
     chat_id = message.chat.id
     
-    # Jalankan pengecekan timeout sebelum menampilkan riwayat
     get_latest_user_order_data(chat_id)
     
     orders = get_user_orders(chat_id)
@@ -674,6 +669,7 @@ def cmd_katalog(message):
         katalog_text += "\n\n🎁 <b>INFO PROMO:</b> Anda memiliki hak potong harga spesial member baru otomatis di katalog ini!"
         
     bot.send_message(message.chat.id, katalog_text, reply_markup=markup, parse_mode="HTML")
+
 @bot.callback_query_handler(func=lambda call: True)
 def callback_handler(call):
     save_user(call.message.chat.id)
@@ -684,7 +680,6 @@ def callback_handler(call):
     message_id = call.message.message_id
     greeting = get_time_greeting()
 
-    # --- FITUR INTERAKTIF ADMIN: ACC / TOLAK PEMBAYARAN ---
     if call.data.startswith('acc_') or call.data.startswith('tolak_') or call.data.startswith('acc|') or call.data.startswith('tolak|'):
         try:
             sep = '|' if '|' in call.data else '_'
@@ -931,7 +926,7 @@ def callback_handler(call):
         search_list = all_items_promo if is_promo_used else all_items_normal
         for btn_txt, cb_val, desc_val in search_list:
             if cb_val == call.data:
-                paket_nama = btn_txt.split(" <s>")[0].replace("🛒 Buy: ", "").replace("🛒 Beli: ", "")
+                paket_nama = btn_txt.replace("🛒 Beli: ", "").replace("🛒 ", "").split(" (Rp")[0]
                 if "— " in desc_val:
                     harga_paket = desc_val.split("— ")[1].split("\n")[0]
                 break
@@ -995,7 +990,6 @@ def handle_photo(message):
     save_user(message.chat.id)
     user = message.from_user
     
-    # Cek status timeout 15 menit terlebih dahulu
     resi_unik, order_status = get_latest_user_order_data(message.chat.id)
     
     if order_status == "EXPIRED":
