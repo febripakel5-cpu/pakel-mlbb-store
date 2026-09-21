@@ -5,7 +5,7 @@ import time
 import threading
 from datetime import datetime, timezone, timedelta
 
-# Token bot baru lu yang aman dan dirahasiakan
+# Token bot resmi Pakel MlbbStore
 TOKEN = '8614166487:AAFt6SzB6mP6sA31fXU7QUsz9uH8KdIEiFo'
 
 bot = telebot.TeleBot(TOKEN)
@@ -35,9 +35,7 @@ QRIS_WEB_LINK = "https://ibb.co.com/cX2J28kj"
 def save_user(chat_id):
     try:
         chat_id_str = str(chat_id).strip()
-        if not chat_id_str:
-            return
-        if chat_id_str.startswith('-'):
+        if not chat_id_str or chat_id_str.startswith('-'):
             return
 
         users = []
@@ -220,7 +218,6 @@ def check_store_status():
     if 0 <= hour < 7:
         return False, "⚠️ <b>INFO OPERASIONAL TOKO:</b>\nHalo Kak! Saat ini toko sedang istirahat (Offline) jam 00:00 - 07:00 WIB. Pesanan dan pembayaran tetap bisa dilakukan lewat bot, namun proses pengiriman script dan verifikasi resi akan dilanjutkan pagi ini mulai pukul 07:00 WIB ya! 🙏✨"
     return True, ""
-
 def get_random_masked_name():
     list_nama_tele = [
         "@R_Zky***", "@Alvinn_***", "@Dimas_99***", "@RezaPrat_***", 
@@ -669,7 +666,6 @@ def cmd_katalog(message):
         katalog_text += "\n\n🎁 <b>INFO PROMO:</b> Anda memiliki hak potong harga spesial member baru otomatis di katalog ini!"
         
     bot.send_message(message.chat.id, katalog_text, reply_markup=markup, parse_mode="HTML")
-
 @bot.callback_query_handler(func=lambda call: True)
 def callback_handler(call):
     save_user(call.message.chat.id)
