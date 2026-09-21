@@ -390,7 +390,6 @@ def get_back_markup(l):
     text = TRANSLATIONS.get(l, TRANSLATIONS['en'])['back']
     markup.add(types.InlineKeyboardButton(text, callback_data='menu_utama'))
     return markup
-
 @bot.message_handler(commands=['bc', 'broadcast'])
 def broadcast_message(message):
     save_user(message.chat.id)
@@ -745,7 +744,7 @@ def callback_handler(call):
         save_order(chat_id, paket_nama, harga_paket, resi_unik)
         
         invoice_text = (
-            f"{t['inv_title']}\n\n"
+            f"{t['inv_title'].format(name=user.first_name)}\n\n"
             f"📦 Paket Dipilih: {paket_nama}\n"
             f"💵 Harga: {harga_paket}\n"
             f"🔢 Nomor Resi Unik: <code>{resi_unik}</code>\n"
