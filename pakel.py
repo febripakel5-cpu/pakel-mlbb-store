@@ -147,8 +147,7 @@ def reduce_user_points(chat_id, amount):
         pass
     with open("points.txt", "w") as f:
         f.writelines(rows)
-
-def save_order(chat_id, paket_nama, harga, resi, payment_method="TRANSFER"):
+def save_order(chat_id, paket_nama, harga, resi, payment_method="TRANSFER", point_cost=0):
     try:
         WIB = timezone(timedelta(hours=7))
         now = datetime.now(WIB)
@@ -163,7 +162,7 @@ def save_order(chat_id, paket_nama, harga, resi, payment_method="TRANSFER"):
         hari_en = now.strftime('%a')
         hari_str = days_indo.get(hari_en, hari_en)
         
-        order_line = f"{chat_id}|{tanggal_str}|{hari_str}|{jam_str}|{paket_nama}|{harga}|{resi}|PENDING|{timestamp_epoch}|{payment_method}\n"
+        order_line = f"{chat_id}|{tanggal_str}|{hari_str}|{jam_str}|{paket_nama}|{harga}|{resi}|PENDING|{timestamp_epoch}|{payment_method}|{point_cost}\n"
         
         with open("orders.txt", "a") as f:
             f.write(order_line)
@@ -174,8 +173,8 @@ def update_order_status_by_resi(resi_target, status_baru):
     try:
         updated = False
         target_chat_id = None
-        target_paket = ""
         target_payment = "TRANSFER"
+        target_points_cost = 0
         rows = []
         try:
             with open("orders.txt", "r") as f:
@@ -192,14 +191,15 @@ def update_order_status_by_resi(resi_target, status_baru):
                         status = parts[7]
                         timestamp_epoch = parts[8] if len(parts) > 8 else "0"
                         pay_method = parts[9] if len(parts) > 9 else "TRANSFER"
+                        p_cost = int(parts[10]) if len(parts) > 10 and parts[10].isdigit() else 0
 
                         if resi.strip() == resi_target.strip():
                             target_chat_id = chat_id
-                            target_paket = paket
                             target_payment = pay_method
+                            target_points_cost = p_cost
                             status = status_baru
                             updated = True
-                        rows.append(f"{chat_id}|{tanggal}|{hari}|{jam}|{paket}|{harga}|{resi}|{status}|{timestamp_epoch}|{pay_method}\n")
+                        rows.append(f"{chat_id}|{tanggal}|{hari}|{jam}|{paket}|{harga}|{resi}|{status}|{timestamp_epoch}|{pay_method}|{p_cost}\n")
         except FileNotFoundError:
             return False
 
@@ -209,16 +209,15 @@ def update_order_status_by_resi(resi_target, status_baru):
             
             if target_chat_id:
                 if status_baru == "BERHASIL":
+                    # KUNCI UTAMA: Kupon dijamin hangus permanen & tambah poin loyalitas
                     set_user_coupon_status(target_chat_id, "USED")
-                    # Berikan 10 Poin loyalitas otomatis setiap transaksi berhasil
-                    add_user_points(target_chat_id, 10)
+                    if target_payment != "POIN":
+                        add_user_points(target_chat_id, 10)
                 elif status_baru in ["DITOLAK", "EXPIRED", "CANCELLED"]:
                     set_user_coupon_status(target_chat_id, "AVAILABLE")
-                    # Jika pembayaran pakai poin dan ditolak/dibatalkan, kembalikan poinnya
-                    if target_payment == "POIN":
-                        # Estimasi poin berdasarkan nama paket atau harga standar poin
-                        points_to_refund = 50 if "Sultan" in target_paket or "Permanent" in target_paket else 30
-                        add_user_points(target_chat_id, points_to_refund)
+                    # Refund poin akurat sesuai data asli pemotongan
+                    if target_payment == "POIN" and target_points_cost > 0:
+                        add_user_points(target_chat_id, target_points_cost)
                     
             return True
     except Exception as e:
@@ -759,7 +758,7 @@ def callback_handler(call):
                 f"❌ <b>PESANAN BERHASIL DIBATALKAN</b> ❌\n\n"
                 f"🔑 No Resi: <code>{resi_target}</code>\n"
                 "Pesanan ini telah dibatalkan atas permintaan Anda.\n"
-                "💡 Hak kupon/diskon member baru serta saldo poin Anda (jika terpotong) telah dikembalikan secara otomatis. Silakan pilih ulang paket di katalog!"
+                "💡 Hak kupon/diskon member baru serta saldo poin Anda telah dikembalikan secara otomatis. Silakan pilih ulang paket di katalog!"
             )
             try:
                 bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=cancel_text, parse_mode="HTML", reply_markup=get_back_markup(l))
@@ -776,7 +775,6 @@ def callback_handler(call):
         action_type = parts[1] # 'transfer' atau 'poin'
         paket_code = parts[2]
         
-        # Mapping harga & info paket
         paket_dict = {
             'buy_natural': ("Natural Balance (30 Hari)", "Rp 120.000", 30),
             'buy_light': ("Light VIP + Drone (30 Hari)", "Rp 95.000", 25),
@@ -795,9 +793,8 @@ def callback_handler(call):
         if action_type == 'poin':
             user_pts = get_user_points(chat_id)
             if user_pts >= p_points:
-                # Poin cukup, potong poin dan langsung sukseskan pesanan
                 reduce_user_points(chat_id, p_points)
-                save_order(chat_id, p_name, f"{p_points} Poin", resi_unik, payment_method="POIN")
+                save_order(chat_id, p_name, f"{p_points} Poin", resi_unik, payment_method="POIN", point_cost=p_points)
                 update_order_status_by_resi(resi_unik, "BERHASIL")
                 
                 success_poin_text = (
@@ -823,7 +820,6 @@ def callback_handler(call):
                 bot.send_message(chat_id, success_poin_text, parse_mode="HTML")
                 bot.send_message(chat_id, f"<code>{template_chat_admin}</code>", parse_mode="HTML")
                 
-                # Kirim laporan ke grup admin Paysukses
                 try:
                     report_admin = (
                         "🚨 <b>TRANSAKSI SUKSES (BAYAR PAKAI POIN)</b> 🚨\n\n"
@@ -841,7 +837,6 @@ def callback_handler(call):
                 bot.answer_callback_query(call.id, text="Pembayaran poin berhasil!")
                 return
             else:
-                # Poin kurang, berikan notifikasi dan sediakan tombol opsi transfer
                 markup_fallback = types.InlineKeyboardMarkup(row_width=1)
                 markup_fallback.add(types.InlineKeyboardButton(f"💳 Lanjut Bayar Via Transfer Saja ({p_price})", callback_data=f"paymode_|transfer|{paket_code}"))
                 markup_fallback.add(types.InlineKeyboardButton(t['back'], callback_data='menu_utama'))
@@ -860,11 +855,10 @@ def callback_handler(call):
                 return
 
         elif action_type == 'transfer':
-            # Proses checkout normal via transfer
             coupon_status = get_user_coupon_status(chat_id)
             is_promo_used = (coupon_status == "AVAILABLE")
             
-            save_order(chat_id, p_name, p_price, resi_unik, payment_method="TRANSFER")
+            save_order(chat_id, p_name, p_price, resi_unik, payment_method="TRANSFER", point_cost=0)
             if is_promo_used:
                 set_user_coupon_status(chat_id, "PENDING")
                 
@@ -1136,7 +1130,6 @@ def callback_handler(call):
         bot.answer_callback_query(call.id)
 
     elif call.data.startswith('buy_'):
-        # Ketika user klik paket di katalog, tawarkan pilihan metode pembayaran (Transfer vs Poin)
         paket_code = call.data
         paket_dict = {
             'buy_natural': ("Natural Balance (30 Hari)", "Rp 120.000", 30),
@@ -1260,5 +1253,5 @@ def auto_reply(message):
         
     bot.reply_to(message, res_msg, disable_web_page_preview=True)
 
-print("[INFO] Pakel MlbbStore Master Ultimate Edition with Loyalty Points & Cancel Button Berhasil Dijalankan...")
+print("[INFO] Pakel MlbbStore Master Ultimate Edition with Deep-Audit Fix Berhasil Dijalankan...")
 bot.infinity_polling()
