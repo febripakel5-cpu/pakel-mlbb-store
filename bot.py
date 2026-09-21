@@ -10,6 +10,12 @@ TOKEN = '8455547902:AAFN3_el-rrdqacd0DsgHT8LH96bZ1Emw5U'
 
 bot = telebot.TeleBot(TOKEN)
 
+# Hapus webhook yang nyangkut biar tidak error 409 Conflict
+try:
+    bot.remove_webhook()
+except Exception:
+    pass
+
 # --- PENGATURAN IDENTITAS & JALUR GRUP TERPISAH ---
 ADMIN_USERNAME = "@PakelMlbbOfficial"
 ADMIN_LINK = "https://t.me/PakelMlbbOfficial"
