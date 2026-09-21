@@ -37,8 +37,6 @@ def save_user(chat_id):
         chat_id_str = str(chat_id).strip()
         if not chat_id_str:
             return
-            
-        # Pengecekan ketat: Jangan pernah simpan ID Grup atau Channel (yang berawalan tanda minus '-') ke database users.txt
         if chat_id_str.startswith('-'):
             return
 
@@ -55,12 +53,51 @@ def save_user(chat_id):
     except Exception as e:
         print(f"[SAVE USER ERROR]: {e}")
 
+# --- MANAJEMEN STATUS KUPON MEMBER BARU ---
+def get_user_coupon_status(chat_id):
+    try:
+        with open("coupons.txt", "r") as f:
+            for line in f:
+                parts = line.strip().split('|')
+                if len(parts) == 2 and parts[0] == str(chat_id):
+                    return parts[1]
+    except FileNotFoundError:
+        pass
+    return "AVAILABLE"
+
+def set_user_coupon_status(chat_id, status_baru):
+    try:
+        rows = []
+        updated = False
+        chat_id_str = str(chat_id)
+        try:
+            with open("coupons.txt", "r") as f:
+                for line in f:
+                    parts = line.strip().split('|')
+                    if len(parts) == 2:
+                        c_id, status = parts
+                        if c_id == chat_id_str:
+                            status = status_baru
+                            updated = True
+                        rows.append(f"{c_id}|{status}\n")
+        except FileNotFoundError:
+            pass
+            
+        if not updated:
+            rows.append(f"{chat_id_str}|{status_baru}\n")
+            
+        with open("coupons.txt", "w") as f:
+            f.writelines(rows)
+    except Exception as e:
+        print(f"[COUPON ERROR]: {e}")
+
 def save_order(chat_id, paket_nama, harga, resi):
     try:
         WIB = timezone(timedelta(hours=7))
         now = datetime.now(WIB)
         tanggal_str = now.strftime('%d-%m-%Y')
         jam_str = now.strftime('%H:%M:%S WIB')
+        timestamp_epoch = int(now.timestamp()) # Diperlukan untuk sistem Timeout 15 Menit
         
         days_indo = {
             'Mon': 'Senin', 'Tue': 'Selasa', 'Wed': 'Rabu', 
@@ -69,7 +106,7 @@ def save_order(chat_id, paket_nama, harga, resi):
         hari_en = now.strftime('%a')
         hari_str = days_indo.get(hari_en, hari_en)
         
-        order_line = f"{chat_id}|{tanggal_str}|{hari_str}|{jam_str}|{paket_nama}|{harga}|{resi}|PENDING\n"
+        order_line = f"{chat_id}|{tanggal_str}|{hari_str}|{jam_str}|{paket_nama}|{harga}|{resi}|PENDING|{timestamp_epoch}\n"
         
         with open("orders.txt", "a") as f:
             f.write(order_line)
@@ -79,23 +116,42 @@ def save_order(chat_id, paket_nama, harga, resi):
 def update_order_status_by_resi(resi_target, status_baru):
     try:
         updated = False
+        target_chat_id = None
         rows = []
         try:
             with open("orders.txt", "r") as f:
                 for line in f:
                     parts = line.strip().split('|')
-                    if len(parts) == 8:
-                        chat_id, tanggal, hari, jam, paket, harga, resi, status = parts
+                    if len(parts) >= 8:
+                        chat_id = parts[0]
+                        tanggal = parts[1]
+                        hari = parts[2]
+                        jam = parts[3]
+                        paket = parts[4]
+                        harga = parts[5]
+                        resi = parts[6]
+                        status = parts[7]
+                        timestamp_epoch = parts[8] if len(parts) > 8 else "0"
+
                         if resi.strip() == resi_target.strip():
+                            target_chat_id = chat_id
                             status = status_baru
                             updated = True
-                        rows.append(f"{chat_id}|{tanggal}|{hari}|{jam}|{paket}|{harga}|{resi}|{status}\n")
+                        rows.append(f"{chat_id}|{tanggal}|{hari}|{jam}|{paket}|{harga}|{resi}|{status}|{timestamp_epoch}\n")
         except FileNotFoundError:
             return False
 
         if updated:
             with open("orders.txt", "w") as f:
                 f.writelines(rows)
+            
+            if target_chat_id:
+                if status_baru == "BERHASIL":
+                    set_user_coupon_status(target_chat_id, "USED")
+                elif status_baru == "DITOLAK" or status_baru == "EXPIRED":
+                    # Jika ditolak atau expired, kupon dikembalikan aktif
+                    set_user_coupon_status(target_chat_id, "AVAILABLE")
+                    
             return True
     except Exception as e:
         print(f"[UPDATE ORDER ERROR]: {e}")
@@ -107,7 +163,7 @@ def get_user_orders(chat_id):
         with open("orders.txt", "r") as f:
             for line in f:
                 parts = line.strip().split('|')
-                if len(parts) == 8 and parts[0] == str(chat_id):
+                if len(parts) >= 8 and parts[0] == str(chat_id):
                     orders.append({
                         'tanggal': parts[1],
                         'hari': parts[2],
@@ -121,11 +177,33 @@ def get_user_orders(chat_id):
         pass
     return orders
 
-def get_latest_user_order(chat_id):
-    orders = get_user_orders(chat_id)
-    if orders:
-        return orders[-1]['resi']
-    return f"PKL-MLBB-{random.randint(10000, 99999)}"
+def get_latest_user_order_data(chat_id):
+    """Mengambil data detail pesanan terakhir user untuk pengecekan Timeout 15 Menit"""
+    try:
+        WIB = timezone(timedelta(hours=7))
+        current_time = int(datetime.now(WIB).timestamp())
+        
+        last_order = None
+        with open("orders.txt", "r") as f:
+            for line in f:
+                parts = line.strip().split('|')
+                if len(parts) >= 8 and parts[0] == str(chat_id):
+                    last_order = parts
+                    
+        if last_order:
+            resi = last_order[6]
+            status = last_order[7]
+            timestamp_epoch = int(last_order[8]) if len(last_order) > 8 else current_time
+            
+            # Cek apakah sudah lebih dari 15 menit (900 detik) dan status masih PENDING
+            if status == "PENDING" and (current_time - timestamp_epoch > 900):
+                update_order_status_by_resi(resi, "EXPIRED")
+                return resi, "EXPIRED"
+                
+            return resi, status
+    except Exception as e:
+        print(f"[LATEST ORDER ERROR]: {e}")
+    return f"PKL-MLBB-{random.randint(10000, 99999)}", "PENDING"
 
 def get_time_greeting():
     WIB = timezone(timedelta(hours=7))
@@ -311,7 +389,7 @@ TRANSLATIONS = {
         'btn_katalog': "💎 Katalog VIP & Harga Paket",
         'btn_testi': "🌟 Testimoni & Real-Time Bukti Order",
         'btn_riwayat': "📦 Cek Riwayat & Status Pesanan Saya",
-        'btn_promo': "🎁 Klaim Promo Member Baru",
+        'btn_promo': "🎁 Klaim Kupon Member Baru",
         'btn_cara_order': "❓ Panduan Cara Order",
         'btn_bayar': "💳 Metode Pembayaran Lengkap",
         'btn_faq': "💡 FAQ / Pertanyaan Umum",
@@ -321,17 +399,29 @@ TRANSLATIONS = {
         'cat_title_1': "🔥 VIP EXCLUSIVE CATALOGUE - BAGIAN 1 (Kak {name}) 🔥\n*(Kategori: Custom Damage High-Tier & Fair Play Anti-Detect)*",
         'cat_title_2': "🔥 VIP EXCLUSIVE CATALOGUE - BAGIAN 2 (Kak {name}) 🔥\n*(Kategori: Sultan One Hit Instan & Dominasi Mutlak)*",
         'bonus_txt': "⚡ BONUS SPESIAL FREE ALL PACKAGES (TANPA BIAYA TAMBAHAN): \n🎁 Setiap pembelian paket apa saja, otomatis mendapatkan:\n  • Panel Server Lag Musuh (Global Ping Spikes)\n  • Drone View Eksklusif X1 sampai X10 (Ultra Wide View)\n\n📂 SILAKAN PILIH SCRIPT & PELAJARI DETAIL FITUR DI BAWAH INI:",
-        'p1': [
+        'p1_normal': [
             ("🛒 Beli: Natural Balance (Rp 120k)", "buy_natural", "• 💎 Natural Balance (30 Hari) — Rp 120.000\n  └ 🎯 Fungsi: Script penyetara damage halus, aman anti-detect untuk tier Mythic."),
             ("🛒 Beli: Light VIP + Drone (Rp 95k)", "buy_light", "• ⚡ Light VIP + Drone (30 Hari) — Rp 95.000\n  └ 🎯 Fungsi: Boost damage ringan + map vision luas (drone view)."),
             ("🛒 Beli: Semi-Safe 14 Hari (Rp 75k)", "buy_semisafe", "• 🛡️ Semi-Safe (14 Hari) — Rp 75.000\n  └ 🎯 Fungsi: Solusi cepat push rank akhir season."),
             ("🛒 Beli: Lifetime Safe Permanent (Rp 200k)", "buy_lifetimesafe", "• 👑 Lifetime Safe (Permanent) — Rp 200.000\n  └ 🎯 Fungsi: Akses permanen seumur hidup + update gratis.")
         ],
-        'p2': [
+        'p1_promo': [
+            ("🛒 Beli: Natural Balance <s>Rp 120k</s> <b>Rp 110k</b> (-8%)", "buy_natural", "• 💎 Natural Balance (30 Hari) — <s>Rp 120.000</s> <b>Rp 110.000</b> (Hemat Rp 10.000!)\n  └ 🎯 Fungsi: Script penyetara damage halus, aman anti-detect untuk tier Mythic."),
+            ("🛒 Beli: Light VIP + Drone <s>Rp 95k</s> <b>Rp 85k</b> (-10%)", "buy_light", "• ⚡ Light VIP + Drone (30 Hari) — <s>Rp 95.000</s> <b>Rp 85.000</b> (Hemat Rp 10.000!)\n  └ 🎯 Fungsi: Boost damage ringan + map vision luas (drone view)."),
+            ("🛒 Beli: Semi-Safe 14 Hari <s>Rp 75k</s> <b>Rp 65k</b> (-13%)", "buy_semisafe", "• 🛡️ Semi-Safe (14 Hari) — <s>Rp 75.000</s> <b>Rp 65.000</b> (Hemat Rp 10.000!)\n  └ 🎯 Fungsi: Solusi cepat push rank akhir season."),
+            ("🛒 Beli: Lifetime Safe Permanent <s>Rp 200k</s> <b>Rp 190k</b> (-5%)", "buy_lifetimesafe", "• 👑 Lifetime Safe (Permanent) — <s>Rp 200.000</s> <b>Rp 190.000</b> (Hemat Rp 10.000!)\n  └ 🎯 Fungsi: Akses permanen seumur hidup + update gratis.")
+        ],
+        'p2_normal': [
             ("🛒 Beli: Sultan One Hit 100% (Rp 150k)", "buy_sultan", "• 💥 Sultan One Hit 100% (30 Hari) — Rp 150.000\n  └ 🎯 Fungsi: One hit kill mutlak untuk dominasi total."),
             ("🛒 Beli: VIP Pro One Hit 80% (Rp 100k)", "buy_pro", "• ⚡ VIP Pro One Hit 80% (30 Hari) — Rp 100.000\n  └ 🎯 Fungsi: Keseimbangan kekuatan dan keamanan akun."),
             ("🛒 Beli: Semi-Private 14 Hari (Rp 75k)", "buy_semiprivate", "• 🔒 Semi-Private (14 Hari) — Rp 75.000\n  └ 🎯 Fungsi: Script privat eksklusif 2 minggu."),
             ("🛒 Beli: Permanent Legend (Rp 250k)", "buy_permanent", "• 🏆 Permanent Legend (Lifetime) — Rp 250.000\n  └ 🎯 Fungsi: Paket elit permanen seumur hidup.")
+        ],
+        'p2_promo': [
+            ("🛒 Beli: Sultan One Hit 100% <s>Rp 150k</s> <b>Rp 140k</b> (-7%)", "buy_sultan", "• 💥 Sultan One Hit 100% (30 Hari) — <s>Rp 150.000</s> <b>Rp 140.000</b> (Hemat Rp 10.000!)\n  └ 🎯 Fungsi: One hit kill mutlak untuk dominasi total."),
+            ("🛒 Beli: VIP Pro One Hit 80% <s>Rp 100k</s> <b>Rp 90k</b> (-10%)", "buy_pro", "• ⚡ VIP Pro One Hit 80% (30 Hari) — <s>Rp 100.000</s> <b>Rp 90.000</b> (Hemat Rp 10.000!)\n  └ 🎯 Fungsi: Keseimbangan kekuatan dan keamanan akun."),
+            ("🛒 Beli: Semi-Private 14 Hari <s>Rp 75k</s> <b>Rp 65k</b> (-13%)", "buy_semiprivate", "• 🔒 Semi-Private (14 Hari) — <s>Rp 75.000</s> <b>Rp 65.000</b> (Hemat Rp 10.000!)\n  └ 🎯 Fungsi: Script privat eksklusif 2 minggu."),
+            ("🛒 Beli: Permanent Legend <s>Rp 250k</s> <b>Rp 240k</b> (-4%)", "buy_permanent", "• 🏆 Permanent Legend (Lifetime) — <s>Rp 250.000</s> <b>Rp 240.000</b> (Hemat Rp 10.000!)\n  └ 🎯 Fungsi: Paket elit permanen seumur hidup.")
         ],
         'next_1': "▶️ Lanjut ke Katalog Bagian 2 (Sultan One Hit)",
         'prev_2': "◀️ Kembali ke Katalog Bagian 1",
@@ -352,7 +442,7 @@ TRANSLATIONS = {
         'btn_katalog': "💎 VIP Catalogue & Pricing",
         'btn_testi': "🌟 Live Testimonials",
         'btn_riwayat': "📦 My Order History & Status",
-        'btn_promo': "🎁 Claim New Member Promo",
+        'btn_promo': "🎁 Claim Member Promo",
         'btn_cara_order': "❓ How to Order Guide",
         'btn_bayar': "💳 All Payment Methods",
         'btn_faq': "💡 FAQ / General Questions",
@@ -362,17 +452,29 @@ TRANSLATIONS = {
         'cat_title_1': "🔥 VIP EXCLUSIVE CATALOGUE - PART 1 ({name}) 🔥",
         'cat_title_2': "🔥 VIP EXCLUSIVE CATALOGUE - PART 2 ({name}) 🔥",
         'bonus_txt': "⚡ SPECIAL BONUS (FREE ALL PACKAGES): \n🎁 Get for FREE:\n  • Enemy Server Lag Panel\n  • Drone View X1 - X10 (Ultra Wide)\n\n📂 PACKAGE DETAILS & FUNCTIONS:",
-        'p1': [
+        'p1_normal': [
             ("🛒 Buy: Natural Balance ($8 / Rp 120k)", "buy_natural", "• 💎 Natural Balance (30 Days) — $8 / Rp 120k"),
             ("🛒 Buy: Light VIP + Drone ($6 / Rp 95k)", "buy_light", "• ⚡ Light VIP + Drone (30 Days) — $6 / Rp 95k"),
             ("🛒 Buy: Semi-Safe 14 Days ($5 / Rp 75k)", "buy_semisafe", "• 🛡️ Semi-Safe (14 Days) — $5 / Rp 75k"),
             ("🛒 Buy: Lifetime Permanent ($13 / Rp 200k)", "buy_lifetimesafe", "• 👑 Lifetime Permanent — $13 / Rp 200k")
         ],
-        'p2': [
+        'p1_promo': [
+            ("🛒 Buy: Natural Balance <s>$8</s> <b>$7.3</b>", "buy_natural", "• 💎 Natural Balance (30 Days) — <s>$8</s> <b>$7.3</b> (Promo Member Baru!)"),
+            ("🛒 Buy: Light VIP + Drone <s>$6</s> <b>$5.3</b>", "buy_light", "• ⚡ Light VIP + Drone (30 Days) — <s>$6</s> <b>$5.3</b> (Promo Member Baru!)"),
+            ("🛒 Buy: Semi-Safe 14 Days <s>$5</s> <b>$4.3</b>", "buy_semisafe", "• 🛡️ Semi-Safe (14 Days) — <s>$5</s> <b>$4.3</b> (Promo Member Baru!)"),
+            ("🛒 Buy: Lifetime Permanent <s>$13</s> <b>$12.3</b>", "buy_lifetimesafe", "• 👑 Lifetime Permanent — <s>$13</s> <b>$12.3</b> (Promo Member Baru!)")
+        ],
+        'p2_normal': [
             ("🛒 Buy: Sultan One Hit 100% ($10 / Rp 150k)", "buy_sultan", "• 💥 Sultan One Hit 100% — $10 / Rp 150k"),
             ("🛒 Buy: VIP Pro One Hit 80% ($7 / Rp 100k)", "buy_pro", "• ⚡ VIP Pro One Hit 80% — $7 / Rp 100k"),
             ("🛒 Buy: Semi-Private 14 Days ($5 / Rp 75k)", "buy_semiprivate", "• 🔒 Semi-Private (14 Days) — $5 / Rp 75k"),
             ("🛒 Buy: Permanent Legend ($16 / Rp 250k)", "buy_permanent", "• 🏆 Permanent Legend — $16 / Rp 250k")
+        ],
+        'p2_promo': [
+            ("🛒 Buy: Sultan One Hit 100% <s>$10</s> <b>$9.3</b>", "buy_sultan", "• 💥 Sultan One Hit 100% — <s>$10</s> <b>$9.3</b> (Promo Member Baru!)"),
+            ("🛒 Buy: VIP Pro One Hit 80% <s>$7</s> <b>$6.3</b>", "buy_pro", "• ⚡ VIP Pro One Hit 80% — <s>$7</s> <b>$6.3</b> (Promo Member Baru!)"),
+            ("🛒 Buy: Semi-Private 14 Days <s>$5</s> <b>$4.3</b>", "buy_semiprivate", "• 🔒 Semi-Private (14 Days) — <s>$5</s> <b>$4.3</b> (Promo Member Baru!)"),
+            ("🛒 Buy: Permanent Legend <s>$16</s> <b>$15.3</b>", "buy_permanent", "• 🏆 Permanent Legend — <s>$16</s> <b>$15.3</b> (Promo Member Baru!)")
         ],
         'next_1': "▶️ Next: Catalog Part 2 (One Hit)",
         'prev_2': "◀️ Back to Catalog Part 1",
@@ -418,7 +520,7 @@ def broadcast_message(message):
     success = 0
     failed = 0
     
-    bot.reply_to(message, f"🚀 Memulai broadcast ke {len(users)} member...")
+    bot.reply_to(message, f"🚀 Memulai Broadcast Umum ke {len(users)} member...")
     for chat_id in users:
         try:
             bot.send_message(chat_id, f"📢 <b>PENGUMUMAN RESMI PAKEL MLBBSTORE</b>\n\n{pesan_bc}", parse_mode="HTML")
@@ -427,7 +529,46 @@ def broadcast_message(message):
         except Exception:
             failed += 1
             
-    bot.send_message(message.chat.id, f"✅ Broadcast Selesai!\n- Berhasil: {success}\n- Gagal: {failed}")
+    bot.send_message(message.chat.id, f"✅ Broadcast Umum Selesai!\n- Berhasil: {success}\n- Gagal: {failed}")
+
+@bot.message_handler(commands=['bcs'])
+def broadcast_buyers_only(message):
+    pesan_bcs = message.text.replace('/bcs', '').strip()
+    if not pesan_bcs:
+        bot.reply_to(message, "⚠️ Format salah! Contoh: /bcs Halo Kak, khusus member VIP ada update script terbaru nih!")
+        return
+    
+    buyer_ids = set()
+    try:
+        with open("orders.txt", "r") as f:
+            for line in f:
+                parts = line.strip().split('|')
+                if len(parts) >= 8:
+                    chat_id = parts[0]
+                    status = parts[7]
+                    if status.strip() == "BERHASIL":
+                        buyer_ids.add(chat_id.strip())
+    except FileNotFoundError:
+        bot.reply_to(message, "⚠️ Belum ada data pesanan sukses tersimpan.")
+        return
+        
+    if not buyer_ids:
+        bot.reply_to(message, "⚠️ Belum ada pembeli yang transaksinya di-ACC.")
+        return
+
+    success = 0
+    failed = 0
+    
+    bot.reply_to(message, f"🚀 Memulai Broadcast Khusus VIP (Buyer) ke {len(buyer_ids)} pelanggan...")
+    for chat_id in buyer_ids:
+        try:
+            bot.send_message(chat_id, f"💎 <b>INFO KHUSUS PELANGGAN SETIA PAKEL MLBBSTORE</b>\n\n{pesan_bcs}", parse_mode="HTML")
+            success += 1
+            time.sleep(0.05)
+        except Exception:
+            failed += 1
+            
+    bot.send_message(message.chat.id, f"✅ Broadcast Khusus VIP Selesai!\n- Berhasil: {success}\n- Gagal: {failed}")
 
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
@@ -472,13 +613,24 @@ def cmd_riwayat(message):
     l = get_lang(user)
     chat_id = message.chat.id
     
+    # Jalankan pengecekan timeout sebelum menampilkan riwayat
+    get_latest_user_order_data(chat_id)
+    
     orders = get_user_orders(chat_id)
     if not orders:
         text = f"📋 RIWAYAT PESANAN SAYA (Kak {user.first_name})\n\n❌ Belum ada riwayat pesanan tercatat.\n💡 Silakan pilih paket di /katalog untuk melakukan pemesanan baru!"
     else:
         text = f"📋 <b>RIWAYAT PESANAN SAYA (Kak {user.first_name})</b>\n\n"
         for idx, o in enumerate(orders[-5:], 1):
-            status_emoji = "✅ BERHASIL" if o['status'] == "BERHASIL" else ("❌ DITOLAK" if o['status'] == "DITOLAK" else "⏳ PENDING")
+            if o['status'] == "BERHASIL":
+                status_emoji = "✅ BERHASIL"
+            elif o['status'] == "DITOLAK":
+                status_emoji = "❌ DITOLAK"
+            elif o['status'] == "EXPIRED":
+                status_emoji = "⌛ EXPIRED (Waktu 15 Menit Habis)"
+            else:
+                status_emoji = "⏳ PENDING"
+                
             text += (
                 f"<b>{idx}. {o['paket']}</b>\n"
                 f"   • Harga: {o['harga']}\n"
@@ -508,14 +660,20 @@ def cmd_katalog(message):
     l = get_lang(user)
     t = TRANSLATIONS[l]
     
+    coupon_status = get_user_coupon_status(message.chat.id)
+    items_to_use = t['p1_promo'] if coupon_status == "AVAILABLE" else t['p1_normal']
+    
     markup = types.InlineKeyboardMarkup(row_width=1)
-    for btn_text, callback_val, _ in t['p1']:
+    for btn_text, callback_val, _ in items_to_use:
         markup.add(types.InlineKeyboardButton(btn_text, callback_data=callback_val))
     markup.add(types.InlineKeyboardButton(t['next_1'], callback_data='katalog_part2'))
     markup.add(types.InlineKeyboardButton(t['back'], callback_data='menu_utama'))
 
-    katalog_text = f"{t['cat_title_1'].format(name=user.first_name)}\n\n{t['bonus_txt']}\n\n" + "\n\n".join([desc for _, _, desc in t['p1']])
-    bot.send_message(message.chat.id, katalog_text, reply_markup=markup)
+    katalog_text = f"{t['cat_title_1'].format(name=user.first_name)}\n\n{t['bonus_txt']}\n\n" + "\n\n".join([desc for _, _, desc in items_to_use])
+    if coupon_status == "AVAILABLE":
+        katalog_text += "\n\n🎁 <b>INFO PROMO:</b> Anda memiliki hak potong harga spesial member baru otomatis di katalog ini!"
+        
+    bot.send_message(message.chat.id, katalog_text, reply_markup=markup, parse_mode="HTML")
 @bot.callback_query_handler(func=lambda call: True)
 def callback_handler(call):
     save_user(call.message.chat.id)
@@ -540,7 +698,7 @@ def callback_handler(call):
             if action == 'acc':
                 update_order_status_by_resi(resi_code, "BERHASIL")
                 
-                new_admin_text = original_text + "\n\n<b>STATUS: ✅ TELAH DI-ACC OLEH ADMIN</b>"
+                new_admin_text = original_text + "\n\n<b>STATUS: ✅ TELAH DI-ACC OLEH ADMIN (Kupon Resmi Hangus)</b>"
                 if call.message.content_type == 'photo':
                     bot.edit_message_caption(chat_id=chat_id, message_id=message_id, caption=new_admin_text, parse_mode="HTML", reply_markup=None)
                 else:
@@ -553,7 +711,7 @@ def callback_handler(call):
                     with open("orders.txt", "r") as f:
                         for line in f:
                             p = line.strip().split('|')
-                            if len(p) == 8 and p[6].strip() == resi_code.strip():
+                            if len(p) >= 8 and p[6].strip() == resi_code.strip():
                                 detail_paket = p[4]
                                 detail_harga = p[5]
                                 waktu_beli = f"{p[1]}, {p[3]}"
@@ -564,7 +722,7 @@ def callback_handler(call):
                 buyer_msg = (
                     "🎉 <b>PEMBAYARAN ANDA TELAH DI-ACC ADMIN!</b> 🎉\n\n"
                     f"🔑 No Resi: <code>{resi_code}</code>\n"
-                    "Status transaksi Anda sudah <b>BERHASIL</b> di sistem.\n\n"
+                    "Status transaksi Anda sudah <b>BERHASIL</b> di sistem. Hak promo member baru Anda telah terpakai.\n\n"
                     "📋 <b>SILAKAN SALIN FORMAT PESAN DI BAWAH INI DAN KIRIM KE ADMIN:</b>\n"
                     "👇 (Cukup ketuk/klik teks di bawah untuk menyalin otomatis)"
                 )
@@ -581,12 +739,12 @@ def callback_handler(call):
                 )
                 bot.send_message(chat_id=target_user_id, text=f"<code>{template_chat_admin}</code>", parse_mode="HTML")
                 
-                bot.answer_callback_query(call.id, text="Pembayaran berhasil di-ACC & status di riwayat jadi BERHASIL!")
+                bot.answer_callback_query(call.id, text="Pembayaran di-ACC, kupon hangus permanen!")
 
             elif action == 'tolak':
                 update_order_status_by_resi(resi_code, "DITOLAK")
 
-                new_admin_text = original_text + "\n\n<b>STATUS: ❌ DITOLAK OLEH ADMIN</b>"
+                new_admin_text = original_text + "\n\n<b>STATUS: ❌ DITOLAK OLEH ADMIN (Kupon Dikembalikan)</b>"
                 if call.message.content_type == 'photo':
                     bot.edit_message_caption(chat_id=chat_id, message_id=message_id, caption=new_admin_text, parse_mode="HTML", reply_markup=None)
                 else:
@@ -595,11 +753,12 @@ def callback_handler(call):
                 buyer_msg = (
                     "❌ <b> MOHON MAAF, PEMBAYARAN DITOLAK </b> ❌\n\n"
                     f"🔑 No Resi: <code>{resi_code}</code>\n"
-                    "Bukti pembayaran Anda tidak valid atau mutasi tidak ditemukan.\n\n"
+                    "Bukti pembayaran Anda tidak valid atau mutasi tidak ditemukan.\n"
+                    "💡 <i>Tenang Kak, hak diskon/promo member baru Anda telah dikembalikan dan bisa dipakai kembali untuk order ulang!</i>\n\n"
                     f"💬 Silakan hubungi Admin resmi untuk konfirmasi lebih lanjut: {ADMIN_USERNAME}"
                 )
                 bot.send_message(chat_id=target_user_id, text=buyer_msg, parse_mode="HTML", disable_web_page_preview=True)
-                bot.answer_callback_query(call.id, text="Pembayaran ditolak & status di riwayat jadi DITOLAK!")
+                bot.answer_callback_query(call.id, text="Pembayaran ditolak & kupon dikembalikan aktif!")
         except Exception as e:
             bot.answer_callback_query(call.id, text=f"Error: {e}", show_alert=True)
         return
@@ -680,13 +839,22 @@ def callback_handler(call):
         bot.answer_callback_query(call.id, text="Testimoni diperbarui!")
 
     elif call.data == 'menu_riwayat':
+        get_latest_user_order_data(chat_id)
         orders = get_user_orders(chat_id)
         if not orders:
             riw_text = f"📋 RIWAYAT PESANAN SAYA (Kak {user.first_name})\n\n❌ Belum ada riwayat pesanan tercatat.\n💡 Silakan pilih paket di katalog untuk membuat pesanan baru!"
         else:
             riw_text = f"📋 <b>RIWAYAT PESANAN SAYA (Kak {user.first_name})</b>\n\n"
             for idx, o in enumerate(orders[-5:], 1):
-                status_emoji = "✅ BERHASIL" if o['status'] == "BERHASIL" else ("❌ DITOLAK" if o['status'] == "DITOLAK" else "⏳ PENDING")
+                if o['status'] == "BERHASIL":
+                    status_emoji = "✅ BERHASIL"
+                elif o['status'] == "DITOLAK":
+                    status_emoji = "❌ DITOLAK"
+                elif o['status'] == "EXPIRED":
+                    status_emoji = "⌛ EXPIRED (Waktu 15 Menit Habis)"
+                else:
+                    status_emoji = "⏳ PENDING"
+                    
                 riw_text += (
                     f"<b>{idx}. {o['paket']}</b>\n"
                     f"   • Harga: {o['harga']}\n"
@@ -700,8 +868,15 @@ def callback_handler(call):
         bot.answer_callback_query(call.id, text="Riwayat dimuat!")
 
     elif call.data == 'menu_promo':
-        promo_text = f"🎁 PROMO EKSKLUSIF (Kak {user.first_name})\n\n🎟️ KODE KUPON: WELCOMEPAKEL\n💰 Potongan harga spesial pembelian pertama!"
-        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=promo_text, reply_markup=get_back_markup(l))
+        status_c = get_user_coupon_status(chat_id)
+        if status_c == "AVAILABLE":
+            promo_text = f"🎁 PROMO MEMBER BARU (Kak {user.first_name})\n\n✨ Status Kupon: <b>AKTIF & TERSEDIA!</b>\n💰 Nikmati potongan harga otomatis langsung saat Anda memilih paket di menu Katalog VIP."
+        elif status_c == "PENDING":
+            promo_text = f"🎁 PROMO MEMBER BARU (Kak {user.first_name})\n\n⏳ Status Kupon: <b>DIKUNCI SEMENTARA</b>\nSedang menunggu verifikasi bukti pembayaran oleh admin."
+        else:
+            promo_text = f"🎁 PROMO MEMBER BARU (Kak {user.first_name})\n\n❌ Status Kupon: <b>SUDAH TERPAKAI / HABIS</b>\nTerima kasih telah menggunakan promo member baru di Pakel MlbbStore!"
+            
+        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=promo_text, reply_markup=get_back_markup(l), parse_mode="HTML")
         bot.answer_callback_query(call.id)
 
     elif call.data == 'menu_faq':
@@ -710,34 +885,53 @@ def callback_handler(call):
         bot.answer_callback_query(call.id)
 
     elif call.data == 'menu_katalog' or call.data == 'katalog_part1':
+        coupon_status = get_user_coupon_status(chat_id)
+        items_to_use = t['p1_promo'] if coupon_status == "AVAILABLE" else t['p1_normal']
+        
         markup = types.InlineKeyboardMarkup(row_width=1)
-        for btn_text, callback_val, _ in t['p1']:
+        for btn_text, callback_val, _ in items_to_use:
             markup.add(types.InlineKeyboardButton(btn_text, callback_data=callback_val))
         markup.add(types.InlineKeyboardButton(t['next_1'], callback_data='katalog_part2'))
         markup.add(types.InlineKeyboardButton(t['back'], callback_data='menu_utama'))
 
-        katalog_text = f"{t['cat_title_1'].format(name=user.first_name)}\n\n{t['bonus_txt']}\n\n" + "\n\n".join([desc for _, _, desc in t['p1']])
-        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=katalog_text, reply_markup=markup, disable_web_page_preview=True)
+        katalog_text = f"{t['cat_title_1'].format(name=user.first_name)}\n\n{t['bonus_txt']}\n\n" + "\n\n".join([desc for _, _, desc in items_to_use])
+        if coupon_status == "AVAILABLE":
+            katalog_text += "\n\n🎁 <b>INFO PROMO:</b> Harga coret di atas adalah potongan spesial member baru otomatis!"
+            
+        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=katalog_text, reply_markup=markup, parse_mode="HTML", disable_web_page_preview=True)
         bot.answer_callback_query(call.id)
 
     elif call.data == 'katalog_part2':
+        coupon_status = get_user_coupon_status(chat_id)
+        items_to_use = t['p2_promo'] if coupon_status == "AVAILABLE" else t['p2_normal']
+        
         markup = types.InlineKeyboardMarkup(row_width=1)
-        for btn_text, callback_val, _ in t['p2']:
+        for btn_text, callback_val, _ in items_to_use:
             markup.add(types.InlineKeyboardButton(btn_text, callback_data=callback_val))
         markup.add(types.InlineKeyboardButton(t['prev_2'], callback_data='katalog_part1'))
         markup.add(types.InlineKeyboardButton(t['back'], callback_data='menu_utama'))
 
-        katalog_text = f"{t['cat_title_2'].format(name=user.first_name)}\n\n" + "\n\n".join([desc for _, _, desc in t['p2']])
-        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=katalog_text, reply_markup=markup, disable_web_page_preview=True)
+        katalog_text = f"{t['cat_title_2'].format(name=user.first_name)}\n\n" + "\n\n".join([desc for _, _, desc in items_to_use])
+        if coupon_status == "AVAILABLE":
+            katalog_text += "\n\n🎁 <b>INFO PROMO:</b> Harga coret di atas adalah potongan spesial member baru otomatis!"
+            
+        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=katalog_text, reply_markup=markup, parse_mode="HTML", disable_web_page_preview=True)
         bot.answer_callback_query(call.id)
 
     elif call.data.startswith('buy_'):
-        all_items = t['p1'] + t['p2']
+        coupon_status = get_user_coupon_status(chat_id)
+        is_promo_used = (coupon_status == "AVAILABLE")
+        
+        all_items_normal = t['p1_normal'] + t['p2_normal']
+        all_items_promo = t['p1_promo'] + t['p2_promo']
+        
         paket_nama = "VIP Package"
         harga_paket = "Rp 100.000"
-        for btn_txt, cb_val, desc_val in all_items:
+        
+        search_list = all_items_promo if is_promo_used else all_items_normal
+        for btn_txt, cb_val, desc_val in search_list:
             if cb_val == call.data:
-                paket_nama = btn_txt.replace("🛒 Buy: ", "").replace("🛒 Beli: ", "")
+                paket_nama = btn_txt.split(" <s>")[0].replace("🛒 Buy: ", "").replace("🛒 Beli: ", "")
                 if "— " in desc_val:
                     harga_paket = desc_val.split("— ")[1].split("\n")[0]
                 break
@@ -747,12 +941,19 @@ def callback_handler(call):
         
         save_order(chat_id, paket_nama, harga_paket, resi_unik)
         
+        if is_promo_used:
+            set_user_coupon_status(chat_id, "PENDING")
+        
         invoice_text = (
             f"{t['inv_title'].format(name=user.first_name)}\n\n"
             f"📦 Paket Dipilih: {paket_nama}\n"
-            f"💵 Harga: {harga_paket}\n"
-            f"🔢 Nomor Resi Unik: <code>{resi_unik}</code>\n"
-            f"⏱️ Batas Waktu: 15 Menit\n\n"
+            f"💵 Harga: {harga_paket}"
+        )
+        if is_promo_used:
+            invoice_text += " <i>(Sudah termasuk Potongan Promo Member Baru ✨)</i>"
+        invoice_text += (
+            f"\n🔢 Nomor Resi Unik: <code>{resi_unik}</code>\n"
+            f"⏱️ Batas Waktu: 15 Menit (Sesi Timeout Aktif)\n\n"
             f"{t['pay_info']}\n\n"
             f"{t['confirm_instr']}\n"
             f"👉 Admin: {ADMIN_USERNAME}"
@@ -771,7 +972,7 @@ def callback_handler(call):
         bot.answer_callback_query(call.id, text="Invoice & Riwayat Tercatat Otomatis!")
 
     elif call.data == 'menu_cara_order':
-        text = "❓ PANDUAN CARA ORDER\n1. Pilih paket di katalog.\n2. Klik beli untuk dapat nomor resi.\n3. Transfer ke DANA/GoPay & kirim bukti transfer."
+        text = "❓ PANDUAN CARA ORDER\n1. Pilih paket di katalog.\n2. Klik beli untuk dapat nomor resi.\n3. Transfer ke DANA/GoPay & kirim bukti transfer dalam 15 menit."
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, reply_markup=get_back_markup(l), disable_web_page_preview=True)
         bot.answer_callback_query(call.id)
 
@@ -785,7 +986,7 @@ def callback_handler(call):
 
     elif call.data == 'menu_konfirmasi':
         rs = random.randint(10000, 99999)
-        text = f"✅ KONFIRMASI PEMBAYARAN\n\nKirim screenshot bukti transfer Anda dengan menyertakan Nomor Resi (misal: PKL-MLBB-{rs}) ke admin."
+        text = f"✅ KONFIRMASI PEMBAYARAN\n\nKirim screenshot bukti transfer Anda dengan menyertakan Nomor Resi (misal: PKL-MLBB-{rs}) ke admin sebelum 15 menit."
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, reply_markup=get_back_markup(l), disable_web_page_preview=True)
         bot.answer_callback_query(call.id)
 
@@ -794,7 +995,13 @@ def handle_photo(message):
     save_user(message.chat.id)
     user = message.from_user
     
-    resi_unik = get_latest_user_order(message.chat.id)
+    # Cek status timeout 15 menit terlebih dahulu
+    resi_unik, order_status = get_latest_user_order_data(message.chat.id)
+    
+    if order_status == "EXPIRED":
+        bot.reply_to(message, "❌ <b>WAKTU KONFIRMASI HABIS (TIMEOUT 15 MENIT)!</b>\n\nMohon maaf Kak, batas waktu pengiriman bukti transfer untuk pesanan ini sudah lewat dari 15 menit sehingga pesanan otomatis kedaluwarsa.\n\n💡 Hak diskon member baru Anda telah dikembalikan. Silakan buat pesanan baru melalui /katalog ya! 🙏", parse_mode="HTML")
+        return
+
     user_caption = message.caption if message.caption else "Tidak ada pesan"
     
     WIB = timezone(timedelta(hours=7))
@@ -838,7 +1045,6 @@ def handle_photo(message):
 
 @bot.message_handler(func=lambda message: True)
 def auto_reply(message):
-    # Abaikan pesan dari grup atau channel agar database users.txt bersih khusus pembeli pribadi
     if message.chat.type != 'private':
         return
 
@@ -858,4 +1064,3 @@ def auto_reply(message):
 
 print("[INFO] Pakel MlbbStore Master Ultimate Edition Berhasil Dijalankan...")
 bot.infinity_polling()
-
