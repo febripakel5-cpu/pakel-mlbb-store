@@ -147,6 +147,125 @@ def reduce_user_points(chat_id, amount):
         pass
     with open("points.txt", "w") as f:
         f.writelines(rows)
+
+# --- MODUL FITUR AUTO-BROADCAST TERJADWAL (10 TEMPLATE BERBEDA) ---
+def background_auto_broadcast():
+    time.sleep(300) # Jeda awal 5 menit setelah bot pertama kali nyala
+    
+    broadcast_templates = [
+        # Template 1: Fokus Promo & Member Baru
+        (
+            "📢 <b>INFO PROMO SPESIAL HARI INI!</b> 🔥\n\n"
+            "Buat Kakak yang mau ngebut <i>push rank</i> tanpa takut kena ban, buruan sikat script VIP kita sekarang!\n"
+            "🎁 Spesial hari ini, ada potongan harga spesial + bonus <i>Server Lag Panel</i> dan <i>Drone View X10</i> gratis tanpa biaya tambahan.\n\n"
+            "🛒 Langsung cek katalog lengkapnya di bot: @{bot_username}"
+        ),
+        # Template 2: Fokus Keamanan & Anti-Detect
+        (
+            "🛡️ <b>KENAPA HARUS PAKAI SCRIPT PAKEL MLBBSTORE?</b> ⚡\n\n"
+            "Jangan pertaruhkan akun sultan Kakak pakai script sembarangan yang gampang terdeteksi sistem Moonton!\n"
+            "Di sini kita pakai enkripsi <i>high-tier anti-detect</i> paling stabil se-Indonesia, aman buat main di mode <i>Ranked</i> Mythic sekalipun.\n\n"
+            "📦 Pilih paket andalan Kakak sekarang sebelum kehabisan slot: @{bot_username}"
+        ),
+        # Template 3: Fokus Bonus Spesial
+        (
+            "⚡ <b>BONUS FREE ALL PACKAGES TANPA SYARAT!</b> 🎁\n\n"
+            "Setiap pembelian paket apa saja di Official Pakel MlbbStore, Kakak bakal otomatis dapet:\n"
+            "• Panel Server Lag Musuh (<i>Global Ping Spikes</i>) 🌐\n"
+            "• Drone View Eksklusif Ultra Wide X1 - X10 🦅\n\n"
+            "🚀 Yuk dominasi permainan sekarang juga! Order gampang via bot: @{bot_username}"
+        ),
+        # Template 4: Fokus Push Rank & Top Global
+        (
+            "🏆 <b>MAU JADI TOP GLOBAL ATAU NYAMPE MYTHIC GLORY DENGAN CEPAT?</b> 🔥\n\n"
+            "Waktunya buktikan kemampuan terbaikmu di Land of Dawn! Gunakan <i>Custom Damage</i> dan <i>Light VIP</i> dari Pakel MlbbStore biar gameplay makin gampang dan mulus.\n\n"
+            "💬 Cek riwayat pesanan, klaim kupon, atau pilih paket langsung di: @{bot_username}"
+        ),
+        # Template 5: Fokus Testimoni & Kepercayaan
+        (
+            "🌟 <b>PEMBERITAHUAN UPDATE STOK & TESTIMONI HARIAN</b> 🚀\n\n"
+            "Ratusan player sudah membuktikan sendiri kestabilan script kita hari ini tanpa kendala. Giliran Kakak nih buat rasain bedanya pas war!\n"
+            "💎 Proses cepat, amanah, dan dibimbing sampai beres.\n\n"
+            "👇 Yuk amankan paket pilihanmu langsung di bot: @{bot_username}"
+        ),
+        # Template 6: Fokus Paket Sultan / One Hit
+        (
+            "💥 <b>SPECIAL EDITION: SULTAN ONE HIT & INSTANT KILL</b> ⚡\n\n"
+            "Mau ngerasain dominasi mutlak di setiap pertandingan? Paket <i>Sultan One Hit</i> siap bikin musuh kewalahan dan rata dalam sekejap!\n"
+            "🛡️ Dilengkapi sistem pengaman kelas atas agar akun tetap aman sentosa.\n\n"
+            "🛒 Sikat promonya sekarang lewat bot: @{bot_username}"
+        ),
+        # Template 7: Pengingat Poin Loyalitas & Kupon
+        (
+            "🎁 <b>CEK SALDO POIN & KUPON MEMBER KAMU!</b> 💳\n\n"
+            "Tahukah Kakak? Setiap transaksi sukses di Official Pakel MlbbStore, Kakak bakal otomatis dapet tambahan Poin Loyalitas lho!\n"
+            "🪙 Poinnya bisa ditukar buat bayar paket script gratis tanpa perlu transfer rupiah lagi. Mantap kan?\n\n"
+            "✨ Yuk cek poinmu sekarang di bot: @{bot_username}"
+        ),
+        # Template 8: Fokus Anti Lag & Server Stabil
+        (
+            "🌐 <b>BASMI LAG & FPS DROP SAAT WAR BERSAMA KITA!</b> 📉➡️📈\n\n"
+            "Kesel banget kan pas lagi momen penting malah patah-patah atau sinyal mendadak merah? Tenang, script kita sudah include fitur *Server Lag Panel* buat stabilin permainan.\n"
+            "🎯 Main jadi lebih PeDe, mulus, dan bebas hambatan!\n\n"
+            "📦 Langsung pilih paketnya di sini: @{bot_username}"
+        ),
+        # Template 9: Fokus Solusi Akhir Season
+        (
+            "⏰ <b>WAKTU TERBATAS: GASPOL PUSH RANK AKHIR SEASON!</b> ⏳\n\n"
+            "Jangan biarkan bintangmu turun atau stuck di satu tier terus! Maksimalkan performa permainanmu dengan script premium anti-detect terpercaya se-Indonesia.\n"
+            "⚡ Dijamin ampuh buat bantu naik tier dengan mulus.\n\n"
+            "🚀 Amankan paketmu sekarang juga via bot: @{bot_username}"
+        ),
+        # Template 10: Penutup / Sapaan Santai ke Member
+        (
+            "👋 <b>HALO KAKAK-KAKAK PLAYER MLBB INDONESIA!</b> 🎮✨\n\n"
+            "Mau mabar bareng squad tapi minder sama performa hero? Jangan khawatir, Official Pakel MlbbStore selalu siap jadi solusi terbaik buat naikin performa game kamu hari ini.\n"
+            "💎 Aman, stabil, dan bergaransi.\n\n"
+            "👇 Yuk langsung mampir ke katalog bot: @{bot_username}"
+        )
+    ]
+
+    while True:
+        try:
+            # Jeda waktu acak antara 4 jam sampai 8 jam sekali antar broadcast
+            sleep_interval = random.randint(14400, 28800)
+            time.sleep(sleep_interval)
+
+            try:
+                with open("users.txt", "r") as f:
+                    users = [line.strip() for line in f.read().splitlines() if line.strip()]
+            except FileNotFoundError:
+                continue
+                
+            if not users:
+                continue
+
+            users = list(set(users))
+            
+            # Pilih salah satu dari 10 template secara acak biar beda-beda terus isinya
+            template_pilihan = random.choice(broadcast_templates)
+            bot_username = bot.get_me().username
+            pesan_final = template_pilihan.format(bot_username=bot_username)
+
+            for chat_id in users:
+                try:
+                    bot.send_message(
+                        chat_id=chat_id, 
+                        text=f"📢 <b>PENGUMUMAN OTOMATIS PAKEL MLBBSTORE</b>\n\n{pesan_final}", 
+                        parse_mode="HTML",
+                        disable_web_page_preview=True
+                    )
+                    time.sleep(0.05)
+                except Exception:
+                    pass
+
+        except Exception as e:
+            print(f"[AUTO-BROADCAST ERROR]: {e}")
+            time.sleep(300)
+
+bc_thread = threading.Thread(target=background_auto_broadcast, daemon=True)
+bc_thread.start()
+
 def save_order(chat_id, paket_nama, harga, resi, payment_method="TRANSFER", point_cost=0):
     try:
         WIB = timezone(timedelta(hours=7))
