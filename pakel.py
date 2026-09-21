@@ -5,7 +5,7 @@ import time
 import threading
 from datetime import datetime, timezone, timedelta
 
-# Token bot lu yang aktif dan siap tempur
+# Token bot baru lu yang aman dan dirahasiakan
 TOKEN = '8614166487:AAFt6SzB6mP6sA31fXU7QUsz9uH8KdIEiFo'
 
 bot = telebot.TeleBot(TOKEN)
@@ -21,15 +21,12 @@ ADMIN_USERNAME = "@PakelMlbbOfficial"
 ADMIN_LINK = "https://t.me/PakelMlbbOfficial"
 CHANNEL_TESTI_LINK = "https://t.me/PakelMlbb/368"
 
-# 1. Jalur Grup Komunitas Utama (Khusus Testimoni, /sc, & /push)
 GROUP_CHAT_ID = "@PakelMlbb"
 GROUP_TOPIC_ID = 368
 
-# 2. Jalur Grup Khusus Admin / Pay Sukses (Khusus Forward Bukti Transfer & Tombol ACC)
 GROUP_PAY_ID = "@Paysukses"
 GROUP_PAY_TOPIC_ID = 5
 
-# Informasi Nomor Pembayaran Resmi & Link QRIS Web
 INFO_DANA = "085188371150"
 INFO_GOPAY = "085188371150"
 INFO_SAWERIA = "https://saweria.co/PakelMlbb"
@@ -53,7 +50,6 @@ def save_user(chat_id):
     except Exception as e:
         print(f"[SAVE USER ERROR]: {e}")
 
-# Fungsi Pencatat Riwayat Pesanan Otomatis ke database orders.txt
 def save_order(chat_id, paket_nama, harga, resi):
     try:
         WIB = timezone(timedelta(hours=7))
@@ -85,7 +81,7 @@ def update_order_status_by_resi(resi_target, status_baru):
                     parts = line.strip().split('|')
                     if len(parts) == 8:
                         chat_id, tanggal, hari, jam, paket, harga, resi, status = parts
-                        if resi == resi_target:
+                        if resi.strip() == resi_target.strip():
                             status = status_baru
                             updated = True
                         rows.append(f"{chat_id}|{tanggal}|{hari}|{jam}|{paket}|{harga}|{resi}|{status}\n")
@@ -119,6 +115,12 @@ def get_user_orders(chat_id):
     except FileNotFoundError:
         pass
     return orders
+
+def get_latest_user_order(chat_id):
+    orders = get_user_orders(chat_id)
+    if orders:
+        return orders[-1]['resi']
+    return f"PKL-MLBB-{random.randint(10000, 99999)}"
 
 def get_time_greeting():
     WIB = timezone(timedelta(hours=7))
@@ -388,7 +390,7 @@ def get_back_markup(l):
     text = TRANSLATIONS.get(l, TRANSLATIONS['en'])['back']
     markup.add(types.InlineKeyboardButton(text, callback_data='menu_utama'))
     return markup
- 
+
 @bot.message_handler(commands=['bc', 'broadcast'])
 def broadcast_message(message):
     save_user(message.chat.id)
@@ -541,7 +543,6 @@ def callback_handler(call):
                 else:
                     bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=new_admin_text, parse_mode="HTML", reply_markup=None)
 
-                # Ambil detail pesanan dari database orders.txt buat dimasukin ke template
                 detail_paket = "VIP Package"
                 detail_harga = "Rp 100.000"
                 waktu_beli = datetime.now(timezone(timedelta(hours=7))).strftime('%d-%m-%Y %H:%M:%S WIB')
@@ -549,7 +550,7 @@ def callback_handler(call):
                     with open("orders.txt", "r") as f:
                         for line in f:
                             p = line.strip().split('|')
-                            if len(p) == 8 and p[6] == resi_code:
+                            if len(p) == 8 and p[6].strip() == resi_code.strip():
                                 detail_paket = p[4]
                                 detail_harga = p[5]
                                 waktu_beli = f"{p[1]}, {p[3]}"
@@ -566,7 +567,6 @@ def callback_handler(call):
                 )
                 bot.send_message(chat_id=target_user_id, text=buyer_msg, parse_mode="HTML")
                 
-                # Template teks salin detail lengkap
                 template_chat_admin = (
                     "🔥 KONFIRMASI KLAIM SCRIPT VIP 🔥\n"
                     f"📦 Paket: {detail_paket}\n"
@@ -578,7 +578,7 @@ def callback_handler(call):
                 )
                 bot.send_message(chat_id=target_user_id, text=f"<code>{template_chat_admin}</code>", parse_mode="HTML")
                 
-                bot.answer_callback_query(call.id, text="Pembayaran berhasil di-ACC & template lengkap terkirim!")
+                bot.answer_callback_query(call.id, text="Pembayaran berhasil di-ACC & status di riwayat jadi BERHASIL!")
 
             elif action == 'tolak':
                 update_order_status_by_resi(resi_code, "DITOLAK")
@@ -596,7 +596,7 @@ def callback_handler(call):
                     f"💬 Silakan hubungi Admin resmi untuk konfirmasi lebih lanjut: {ADMIN_USERNAME}"
                 )
                 bot.send_message(chat_id=target_user_id, text=buyer_msg, parse_mode="HTML", disable_web_page_preview=True)
-                bot.answer_callback_query(call.id, text="Pembayaran ditolak & notifikasi terkirim ke pembeli.")
+                bot.answer_callback_query(call.id, text="Pembayaran ditolak & status di riwayat jadi DITOLAK!")
         except Exception as e:
             bot.answer_callback_query(call.id, text=f"Error: {e}", show_alert=True)
         return
@@ -790,14 +790,17 @@ def callback_handler(call):
 def handle_photo(message):
     save_user(message.chat.id)
     user = message.from_user
-    rs = random.randint(10000, 99999)
+    
+    resi_unik = get_latest_user_order(message.chat.id)
+    user_caption = message.caption if message.caption else "Tidak ada pesan"
+    
     WIB = timezone(timedelta(hours=7))
     now = datetime.now(WIB)
     
     res_to_buyer = (
         "✅ BUKTI PEMBAYARAN BERHASIL DIUNGGAH!\n"
         f"Terima kasih Kak {user.first_name} 🙏\n\n"
-        f"🛡️ No Resi Unik: PKL-MLBB-{rs}\n"
+        f"🛡️ No Resi Unik: {resi_unik}\n"
         f"⏱️ Waktu: {now.strftime('%d-%m-%Y %H:%M:%S WIB')}\n\n"
         f"📋 Silakan tunggu verifikasi dari Admin: {ADMIN_USERNAME}"
     )
@@ -807,15 +810,16 @@ def handle_photo(message):
         caption_admin = (
             "🚨 <b>ADA BUKTI TRANSFER MASUK!</b> 🚨\n\n"
             f"👤 Dari User: @{user.username if user.username else user.first_name} (ID: <code>{user.id}</code>)\n"
+            f"✉️ Pesan Dari User: \"{user_caption}\"\n"
             f"⏱️ Waktu: {now.strftime('%d-%m-%Y %H:%M:%S WIB')}\n"
-            f"🔑 No Resi Unik: PKL-MLBB-{rs}\n\n"
+            f"🔑 No Resi Unik: {resi_unik}\n\n"
             "👇 <i>Silakan cek mutasi e-wallet, lalu klik tombol di bawah untuk ACC atau Tolak!</i>"
         )
         
         markup_admin_action = types.InlineKeyboardMarkup(row_width=2)
         markup_admin_action.add(
-            types.InlineKeyboardButton("✅ ACC", callback_data=f"acc|{user.id}|PKL-MLBB-{rs}"),
-            types.InlineKeyboardButton("❌ TOLAK", callback_data=f"tolak|{user.id}|PKL-MLBB-{rs}")
+            types.InlineKeyboardButton("✅ ACC", callback_data=f"acc|{user.id}|{resi_unik}"),
+            types.InlineKeyboardButton("❌ TOLAK", callback_data=f"tolak|{user.id}|{resi_unik}")
         )
         
         bot.send_photo(
