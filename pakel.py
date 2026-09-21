@@ -37,6 +37,11 @@ def save_user(chat_id):
         chat_id_str = str(chat_id).strip()
         if not chat_id_str:
             return
+            
+        # Pengecekan ketat: Jangan pernah simpan ID Grup atau Channel (yang berawalan tanda minus '-') ke database users.txt
+        if chat_id_str.startswith('-'):
+            return
+
         users = []
         try:
             with open("users.txt", "r") as f:
@@ -511,7 +516,6 @@ def cmd_katalog(message):
 
     katalog_text = f"{t['cat_title_1'].format(name=user.first_name)}\n\n{t['bonus_txt']}\n\n" + "\n\n".join([desc for _, _, desc in t['p1']])
     bot.send_message(message.chat.id, katalog_text, reply_markup=markup)
-
 @bot.callback_query_handler(func=lambda call: True)
 def callback_handler(call):
     save_user(call.message.chat.id)
@@ -834,6 +838,10 @@ def handle_photo(message):
 
 @bot.message_handler(func=lambda message: True)
 def auto_reply(message):
+    # Abaikan pesan dari grup atau channel agar database users.txt bersih khusus pembeli pribadi
+    if message.chat.type != 'private':
+        return
+
     save_user(message.chat.id)
     user = message.from_user
     l = get_lang(user)
