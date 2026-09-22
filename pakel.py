@@ -17,7 +17,7 @@ except Exception:
 ADMIN_USERNAME = "@PakelMlbbOfficial"
 ADMIN_LINK = "https://t.me/PakelMlbbOfficial"
 CHANNEL_TESTI_LINK = "https://t.me/PakelMlbb/368"
-ADMIN_TELEGRAM_ID = 8772023108  # Ganti/sesuaikan dengan ID Telegram admin utama
+ADMIN_TELEGRAM_ID = 8772023108  # ID Telegram admin utama untuk command khusus
 
 GROUP_CHAT_ID = "@PakelMlbb"
 GROUP_TOPIC_ID = 368
@@ -222,7 +222,6 @@ def update_order_status_by_resi(resi_target, status_baru):
                         add_user_points(target_chat_id, 10)
                 elif status_baru in ["DITOLAK", "EXPIRED", "CANCELLED"]:
                     set_user_coupon_status(target_chat_id, "AVAILABLE")
-                    # Catatan: Pengembalian poin via tombol cancel ditangani langsung di handler callback agar aman dari duplikasi.
                     
             return True
     except Exception as e:
@@ -486,6 +485,72 @@ def cmd_reset_orders(message):
         bot.reply_to(message, "✅ Berhasil! File orders.txt sudah dikosongkan dan bersih total.")
     except Exception as e:
         bot.reply_to(message, f"❌ Gagal mengosongkan file: {e}")
+
+@bot.message_handler(commands=['poin'])
+def admin_add_points(message):
+    if message.chat.id != ADMIN_TELEGRAM_ID:
+        bot.reply_to(message, "⚠️ Perintah khusus admin utama!")
+        return
+        
+    args = message.text.replace('/poin', '').strip().split()
+    if len(args) < 2:
+        bot.reply_to(message, "⚠️ Format salah! Contoh: /poin @PakelMlbbOfficial 1000")
+        return
+        
+    target_username = args[0].strip()
+    try:
+        jumlah_tambah = int(args[1])
+    except ValueError:
+        bot.reply_to(message, "⚠️ Jumlah poin harus berupa angka! Contoh: /poin @username 500")
+        return
+
+    target_chat_id = None
+    try:
+        with open("users.txt", "r") as f:
+            for line in f:
+                uid = line.strip()
+                if uid and not uid.startswith('-'):
+                    try:
+                        chat_info = bot.get_chat(int(uid))
+                        uname = f"@{chat_info.username}" if chat_info.username else ""
+                        if uname.lower() == target_username.lower():
+                            target_chat_id = int(uid)
+                            break
+                    except Exception:
+                        pass
+    except FileNotFoundError:
+        pass
+
+    if not target_username.startswith('@'):
+        bot.reply_to(message, "⚠️ Format username harus diawali dengan tanda '@' (Contoh: @UsernameAsli)")
+        return
+
+    if not target_chat_id:
+        bot.reply_to(message, "Member atau pengguna tidak ditemukan.")
+        return
+
+    try:
+        chat_info = bot.get_chat(target_chat_id)
+        add_user_points(target_chat_id, jumlah_tambah)
+        total_pasti = get_user_points(target_chat_id)
+        
+        bot.reply_to(message, f"Berhasil ditambahkan {jumlah_tambah} poin ke pengguna @{chat_info.username or target_username} (ID: {target_chat_id}). Poin kamu saat ini ada {total_pasti}.")
+        
+        try:
+            bot.send_message(
+                target_chat_id, 
+                f"🎁 <b>SELAMAT! ADMIN MENAMBAHKAN POIN UNTUKMU</b> 🎁\n\n"
+                f"➕ Jumlah Ditambahkan: <b>+{jumlah_tambah} Poin</b>\n"
+                f"🪙 Saldo Poin Kamu Saat Ini: <b>{total_pasti} Poin</b>\n\n"
+                "Silakan gunakan poinmu untuk klaim script VIP gratis di katalog bot! ✨",
+                parse_mode="HTML"
+            )
+        except Exception:
+            pass
+            
+    except Exception:
+        bot_name = bot.get_me().first_name
+        bot.reply_to(message, f"Pengguna belum pernah mencoba bot {bot_name}.")
 
 @bot.message_handler(commands=['bc', 'broadcast'])
 def broadcast_message(message):
