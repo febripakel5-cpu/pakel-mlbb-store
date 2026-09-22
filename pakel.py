@@ -357,7 +357,6 @@ def background_auto_poster():
 
 threading.Thread(target=background_auto_poster, daemon=True).start()
 
-# 10 TEMPLATE AUTO-BROADCAST ASLI LENGKAP TANPA ADA YANG DIHAPUS
 def background_auto_broadcast():
     time.sleep(300)
     broadcast_templates = [
@@ -412,28 +411,28 @@ TRANSLATIONS = {
         'cat_title_2': "🔥 VIP EXCLUSIVE CATALOGUE - BAGIAN 2 (Kak {name}) 🔥\n*(Kategori: Sultan One Hit Instan & Dominasi Mutlak)*",
         'bonus_txt': "⚡ BONUS SPESIAL FREE ALL PACKAGES (TANPA BIAYA TAMBAHAN): \n🎁 Setiap pembelian paket apa saja, otomatis mendapatkan:\n  • Panel Server Lag Musuh (Global Ping Spikes)\n  • Drone View Eksklusif X1 sampai X10 (Ultra Wide View)\n\n📂 SILAKAN PILIH SCRIPT & PELAJARI DETAIL FITUR DI BAWAH INI:",
         'p1_normal': [
-            ("🛒 Beli: Natural Balance (Rp 120k / 30 Poin)", "buy_natural", "• 💎 Natural Balance (30 Hari) — Rp 120.000 (Atau tukar 30 Poin)\n  └ 🎯 Fungsi: Script penyetara damage halus, aman anti-detect untuk tier Mythic."),
-            ("🛒 Beli: Light VIP + Drone (Rp 95k / 25 Poin)", "buy_light", "• ⚡ Light VIP + Drone (30 Hari) — Rp 95.000 (Atau tukar 25 Poin)\n  └ 🎯 Fungsi: Boost damage ringan + map vision luas (drone view)."),
-            ("🛒 Beli: Semi-Safe 14 Hari (Rp 75k / 20 Poin)", "buy_semisafe", "• 🛡️ Semi-Safe (14 Hari) — Rp 75.000 (Atau tukar 20 Poin)\n  └ 🎯 Fungsi: Solusi cepat push rank akhir season."),
-            ("🛒 Beli: Lifetime Safe (Rp 200k / 50 Poin)", "buy_lifetimesafe", "• 👑 Lifetime Safe (Permanent) — Rp 200.000 (Atau tukar 50 Poin)\n  └ 🎯 Fungsi: Akses permanen seumur hidup + update gratis.")
+            ("🛒 Beli: Natural Balance (Rp 120k / 30 Poin)", "buy_natural", "• 👑 <b>Paket Natural Balance (30 Hari)</b> — Rp 120.000 (Atau tukar 30 Poin)\n  └ 🎯 <b>Fungsi:</b> Dirancang khusus untuk pemain yang mengutamakan keamanan akun. Pengaturan damage dapat disesuaikan secara mandiri (seperti 2 hit yang tidak mencolok), sehingga performa tetap optimal namun senyap[span_0](start_span)[span_0](end_span)."),
+            ("🛒 Beli: Light VIP + Drone (Rp 95k / 25 Poin)", "buy_light", "• ⚡ <b>Paket Light VIP + Drone (30 Hari)</b> — Rp 95.000 (Atau tukar 25 Poin)\n  └ 🎯 <b>Fungsi:</b> Pilihan ekonomis untuk pemakaian bulanan. Kombinasi pas antara damage yang disetel wajar agar tidak terlihat brutal, ditambah pandangan map yang lebih luas untuk membaca pergerakan lawan[span_1](start_span)[span_1](end_span)."),
+            ("🛒 Beli: Semi-Safe 14 Hari (Rp 75k / 20 Poin)", "buy_semisafe", "• 🛡️ <b>Paket Semi-Safe (14 Hari)</b> — Rp 75.000 (Atau tukar 20 Poin)\n  └ 🎯 <b>Fungsi:</b> Paket harian yang sangat terjangkau. Menghadirkan setelan damage fleksibel yang terkontrol serta kestabilan koneksi yang terjaga selama dua minggu penuh[span_2](start_span)[span_2](end_span)."),
+            ("🛒 Beli: Lifetime Safe (Rp 200k / 50 Poin)", "buy_lifetimesafe", "• 👑 <b>Paket Lifetime Safe (Permanent)</b> — Rp 200.000 (Atau tukar 50 Poin)\n  └ 🎯 <b>Fungsi:</b> Solusi hemat jangka panjang tanpa biaya langganan bulanan. Memberikan akses selamanya dengan fitur damage fleksibel yang aman dan stabil digunakan sewaktu-waktu[span_3](start_span)[span_3](end_span).")
         ],
         'p1_promo': [
-            ("🛒 Natural Balance (Hemat 10k / 30 Poin)", "buy_natural", "• 💎 Natural Balance (30 Hari) — <s>Rp 120.000</s> <b>Rp 110.000</b> (Hemat Rp 10.000 / Tukar 30 Poin)\n  └ 🎯 Fungsi: Script penyetara damage halus, aman anti-detect untuk tier Mythic."),
-            ("🛒 Light VIP + Drone (Hemat 10k / 25 Poin)", "buy_light", "• ⚡ Light VIP + Drone (30 Hari) — <s>Rp 95.000</s> <b>Rp 85.000</b> (Hemat Rp 10.000 / Tukar 25 Poin)\n  └ 🎯 Fungsi: Boost damage ringan + map vision luas (drone view)."),
-            ("🛒 Semi-Safe 14 Hari (Hemat 10k / 20 Poin)", "buy_semisafe", "• 🛡️ Semi-Safe (14 Hari) — <s>Rp 75.000</s> <b>Rp 65.000</b> (Hemat Rp 10.000 / Tukar 20 Poin)\n  └ 🎯 Fungsi: Solusi cepat push rank akhir season."),
-            ("🛒 Lifetime Safe (Hemat 10k / 50 Poin)", "buy_lifetimesafe", "• 👑 Lifetime Safe (Permanent) — <s>Rp 200.000</s> <b>Rp 190.000</b> (Hemat Rp 10.000 / Tukar 50 Poin)\n  └ 🎯 Fungsi: Akses permanen seumur hidup + update gratis.")
+            ("🛒 Natural Balance (Hemat 10k / 30 Poin)", "buy_natural", "• 👑 <b>Paket Natural Balance (30 Hari)</b> — <s>Rp 120.000</s> <b>Rp 110.000</b> (Hemat Rp 10.000 / Tukar 30 Poin)\n  └ 🎯 <b>Fungsi:</b> Dirancang khusus untuk pemain yang mengutamakan keamanan akun. Pengaturan damage dapat disesuaikan secara mandiri (seperti 2 hit yang tidak mencolok)[span_4](start_span)[span_4](end_span)."),
+            ("🛒 Light VIP + Drone (Hemat 10k / 25 Poin)", "buy_light", "• ⚡ <b>Paket Light VIP + Drone (30 Hari)</b> — <s>Rp 95.000</s> <b>Rp 85.000</b> (Hemat Rp 10.000 / Tukar 25 Poin)\n  └ 🎯 <b>Fungsi:</b> Pilihan ekonomis pemakaian bulanan. Kombinasi damage wajar + pandangan map luas[span_5](start_span)[span_5](end_span)."),
+            ("🛒 Semi-Safe 14 Hari (Hemat 10k / 20 Poin)", "buy_semisafe", "• 🛡️ <b>Paket Semi-Safe (14 Hari)</b> — <s>Rp 75.000</s> <b>Rp 65.000</b> (Hemat Rp 10.000 / Tukar 20 Poin)\n  └ 🎯 <b>Fungsi:</b> Paket harian terjangkau dengan setelan damage terkontrol & koneksi stabil[span_6](start_span)[span_6](end_span)."),
+            ("🛒 Lifetime Safe (Hemat 10k / 50 Poin)", "buy_lifetimesafe", "• 👑 <b>Paket Lifetime Safe (Permanent)</b> — <s>Rp 200.000</s> <b>Rp 190.000</b> (Hemat Rp 10.000 / Tukar 50 Poin)\n  └ 🎯 <b>Fungsi:</b> Solusi hemat jangka panjang tanpa biaya langganan bulanan[span_7](start_span)[span_7](end_span).")
         ],
         'p2_normal': [
-            ("🛒 Beli: Sultan One Hit (Rp 150k / 40 Poin)", "buy_sultan", "• 💥 Sultan One Hit 100% (30 Hari) — Rp 150.000 (Atau tukar 40 Poin)\n  └ 🎯 Fungsi: One hit kill mutlak untuk dominasi total."),
-            ("🛒 Beli: VIP Pro One Hit (Rp 100k / 30 Poin)", "buy_pro", "• ⚡ VIP Pro One Hit 80% (30 Hari) — Rp 100.000 (Atau tukar 30 Poin)\n  └ 🎯 Fungsi: Keseimbangan kekuatan dan keamanan akun."),
-            ("🛒 Beli: Semi-Private 14 Hari (Rp 75k / 20 Poin)", "buy_semiprivate", "• 🔒 Semi-Private (14 Hari) — Rp 75.000 (Atau tukar 20 Poin)\n  └ 🎯 Fungsi: Script privat eksklusif 2 minggu."),
-            ("🛒 Beli: Permanent Legend (Rp 250k / 60 Poin)", "buy_permanent", "• 🏆 Permanent Legend (Lifetime) — Rp 250.000 (Atau tukar 60 Poin)\n  └ 🎯 Fungsi: Paket elit permanen seumur hidup.")
+            ("🛒 Beli: Sultan One Hit (Rp 150k / 40 Poin)", "buy_sultan", "• 💥 <b>Paket Sultan One Hit 100% (30 Hari)</b> — Rp 150.000 (Atau tukar 40 Poin)\n  └ 🎯 <b>Fungsi:</b> Damage tembus batas, instant kill musuh dalam sekali hit, bypass anti-cheat paling aman, khusus untuk player serius[span_8](start_span)[span_8](end_span)."),
+            ("🛒 Beli: VIP Pro One Hit (Rp 100k / 30 Poin)", "buy_pro", "• ⚡ <b>Paket VIP Pro One Hit 80% (30 Hari)</b> — Rp 100.000 (Atau tukar 30 Poin)\n  └ 🎯 <b>Fungsi:</b> Udah dapet damage sakit, semua skin kebuka, pandangan luas, lengkap jadi satu! Paling dicari para top global[span_9](start_span)[span_9](end_span)."),
+            ("🛒 Beli: Semi-Private 14 Hari (Rp 75k / 20 Poin)", "buy_semiprivate", "• 🔒 <b>Paket Semi-Private (14 Hari)</b> — Rp 75.000 (Atau tukar 20 Poin)\n  └ 🎯 <b>Fungsi:</b> Performanya stabil, anti patah-patah dijamin lancar jaya buat bantai musuh seharian[span_10](start_span)[span_10](end_span)."),
+            ("🛒 Beli: Permanent Legend (Rp 250k / 60 Poin)", "buy_permanent", "• 🏆 <b>Paket Permanent Legend (Lifetime)</b> — Rp 250.000 (Atau tukar 60 Poin)\n  └ 🎯 <b>Fungsi:</b> Sekali bayar, nikmati update script seumur hidup tanpa perlu perpanjang langganan tiap bulan. Auto untung buat jangka panjang[span_11](start_span)[span_11](end_span)!")
         ],
         'p2_promo': [
-            ("🛒 Sultan One Hit (Hemat 10k / 40 Poin)", "buy_sultan", "• 💥 Sultan One Hit 100% (30 Hari) — <s>Rp 150.000</s> <b>Rp 140.000</b> (Hemat Rp 10.000 / Tukar 40 Poin)\n  └ 🎯 Fungsi: One hit kill mutlak untuk dominasi total."),
-            ("🛒 VIP Pro One Hit (Hemat 10k / 30 Poin)", "buy_pro", "• ⚡ VIP Pro One Hit 80% (30 Hari) — <s>Rp 100.000</s> <b>Rp 90.000</b> (Hemat Rp 10.000 / Tukar 30 Poin)\n  └ 🎯 Fungsi: Keseimbangan kekuatan dan keamanan akun."),
-            ("🛒 Semi-Private 14 Hari (Hemat 10k / 20 Poin)", "buy_semiprivate", "• 🔒 Semi-Private (14 Hari) — <s>Rp 75.000</s> <b>Rp 65.000</b> (Hemat Rp 10.000 / Tukar 20 Poin)\n  └ 🎯 Fungsi: Script privat eksklusif 2 minggu."),
-            ("🛒 Permanent Legend (Hemat 10k / 60 Poin)", "buy_permanent", "• 🏆 Permanent Legend (Lifetime) — <s>Rp 250.000</s> <b>Rp 240.000</b> (Hemat Rp 10.000 / Tukar 60 Poin)\n  └ 🎯 Fungsi: Paket elit permanen seumur hidup.")
+            ("🛒 Sultan One Hit (Hemat 10k / 40 Poin)", "buy_sultan", "• 💥 <b>Paket Sultan One Hit 100% (30 Hari)</b> — <s>Rp 150.000</s> <b>Rp 140.000</b> (Hemat Rp 10.000 / Tukar 40 Poin)\n  └ 🎯 <b>Fungsi:</b> Damage tembus batas, instant kill musuh dalam sekali hit[span_12](start_span)[span_12](end_span)."),
+            ("🛒 VIP Pro One Hit (Hemat 10k / 30 Poin)", "buy_pro", "• ⚡ <b>Paket VIP Pro One Hit 80% (30 Hari)</b> — <s>Rp 100.000</s> <b>Rp 90.000</b> (Hemat Rp 10.000 / Tukar 30 Poin)\n  └ 🎯 <b>Fungsi:</b> Damage sakit, unlock all skin & drone view lengkap jadi satu[span_13](start_span)[span_13](end_span)."),
+            ("🛒 Semi-Private 14 Hari (Hemat 10k / 20 Poin)", "buy_semiprivate", "• 🔒 <b>Paket Semi-Private (14 Hari)</b> — <s>Rp 75.000</s> <b>Rp 65.000</b> (Hemat Rp 10.000 / Tukar 20 Poin)\n  └ 🎯 <b>Fungsi:</b> Performa stabil, anti patah-patah buat bantai musuh seharian[span_14](start_span)[span_14](end_span)."),
+            ("🛒 Permanent Legend (Hemat 10k / 60 Poin)", "buy_permanent", "• 🏆 <b>Paket Permanent Legend (Lifetime)</b> — <s>Rp 250.000</s> <b>Rp 240.000</b> (Hemat Rp 10.000 / Tukar 60 Poin)\n  └ 🎯 <b>Fungsi:</b> Sekali bayar untuk update seumur hidup tanpa perpanjang bulanan[span_15](start_span)[span_15](end_span).")
         ],
         'next_1': "▶️ Lanjut ke Katalog Bagian 2 (Sultan One Hit)",
         'prev_2': "◀️ Kembali ke Katalog Bagian 1",
@@ -453,7 +452,7 @@ TRANSLATIONS = {
     'en': {
         'btn_katalog': "💎 VIP Catalogue & Pricing", 'btn_testi': "🌟 Live Testimonials",
         'btn_riwayat': "📦 My Order History", 'btn_promo': "🎁 Claim Promo & Points",
-        'btn_cara_order': "❓ How to Order", 'btn_bayar': "💳 All Payment Methods",
+        'btn_cara_order': "❓ How to Order", 'btn_bayar': "💳 Payments",
         'btn_faq': "💡 FAQ", 'btn_konfirmasi': "✅ Check Status",
         'btn_admin': "💬 Contact Admin", 'back': "⬅️ Kembali ke Menu Utama",
         'cat_title_1': "🔥 VIP EXCLUSIVE CATALOGUE - PART 1 ({name}) 🔥",
@@ -478,6 +477,7 @@ def get_back_markup(l):
     text = TRANSLATIONS.get(l, TRANSLATIONS['en'])['back']
     markup.add(types.InlineKeyboardButton(text, callback_data='menu_utama'))
     return markup
+
 @bot.message_handler(commands=['bc', 'broadcast'])
 def broadcast_message(message):
     save_user(message.chat.id)
