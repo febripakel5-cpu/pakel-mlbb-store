@@ -1106,11 +1106,28 @@ def callback_handler(call):
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=riw_text, reply_markup=get_back_markup(l), parse_mode="HTML", disable_web_page_preview=True)
         bot.answer_callback_query(call.id)
 
-    elif call.data == 'menu_promo':
+        elif call.data == 'menu_promo':
         status_c = get_user_coupon_status(chat_id)
-        promo_text = f"🎁 PROMO & POIN (Kak {user.first_name})\n\n🪙 Saldo Poin: <b>{get_user_points(chat_id)} Poin</b>"
+        user_pts = get_user_points(chat_id)
+        
+        # Penjelasan status kupon member baru
+        if status_c == "AVAILABLE":
+            kupon_info = "🎁 Status Kupon Member Baru: <b>TERSEDIA (Belum Digunakan)</b>\n💡 Otomatis terpotong saat kamu checkout pesanan pertama!"
+        elif status_c == "PENDING":
+            kupon_info = "🎁 Status Kupon Member Baru: <b>PENDING (Sedang Menunggu Verifikasi)</b>"
+        else:
+            kupon_info = "🎁 Status Kupon Member Baru: <b>SUDAH DIGUNAKAN</b>"
+
+        promo_text = (
+            f"🎁 <b>PROMO & POIN LOYALITAS (Kak {user.first_name})</b> 🎁\n\n"
+            f"🪙 Saldo Poin Anda: <b>{user_pts} Poin</b>\n\n"
+            f"{kupon_info}\n\n"
+            "💡 <i>Kumpulkan terus poin transaksi suksesmu dan tukarkan dengan paket script VIP gratis tanpa bayar!</i>"
+        )
+        
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=promo_text, reply_markup=get_back_markup(l), parse_mode="HTML")
         bot.answer_callback_query(call.id)
+
 
     elif call.data == 'menu_faq':
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text="💡 FAQ PAKEL MLBBSTORE\n\n❓ Aman dari banned? \n💬 A: Sangat aman, enkripsi anti-detect tinggi.", reply_markup=get_back_markup(l))
