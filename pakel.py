@@ -695,22 +695,26 @@ def cmd_cekresi(message):
 
 @bot.message_handler(commands=['katalog'])
 def cmd_katalog(message):
-    save_user(message.chat.id)
-    user = message.from_user
-    l = get_lang(user)
-    t = TRANSLATIONS[l]
-    coupon_status = get_user_coupon_status(message.chat.id)
-    items_to_use = t['p1_promo'] if coupon_status == "AVAILABLE" else t['p1_normal']
-    markup = types.InlineKeyboardMarkup(row_width=1)
-    for btn_text, callback_val, _ in items_to_use:
-        markup.add(types.InlineKeyboardButton(btn_text, callback_data=callback_val))
-    markup.add(types.InlineKeyboardButton(t['next_1'], callback_data='katalog_part2'))
-    markup.add(types.InlineKeyboardButton(t['back'], callback_data='menu_utama'))
-    katalog_text = f"{t['cat_title_1'].format(name=user.first_name)}\n\n{t['bonus_txt']}\n\n" + "\n\n".join([desc for _, _, desc in items_to_use])
-    katalog_text += f"\n\n🪙 Saldo Poin Anda: <b>{get_user_points(message.chat.id)} Poin</b>"
-    if coupon_status == "AVAILABLE":
-        katalog_text += "\n🎁 <b>INFO PROMO:</b> Anda memiliki hak potong harga spesial member baru otomatis di katalog ini!"
-    bot.send_message(message.chat.id, katalog_text, reply_markup=markup, parse_mode="HTML")
+    try:
+        save_user(message.chat.id)
+        user = message.from_user
+        l = get_lang(user)
+        t = TRANSLATIONS[l]
+        coupon_status = get_user_coupon_status(message.chat.id)
+        items_to_use = t['p1_promo'] if coupon_status == "AVAILABLE" else t['p1_normal']
+        markup = types.InlineKeyboardMarkup(row_width=1)
+        for btn_text, callback_val, _ in items_to_use:
+            markup.add(types.InlineKeyboardButton(btn_text, callback_data=callback_val))
+        markup.add(types.InlineKeyboardButton(t['next_1'], callback_data='katalog_part2'))
+        markup.add(types.InlineKeyboardButton(t['back'], callback_data='menu_utama'))
+        katalog_text = f"{t['cat_title_1'].format(name=user.first_name)}\n\n{t['bonus_txt']}\n\n" + "\n\n".join([desc for _, _, desc in items_to_use])
+        katalog_text += f"\n\n🪙 Saldo Poin Anda: <b>{get_user_points(message.chat.id)} Poin</b>"
+        if coupon_status == "AVAILABLE":
+            katalog_text += "\n🎁 <b>INFO PROMO:</b> Anda memiliki hak potong harga spesial member baru otomatis di katalog ini!"
+        bot.send_message(message.chat.id, katalog_text, reply_markup=markup, parse_mode="HTML")
+    except Exception as e:
+        print(f"[CMD KATALOG ERROR]: {e}")
+        bot.reply_to(message, "Terjadi kesalahan saat memuat katalog.")
 
 @bot.message_handler(commands=['sc'])
 def cmd_sc_interactive(message):
@@ -948,6 +952,28 @@ def callback_handler(call):
             resi_code = parts[1] if action in ['apoin', 'tpoin'] else parts[2]
             target_user_id = parts[1] if action not in ['apoin', 'tpoin'] else None
 
+            # --- PROTEKSI TINGKAT DEWA: CEK STATUS REAL-TIME DATABASE ---
+            current_db_status = ""
+            try:
+                with open("orders.txt", "r") as f:
+                    for line in f:
+                        p = line.strip().split('|')
+                        if len(p) >= 8 and p[6].strip() == resi_code.strip():
+                            target_user_id = p[0]
+                            current_db_status = p[7].strip()
+                            break
+            except Exception:
+                pass
+
+            if not target_user_id:
+                bot.answer_callback_query(call.id, text="Gagal: Data resi tidak ditemukan di database!", show_alert=True)
+                return
+
+            if current_db_status != "PENDING":
+                bot.answer_callback_query(call.id, text=f"⚠️ PERINGATAN: Pesanan ini sudah diproses sebelumnya dengan status {current_db_status}!", show_alert=True)
+                return
+            # -----------------------------------------------------------
+
             if action in ['apoin', 'tpoin']:
                 try:
                     with open("orders.txt", "r") as f:
@@ -958,10 +984,6 @@ def callback_handler(call):
                                 break
                 except Exception:
                     pass
-
-            if not target_user_id:
-                bot.answer_callback_query(call.id, text="Gagal: Data user dari resi tidak ditemukan di database!", show_alert=True)
-                return
 
             original_text = call.message.caption or call.message.text or ""
 
@@ -1215,27 +1237,50 @@ def callback_handler(call):
         bot.answer_callback_query(call.id)
 
     elif call.data == 'menu_katalog' or call.data == 'katalog_part1':
-        coupon_status = get_user_coupon_status(chat_id)
-        items_to_use = t['p1_promo'] if coupon_status == "AVAILABLE" else t['p1_normal']
-        markup = types.InlineKeyboardMarkup(row_width=1)
-        for btn_text, callback_val, _ in items_to_use:
-            markup.add(types.InlineKeyboardButton(btn_text, callback_data=callback_val))
-        markup.add(types.InlineKeyboardButton(t['next_1'], callback_data='katalog_part2'))
-        markup.add(types.InlineKeyboardButton(t['back'], callback_data='menu_utama'))
-        katalog_text = f"{t['cat_title_1'].format(name=user.first_name)}\n\n{t['bonus_txt']}\n\n" + "\n\n".join([desc for _, _, desc in items_to_use]) + f"\n\n🪙 Saldo Poin Anda: <b>{get_user_points(message.chat.id)} Poin</b>"
-        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=katalog_text, reply_markup=markup, parse_mode="HTML", disable_web_page_preview=True)
+        try:
+            coupon_status = get_user_coupon_status(chat_id)
+            t_trans = TRANSLATIONS.get(l, TRANSLATIONS['id'])
+            items_to_use = t_trans['p1_promo'] if coupon_status == "AVAILABLE" else t_trans['p1_normal']
+            
+            markup = types.InlineKeyboardMarkup(row_width=1)
+            for btn_text, callback_val, _ in items_to_use:
+                markup.add(types.InlineKeyboardButton(btn_text, callback_data=callback_val))
+            
+            markup.add(types.InlineKeyboardButton(t_trans['next_1'], callback_data='katalog_part2'))
+            markup.add(types.InlineKeyboardButton(t_trans['back'], callback_data='menu_utama'))
+            
+            katalog_text = f"{t_trans['cat_title_1'].format(name=user.first_name)}\n\n{t_trans['bonus_txt']}\n\n"
+            katalog_text += "\n\n".join([desc for _, _, desc in items_to_use])
+            katalog_text += f"\n\n🪙 Saldo Poin Anda: <b>{get_user_points(chat_id)} Poin</b>"
+            
+            if coupon_status == "AVAILABLE":
+                katalog_text += "\n🎁 <b>INFO PROMO:</b> Anda memiliki hak potong harga spesial member baru otomatis di katalog ini!"
+                
+            bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=katalog_text, reply_markup=markup, parse_mode="HTML", disable_web_page_preview=True)
+        except Exception as e:
+            print(f"[KATALOG PART 1 ERROR]: {e}")
         bot.answer_callback_query(call.id)
 
     elif call.data == 'katalog_part2':
-        coupon_status = get_user_coupon_status(chat_id)
-        items_to_use = t['p2_promo'] if coupon_status == "AVAILABLE" else t['p2_normal']
-        markup = types.InlineKeyboardMarkup(row_width=1)
-        for btn_text, callback_val, _ in items_to_use:
-            markup.add(types.InlineKeyboardButton(btn_text, callback_data=callback_val))
-        markup.add(types.InlineKeyboardButton(t['prev_2'], callback_data='katalog_part1'))
-        markup.add(types.InlineKeyboardButton(t['back'], callback_data='menu_utama'))
-        katalog_text = f"{t['cat_title_2'].format(name=user.first_name)}\n\n" + "\n\n".join([desc for _, _, desc in items_to_use]) + f"\n\n🪙 Saldo Poin Anda: <b>{get_user_points(message.chat.id)} Poin</b>"
-        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=katalog_text, reply_markup=markup, parse_mode="HTML", disable_web_page_preview=True)
+        try:
+            coupon_status = get_user_coupon_status(chat_id)
+            t_trans = TRANSLATIONS.get(l, TRANSLATIONS['id'])
+            items_to_use = t_trans['p2_promo'] if coupon_status == "AVAILABLE" else t_trans['p2_normal']
+            
+            markup = types.InlineKeyboardMarkup(row_width=1)
+            for btn_text, callback_val, _ in items_to_use:
+                markup.add(types.InlineKeyboardButton(btn_text, callback_data=callback_val))
+                
+            markup.add(types.InlineKeyboardButton(t_trans['prev_2'], callback_data='katalog_part1'))
+            markup.add(types.InlineKeyboardButton(t_trans['back'], callback_data='menu_utama'))
+            
+            katalog_text = f"{t_trans['cat_title_2'].format(name=user.first_name)}\n\n"
+            katalog_text += "\n\n".join([desc for _, _, desc in items_to_use])
+            katalog_text += f"\n\n🪙 Saldo Poin Anda: <b>{get_user_points(chat_id)} Poin</b>"
+            
+            bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=katalog_text, reply_markup=markup, parse_mode="HTML", disable_web_page_preview=True)
+        except Exception as e:
+            print(f"[KATALOG PART 2 ERROR]: {e}")
         bot.answer_callback_query(call.id)
 
     elif call.data.startswith('buy_'):
