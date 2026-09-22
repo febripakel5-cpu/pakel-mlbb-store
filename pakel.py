@@ -148,124 +148,16 @@ def reduce_user_points(chat_id, amount):
     with open("points.txt", "w") as f:
         f.writelines(rows)
 
-# --- MODUL FITUR AUTO-BROADCAST TERJADWAL (10 TEMPLATE BERBEDA) ---
-def background_auto_broadcast():
-    time.sleep(300) # Jeda awal 5 menit setelah bot pertama kali nyala
-    
-    broadcast_templates = [
-        # Template 1: Fokus Promo & Member Baru
-        (
-            "📢 <b>INFO PROMO SPESIAL HARI INI!</b> 🔥\n\n"
-            "Buat Kakak yang mau ngebut <i>push rank</i> tanpa takut kena ban, buruan sikat script VIP kita sekarang!\n"
-            "🎁 Spesial hari ini, ada potongan harga spesial + bonus <i>Server Lag Panel</i> dan <i>Drone View X10</i> gratis tanpa biaya tambahan.\n\n"
-            "🛒 Langsung cek katalog lengkapnya di bot: @{bot_username}"
-        ),
-        # Template 2: Fokus Keamanan & Anti-Detect
-        (
-            "🛡️ <b>KENAPA HARUS PAKAI SCRIPT PAKEL MLBBSTORE?</b> ⚡\n\n"
-            "Jangan pertaruhkan akun sultan Kakak pakai script sembarangan yang gampang terdeteksi sistem Moonton!\n"
-            "Di sini kita pakai enkripsi <i>high-tier anti-detect</i> paling stabil se-Indonesia, aman buat main di mode <i>Ranked</i> Mythic sekalipun.\n\n"
-            "📦 Pilih paket andalan Kakak sekarang sebelum kehabisan slot: @{bot_username}"
-        ),
-        # Template 3: Fokus Bonus Spesial
-        (
-            "⚡ <b>BONUS FREE ALL PACKAGES TANPA SYARAT!</b> 🎁\n\n"
-            "Setiap pembelian paket apa saja di Official Pakel MlbbStore, Kakak bakal otomatis dapet:\n"
-            "• Panel Server Lag Musuh (<i>Global Ping Spikes</i>) 🌐\n"
-            "• Drone View Eksklusif Ultra Wide X1 - X10 🦅\n\n"
-            "🚀 Yuk dominasi permainan sekarang juga! Order gampang via bot: @{bot_username}"
-        ),
-        # Template 4: Fokus Push Rank & Top Global
-        (
-            "🏆 <b>MAU JADI TOP GLOBAL ATAU NYAMPE MYTHIC GLORY DENGAN CEPAT?</b> 🔥\n\n"
-            "Waktunya buktikan kemampuan terbaikmu di Land of Dawn! Gunakan <i>Custom Damage</i> dan <i>Light VIP</i> dari Pakel MlbbStore biar gameplay makin gampang dan mulus.\n\n"
-            "💬 Cek riwayat pesanan, klaim kupon, atau pilih paket langsung di: @{bot_username}"
-        ),
-        # Template 5: Fokus Testimoni & Kepercayaan
-        (
-            "🌟 <b>PEMBERITAHUAN UPDATE STOK & TESTIMONI HARIAN</b> 🚀\n\n"
-            "Ratusan player sudah membuktikan sendiri kestabilan script kita hari ini tanpa kendala. Giliran Kakak nih buat rasain bedanya pas war!\n"
-            "💎 Proses cepat, amanah, dan dibimbing sampai beres.\n\n"
-            "👇 Yuk amankan paket pilihanmu langsung di bot: @{bot_username}"
-        ),
-        # Template 6: Fokus Paket Sultan / One Hit
-        (
-            "💥 <b>SPECIAL EDITION: SULTAN ONE HIT & INSTANT KILL</b> ⚡\n\n"
-            "Mau ngerasain dominasi mutlak di setiap pertandingan? Paket <i>Sultan One Hit</i> siap bikin musuh kewalahan dan rata dalam sekejap!\n"
-            "🛡️ Dilengkapi sistem pengaman kelas atas agar akun tetap aman sentosa.\n\n"
-            "🛒 Sikat promonya sekarang lewat bot: @{bot_username}"
-        ),
-        # Template 7: Pengingat Poin Loyalitas & Kupon
-        (
-            "🎁 <b>CEK SALDO POIN & KUPON MEMBER KAMU!</b> 💳\n\n"
-            "Tahukah Kakak? Setiap transaksi sukses di Official Pakel MlbbStore, Kakak bakal otomatis dapet tambahan Poin Loyalitas lho!\n"
-            "🪙 Poinnya bisa ditukar buat bayar paket script gratis tanpa perlu transfer rupiah lagi. Mantap kan?\n\n"
-            "✨ Yuk cek poinmu sekarang di bot: @{bot_username}"
-        ),
-        # Template 8: Fokus Anti Lag & Server Stabil
-        (
-            "🌐 <b>BASMI LAG & FPS DROP SAAT WAR BERSAMA KITA!</b> 📉➡️📈\n\n"
-            "Kesel banget kan pas lagi momen penting malah patah-patah atau sinyal mendadak merah? Tenang, script kita sudah include fitur *Server Lag Panel* buat stabilin permainan.\n"
-            "🎯 Main jadi lebih PeDe, mulus, dan bebas hambatan!\n\n"
-            "📦 Langsung pilih paketnya di sini: @{bot_username}"
-        ),
-        # Template 9: Fokus Solusi Akhir Season
-        (
-            "⏰ <b>WAKTU TERBATAS: GASPOL PUSH RANK AKHIR SEASON!</b> ⏳\n\n"
-            "Jangan biarkan bintangmu turun atau stuck di satu tier terus! Maksimalkan performa permainanmu dengan script premium anti-detect terpercaya se-Indonesia.\n"
-            "⚡ Dijamin ampuh buat bantu naik tier dengan mulus.\n\n"
-            "🚀 Amankan paketmu sekarang juga via bot: @{bot_username}"
-        ),
-        # Template 10: Penutup / Sapaan Santai ke Member
-        (
-            "👋 <b>HALO KAKAK-KAKAK PLAYER MLBB INDONESIA!</b> 🎮✨\n\n"
-            "Mau mabar bareng squad tapi minder sama performa hero? Jangan khawatir, Official Pakel MlbbStore selalu siap jadi solusi terbaik buat naikin performa game kamu hari ini.\n"
-            "💎 Aman, stabil, dan bergaransi.\n\n"
-            "👇 Yuk langsung mampir ke katalog bot: @{bot_username}"
-        )
-    ]
-
-    while True:
-        try:
-            # Jeda waktu acak antara 4 jam sampai 8 jam sekali antar broadcast
-            sleep_interval = random.randint(14400, 28800)
-            time.sleep(sleep_interval)
-
-            try:
-                with open("users.txt", "r") as f:
-                    users = [line.strip() for line in f.read().splitlines() if line.strip()]
-            except FileNotFoundError:
-                continue
-                
-            if not users:
-                continue
-
-            users = list(set(users))
-            
-            # Pilih salah satu dari 10 template secara acak biar beda-beda terus isinya
-            template_pilihan = random.choice(broadcast_templates)
-            bot_username = bot.get_me().username
-            pesan_final = template_pilihan.format(bot_username=bot_username)
-
-            for chat_id in users:
-                try:
-                    bot.send_message(
-                        chat_id=chat_id, 
-                        text=f"📢 <b>PENGUMUMAN OTOMATIS PAKEL MLBBSTORE</b>\n\n{pesan_final}", 
-                        parse_mode="HTML",
-                        disable_web_page_preview=True
-                    )
-                    time.sleep(0.05)
-                except Exception:
-                    pass
-
-        except Exception as e:
-            print(f"[AUTO-BROADCAST ERROR]: {e}")
-            time.sleep(300)
-
-bc_thread = threading.Thread(target=background_auto_broadcast, daemon=True)
-bc_thread.start()
-
+# --- PENYIMPANAN ULASAN / REVIEW PEMBELI ---
+def save_user_review(chat_id, rating, text_review):
+    try:
+        WIB = timezone(timedelta(hours=7))
+        now = datetime.now(WIB).strftime('%d-%m-%Y %H:%M:%S')
+        review_line = f"{chat_id}|{now}|{rating}|{text_review.replace('|', '-')}\n"
+        with open("reviews.txt", "a") as f:
+            f.write(review_line)
+    except Exception as e:
+        print(f"[SAVE REVIEW ERROR]: {e}")
 def save_order(chat_id, paket_nama, harga, resi, payment_method="TRANSFER", point_cost=0):
     try:
         WIB = timezone(timedelta(hours=7))
@@ -334,7 +226,7 @@ def update_order_status_by_resi(resi_target, status_baru):
                         add_user_points(target_chat_id, 10)
                 elif status_baru in ["DITOLAK", "EXPIRED", "CANCELLED"]:
                     set_user_coupon_status(target_chat_id, "AVAILABLE")
-                    # Refund poin akurat sesuai data asli pemotongan
+                    # Refund poin akurat jika dibatalkan/ditolak
                     if target_payment == "POIN" and target_points_cost > 0:
                         add_user_points(target_chat_id, target_points_cost)
                     
@@ -523,6 +415,105 @@ def background_auto_poster():
 
 poster_thread = threading.Thread(target=background_auto_poster, daemon=True)
 poster_thread.start()
+
+# --- MODUL AUTO-BROADCAST TERJADWAL (10 TEMPLATE BERBEDA) ---
+def background_auto_broadcast():
+    time.sleep(300)
+    broadcast_templates = [
+        (
+            "📢 <b>INFO PROMO SPESIAL HARI INI!</b> 🔥\n\n"
+            "Buat Kakak yang mau ngebut <i>push rank</i> tanpa takut kena ban, buruan sikat script VIP kita sekarang!\n"
+            "🎁 Spesial hari ini, ada potongan harga spesial + bonus <i>Server Lag Panel</i> dan <i>Drone View X10</i> gratis tanpa biaya tambahan.\n\n"
+            "🛒 Langsung cek katalog lengkapnya di bot: @{bot_username}"
+        ),
+        (
+            "🛡️ <b>KENAPA HARUS PAKAI SCRIPT PAKEL MLBBSTORE?</b> ⚡\n\n"
+            "Jangan pertaruhkan akun sultan Kakak pakai script sembarangan yang gampang terdeteksi sistem Moonton!\n"
+            "Di sini kita pakai enkripsi <i>high-tier anti-detect</i> paling stabil se-Indonesia, aman buat main di mode <i>Ranked</i> Mythic sekalipun.\n\n"
+            "📦 Pilih paket andalan Kakak sekarang sebelum kehabisan slot: @{bot_username}"
+        ),
+        (
+            "⚡ <b>BONUS FREE ALL PACKAGES TANPA SYARAT!</b> 🎁\n\n"
+            "Setiap pembelian paket apa saja di Official Pakel MlbbStore, Kakak bakal otomatis dapet:\n"
+            "• Panel Server Lag Musuh (<i>Global Ping Spikes</i>) 🌐\n"
+            "• Drone View Eksklusif Ultra Wide X1 - X10 🦅\n\n"
+            "🚀 Yuk dominasi permainan sekarang juga! Order gampang via bot: @{bot_username}"
+        ),
+        (
+            "🏆 <b>MAU JADI TOP GLOBAL ATAU NYAMPE MYTHIC GLORY DENGAN CEPAT?</b> 🔥\n\n"
+            "Waktunya buktikan kemampuan terbaikmu di Land of Dawn! Gunakan <i>Custom Damage</i> dan <i>Light VIP</i> dari Pakel MlbbStore biar gameplay makin gampang dan mulus.\n\n"
+            "💬 Cek riwayat pesanan, klaim kupon, atau pilih paket langsung di: @{bot_username}"
+        ),
+        (
+            "🌟 <b>PEMBERITAHUAN UPDATE STOK & TESTIMONI HARIAN</b> 🚀\n\n"
+            "Ratusan player sudah membuktikan sendiri kestabilan script kita hari ini tanpa kendala. Giliran Kakak nih buat rasain bedanya pas war!\n"
+            "💎 Proses cepat, amanah, dan dibimbing sampai beres.\n\n"
+            "👇 Yuk amankan paket pilihanmu langsung di bot: @{bot_username}"
+        ),
+        (
+            "💥 <b>SPECIAL EDITION: SULTAN ONE HIT & INSTANT KILL</b> ⚡\n\n"
+            "Mau ngerasain dominasi mutlak di setiap pertandingan? Paket <i>Sultan One Hit</i> siap bikin musuh kewalahan dan rata dalam sekejap!\n"
+            "🛡️ Dilengkapi sistem pengaman kelas atas agar akun tetap aman sentosa.\n\n"
+            "🛒 Sikat promonya sekarang lewat bot: @{bot_username}"
+        ),
+        (
+            "🎁 <b>CEK SALDO POIN & KUPON MEMBER KAMU!</b> 💳\n\n"
+            "Tahukah Kakak? Setiap transaksi sukses di Official Pakel MlbbStore, Kakak bakal otomatis dapet tambahan Poin Loyalitas lho!\n"
+            "🪙 Poinnya bisa ditukar buat bayar paket script gratis tanpa perlu transfer rupiah lagi. Mantap kan?\n\n"
+            "✨ Yuk cek poinmu sekarang di bot: @{bot_username}"
+        ),
+        (
+            "🌐 <b>BASMI LAG & FPS DROP SAAT WAR BERSAMA KITA!</b> 📉➡️📈\n\n"
+            "Kesel banget kan pas lagi momen penting malah patah-patah atau sinyal mendadak merah? Tenang, script kita sudah include fitur *Server Lag Panel* buat stabilin permainan.\n"
+            "🎯 Main jadi lebih PeDe, mulus, dan bebas hambatan!\n\n"
+            "📦 Langsung pilih paketnya di sini: @{bot_username}"
+        ),
+        (
+            "⏰ <b>WAKTU TERBATAS: GASPOL PUSH RANK AKHIR SEASON!</b> ⏳\n\n"
+            "Jangan biarkan bintangmu turun atau stuck di satu tier terus! Maksimalkan performa permainanmu dengan script premium anti-detect terpercaya se-Indonesia.\n"
+            "⚡ Dijamin ampuh buat bantu naik tier dengan mulus.\n\n"
+            "🚀 Amankan paketmu sekarang juga via bot: @{bot_username}"
+        ),
+        (
+            "👋 <b>HALO KAKAK-KAKAK PLAYER MLBB INDONESIA!</b> 🎮✨\n\n"
+            "Mau mabar bareng squad tapi minder sama performa hero? Jangan khawatir, Official Pakel MlbbStore selalu siap jadi solusi terbaik buat naikin performa game kamu hari ini.\n"
+            "💎 Aman, stabil, dan bergaransi.\n\n"
+            "👇 Yuk langsung mampir ke katalog bot: @{bot_username}"
+        )
+    ]
+
+    while True:
+        try:
+            sleep_interval = random.randint(14400, 28800)
+            time.sleep(sleep_interval)
+            try:
+                with open("users.txt", "r") as f:
+                    users = [line.strip() for line in f.read().splitlines() if line.strip()]
+            except FileNotFoundError:
+                continue
+            if not users:
+                continue
+            users = list(set(users))
+            template_pilihan = random.choice(broadcast_templates)
+            bot_username = bot.get_me().username
+            pesan_final = template_pilihan.format(bot_username=bot_username)
+            for chat_id in users:
+                try:
+                    bot.send_message(
+                        chat_id=chat_id, 
+                        text=f"📢 <b>PENGUMUMAN OTOMATIS PAKEL MLBBSTORE</b>\n\n{pesan_final}", 
+                        parse_mode="HTML",
+                        disable_web_page_preview=True
+                    )
+                    time.sleep(0.05)
+                except Exception:
+                    pass
+        except Exception as e:
+            print(f"[AUTO-BROADCAST ERROR]: {e}")
+            time.sleep(300)
+
+bc_thread = threading.Thread(target=background_auto_broadcast, daemon=True)
+bc_thread.start()
 
 @bot.message_handler(commands=['testi', 'push'])
 def admin_push_testi(message):
@@ -761,6 +752,8 @@ def send_welcome(message):
     t = TRANSLATIONS[l]
     greeting = get_time_greeting()
     
+    user_points = get_user_points(message.chat.id)
+    
     markup = types.InlineKeyboardMarkup(row_width=1)
     markup.add(
         types.InlineKeyboardButton(t['btn_katalog'], callback_data='menu_katalog'),
@@ -779,13 +772,14 @@ def send_welcome(message):
     if l == 'id':
         welcome_text = (
             f"🔥 {greeting}, Kak {user.first_name}! Selamat datang di Official Pakel MlbbStore 🙏✨\n\n"
+            f"🪙 Saldo Poin Loyalitas Anda: <b>{user_points} Poin</b>\n\n"
             "Pusat layanan script cheat Mobile Legends premium terpercaya, anti-detect kelas atas, server lag panel, & drone view paling stabil se-Indonesia.\n\n"
         )
         if not is_open:
             welcome_text += f"{store_msg}\n\n"
         welcome_text += "👇 Silakan pilih menu di bawah ini untuk mulai berbelanja:"
     else:
-        welcome_text = f"🔥 {greeting}, {user.first_name}! Welcome to Official Pakel MlbbStore 🙏✨\n\n👇 Please select a menu below:"
+        welcome_text = f"🔥 {greeting}, {user.first_name}! Welcome to Official Pakel MlbbStore 🙏✨\n\n🪙 Your Loyalty Points: <b>{user_points} Poin</b>\n\n👇 Please select a menu below:"
         
     bot.send_message(message.chat.id, welcome_text, reply_markup=markup, parse_mode="HTML")
 
@@ -854,8 +848,9 @@ def cmd_katalog(message):
     markup.add(types.InlineKeyboardButton(t['back'], callback_data='menu_utama'))
 
     katalog_text = f"{t['cat_title_1'].format(name=user.first_name)}\n\n{t['bonus_txt']}\n\n" + "\n\n".join([desc for _, _, desc in items_to_use])
+    katalog_text += f"\n\n🪙 Saldo Poin Anda: <b>{get_user_points(message.chat.id)} Poin</b>"
     if coupon_status == "AVAILABLE":
-        katalog_text += "\n\n🎁 <b>INFO PROMO:</b> Anda memiliki hak potong harga spesial member baru otomatis di katalog ini!"
+        katalog_text += "\n🎁 <b>INFO PROMO:</b> Anda memiliki hak potong harga spesial member baru otomatis di katalog ini!"
         
     bot.send_message(message.chat.id, katalog_text, reply_markup=markup, parse_mode="HTML")
 @bot.callback_query_handler(func=lambda call: True)
@@ -912,48 +907,54 @@ def callback_handler(call):
         if action_type == 'poin':
             user_pts = get_user_points(chat_id)
             if user_pts >= p_points:
-                reduce_user_points(chat_id, p_points)
                 save_order(chat_id, p_name, f"{p_points} Poin", resi_unik, payment_method="POIN", point_cost=p_points)
-                update_order_status_by_resi(resi_unik, "BERHASIL")
+                coupon_status = get_user_coupon_status(chat_id)
+                if coupon_status == "AVAILABLE":
+                    set_user_coupon_status(chat_id, "PENDING")
+
+                pending_poin_text = (
+                    f"🪙 <b>INVOICE PEMBAYARAN VIA POIN (PENDING)</b> 🪙\n\n"
+                    f"📦 Paket: {p_name}\n"
+                    f"🪙 Poin yang Akan Dipotong: <b>{p_points} Poin</b> (Sisa Poin Anda: {user_pts} Poin)\n"
+                    f"🔑 No Resi: <code>{resi_unik}</code>\n"
+                    f"⏱️ Status: Menunggu Verifikasi & ACC dari Admin.\n\n"
+                    "💡 <i>Tenang Kak, poin Anda sama sekali belum dipotong sebelum admin meng-ACC pesanan ini!</i>"
+                )
                 
-                success_poin_text = (
-                    f"🎉 <b>PEMBAYARAN VIA POIN BERHASIL!</b> 🎉\n\n"
-                    f"📦 Paket: {p_name}\n"
-                    f"🪙 Poin Dipotong: {p_points} Poin (Sisa Poin: {get_user_points(chat_id)})\n"
-                    f"🔑 No Resi: <code>{resi_unik}</code>\n\n"
-                    "📋 <b>SILAKAN SALIN FORMAT PESAN DI BAWAH INI DAN KIRIM KE ADMIN:</b>\n"
-                    "👇 (Cukup ketuk/klik teks di bawah untuk menyalin otomatis)"
-                )
-                template_chat_admin = (
-                    "🔥 KONFIRMASI KLAIM SCRIPT VIP (VIA POIN) 🔥\n"
-                    f"📦 Paket: {p_name}\n"
-                    f"🪙 Metode: Potong Saldo Poin ({p_points} Poin)\n"
-                    f"🔑 No Resi: {resi_unik}\n"
-                    "Status: Lunas & Disetujui Bot.\n"
-                    "Mohon kirimkan link/file script-nya ya Kak. Terima kasih! 🙏"
-                )
+                markup_poin_inv = types.InlineKeyboardMarkup(row_width=1)
+                markup_poin_inv.add(types.InlineKeyboardButton("❌ Batalkan Pesanan Ini", callback_data=f"cancel_{resi_unik}"))
+                markup_poin_inv.add(types.InlineKeyboardButton("📦 Cek Riwayat Pesanan Saya", callback_data='menu_riwayat'))
+                markup_poin_inv.add(types.InlineKeyboardButton(t['back'], callback_data='menu_utama'))
+
                 try:
                     bot.delete_message(chat_id=chat_id, message_id=message_id)
                 except Exception:
                     pass
-                bot.send_message(chat_id, success_poin_text, parse_mode="HTML")
-                bot.send_message(chat_id, f"<code>{template_chat_admin}</code>", parse_mode="HTML")
+                
+                bot.send_message(chat_id, pending_poin_text, reply_markup=markup_poin_inv, parse_mode="HTML")
                 
                 try:
-                    report_admin = (
-                        "🚨 <b>TRANSAKSI SUKSES (BAYAR PAKAI POIN)</b> 🚨\n\n"
+                    report_admin_poin = (
+                        "🪙 <b>ADA KLAIM PEMBAYARAN VIA POIN MASUK!</b> 🪙\n\n"
                         f"👤 Dari User: @{user.username if user.username else user.first_name} (ID: <code>{chat_id}</code>)\n"
                         f"📦 Paket: {p_name}\n"
-                        f"🪙 Metode: Saldo Poin (Potong {p_points} Poin)\n"
+                        f"🪙 Nominal Poin: <b>{p_points} Poin</b> (Saldo User: {user_pts} Poin)\n"
                         f"🔑 No Resi: <code>{resi_unik}</code>\n"
-                        f"⏱️ Waktu: {datetime.now(timezone(timedelta(hours=7))).strftime('%d-%m-%Y %H:%M:%S WIB')}\n"
-                        "Status: LUNAS (Dibayar via Poin Loyalitas)"
+                        f"⏱️ Waktu: {datetime.now(timezone(timedelta(hours=7))).strftime('%d-%m-%Y %H:%M:%S WIB')}\n\n"
+                        "👇 <i>Silakan klik ACC POIN untuk memotong poin & menyetujui, atau TOLAK POIN jika ingin membatalkan!</i>"
                     )
-                    bot.send_message(GROUP_PAY_ID, report_admin, message_thread_id=GROUP_PAY_TOPIC_ID, parse_mode="HTML")
-                except Exception as e:
-                    print(f"[REPORT POIN ERROR]: {e}")
                     
-                bot.answer_callback_query(call.id, text="Pembayaran poin berhasil!")
+                    markup_admin_poin = types.InlineKeyboardMarkup(row_width=2)
+                    markup_admin_poin.add(
+                        types.InlineKeyboardButton("✅ ACC POIN", callback_data=f"accpoin|{chat_id}|{resi_unik}|{p_points}"),
+                        types.InlineKeyboardButton("❌ TOLAK POIN", callback_data=f"tolakpoin|{chat_id}|{resi_unik}")
+                    )
+                    
+                    bot.send_message(GROUP_PAY_ID, report_admin_poin, message_thread_id=GROUP_PAY_TOPIC_ID, parse_mode="HTML", reply_markup=markup_admin_poin)
+                except Exception as e:
+                    print(f"[REPORT ADMIN POIN ERROR]: {e}")
+                    
+                bot.answer_callback_query(call.id, text="Invoice poin diterbitkan, menunggu ACC admin!")
                 return
             else:
                 markup_fallback = types.InlineKeyboardMarkup(row_width=1)
@@ -1010,8 +1011,8 @@ def callback_handler(call):
             bot.answer_callback_query(call.id, text="Invoice transfer diterbitkan!")
             return
 
-    # --- ADMIN ACC / TOLAK HANDLER ---
-    if call.data.startswith('acc_') or call.data.startswith('tolak_') or call.data.startswith('acc|') or call.data.startswith('tolak|'):
+    # --- ADMIN ACC / TOLAK HANDLER (TRANSFER & POIN) ---
+    if call.data.startswith('acc_') or call.data.startswith('tolak_') or call.data.startswith('acc|') or call.data.startswith('tolak|') or call.data.startswith('accpoin|') or call.data.startswith('tolakpoin|'):
         try:
             sep = '|' if '|' in call.data else '_'
             parts = call.data.split(sep)
@@ -1021,10 +1022,21 @@ def callback_handler(call):
 
             original_text = call.message.caption or call.message.text or ""
 
-            if action == 'acc':
+            if action == 'acc' or action == 'accpoin':
+                if action == 'accpoin':
+                    p_points_val = int(parts[3]) if len(parts) > 3 and parts[3].isdigit() else 0
+                    current_user_pts = get_user_points(target_user_id)
+                    if current_user_pts >= p_points_val:
+                        reduce_user_points(target_user_id, p_points_val)
+                    else:
+                        bot.answer_callback_query(call.id, text="Gagal ACC: Saldo poin pembeli tidak mencukupi!", show_alert=True)
+                        return
+
                 update_order_status_by_resi(resi_code, "BERHASIL")
                 
-                new_admin_text = original_text + "\n\n<b>STATUS: ✅ TELAH DI-ACC OLEH ADMIN (Kupon Hangus & Poin Ditambahkan)</b>"
+                status_label = "✅ DI-ACC ADMIN (Poin Dipotong & Kupon Hangus)" if action == 'accpoin' else "✅ TELAH DI-ACC OLEH ADMIN (Kupon Hangus & Poin Ditambahkan)"
+                new_admin_text = original_text + f"\n\n<b>STATUS: {status_label}</b>"
+                
                 if call.message.content_type == 'photo':
                     bot.edit_message_caption(chat_id=chat_id, message_id=message_id, caption=new_admin_text, parse_mode="HTML", reply_markup=None)
                 else:
@@ -1048,11 +1060,11 @@ def callback_handler(call):
                 buyer_msg = (
                     "🎉 <b>PEMBAYARAN ANDA TELAH DI-ACC ADMIN!</b> 🎉\n\n"
                     f"🔑 No Resi: <code>{resi_code}</code>\n"
-                    "Status transaksi Anda sudah <b>BERHASIL</b> di sistem. Selamat, Anda juga mendapatkan <b>+10 Poin Loyalitas</b> ke akun Anda!\n\n"
+                    "Status transaksi Anda sudah <b>BERHASIL</b> di sistem. Selamat menikmati script-nya!\n\n"
                     "📋 <b>SILAKAN SALIN FORMAT PESAN DI BAWAH INI DAN KIRIM KE ADMIN:</b>\n"
                     "👇 (Cukup ketuk/klik teks di bawah untuk menyalin otomatis)"
                 )
-                bot.send_message(chat_id=target_user_id, text=buyer_msg, parse_mode="HTML")
+                bot.send_message(target_user_id, buyer_msg, parse_mode="HTML")
                 
                 template_chat_admin = (
                     "🔥 KONFIRMASI KLAIM SCRIPT VIP 🔥\n"
@@ -1063,14 +1075,30 @@ def callback_handler(call):
                     "Status: Lunas & Sudah di-ACC Bot.\n"
                     "Mohon kirimkan link/file script-nya ya Kak. Terima kasih! 🙏"
                 )
-                bot.send_message(chat_id=target_user_id, text=f"<code>{template_chat_admin}</code>", parse_mode="HTML")
+                bot.send_message(target_user_id, f"<code>{template_chat_admin}</code>", parse_mode="HTML")
+
+                # --- KIRIM FORM ULASAN / RATING BINTANG OTOMATIS KE PEMBELI ---
+                markup_rating = types.InlineKeyboardMarkup(row_width=5)
+                markup_rating.add(
+                    types.InlineKeyboardButton("⭐ 1", callback_data=f"rate|1|{resi_code}"),
+                    types.InlineKeyboardButton("⭐ 2", callback_data=f"rate|2|{resi_code}"),
+                    types.InlineKeyboardButton("⭐ 3", callback_data=f"rate|3|{resi_code}"),
+                    types.InlineKeyboardButton("⭐ 4", callback_data=f"rate|4|{resi_code}"),
+                    types.InlineKeyboardButton("⭐ 5", callback_data=f"rate|5|{resi_code}")
+                )
+                review_prompt_text = (
+                    "⭐ <b>BAGAIMANA PELAYANAN KAMI, KAK?</b> ⭐\n\n"
+                    f"Terima kasih telah berbelanja di Official Pakel MlbbStore (Resi: <code>{resi_code}</code>)!\n"
+                    "Silakan berikan penilaian bintang dan ulasan singkat di bawah ini agar kami terus berkembang:"
+                )
+                bot.send_message(target_user_id, review_prompt_text, reply_markup=markup_rating, parse_mode="HTML")
                 
                 bot.answer_callback_query(call.id, text="Pembayaran di-ACC!")
 
-            elif action == 'tolak':
+            elif action == 'tolak' or action == 'tolakpoin':
                 update_order_status_by_resi(resi_code, "DITOLAK")
 
-                new_admin_text = original_text + "\n\n<b>STATUS: ❌ DITOLAK OLEH ADMIN (Kupon/Poin Dikembalikan)</b>"
+                new_admin_text = original_text + "\n\n<b>STATUS: ❌ DITOLAK OLEH ADMIN (Kupon & Poin Dikembalikan)</b>"
                 if call.message.content_type == 'photo':
                     bot.edit_message_caption(chat_id=chat_id, message_id=message_id, caption=new_admin_text, parse_mode="HTML", reply_markup=None)
                 else:
@@ -1083,7 +1111,7 @@ def callback_handler(call):
                     "💡 <i>Tenang Kak, hak diskon member baru atau saldo poin Anda telah dikembalikan secara utuh!</i>\n\n"
                     f"💬 Silakan hubungi Admin resmi untuk konfirmasi lebih lanjut: {ADMIN_USERNAME}"
                 )
-                bot.send_message(chat_id=target_user_id, text=buyer_msg, parse_mode="HTML", disable_web_page_preview=True)
+                bot.send_message(target_user_id, buyer_msg, parse_mode="HTML", disable_web_page_preview=True)
                 bot.answer_callback_query(call.id, text="Pembayaran ditolak & kupon/poin dikembalikan!")
         except Exception as e:
             bot.answer_callback_query(call.id, text=f"Error: {e}", show_alert=True)
@@ -1129,6 +1157,7 @@ def callback_handler(call):
         return
 
     if call.data == 'menu_utama':
+        user_points = get_user_points(chat_id)
         markup = types.InlineKeyboardMarkup(row_width=1)
         markup.add(
             types.InlineKeyboardButton(t['btn_katalog'], callback_data='menu_katalog'),
@@ -1142,7 +1171,7 @@ def callback_handler(call):
             types.InlineKeyboardButton(t['btn_admin'], url=ADMIN_LINK)
         )
         is_open, store_msg = check_store_status()
-        text = f"🔥 {greeting}! Silakan pilih menu utama Pakel MlbbStore:\n\n" if l == 'id' else f"🔥 {greeting}! Main Menu:\n\n"
+        text = f"🔥 {greeting}, Kak {user.first_name}!\n🪙 Saldo Poin Anda: <b>{user_points} Poin</b>\n\nSilakan pilih menu utama Pakel MlbbStore:\n\n" if l == 'id' else f"🔥 {greeting}!\n🪙 Poin: {user_points}\n\nMain Menu:\n\n"
         if not is_open and l == 'id':
             text += f"{store_msg}\n\n"
             
@@ -1301,6 +1330,99 @@ def callback_handler(call):
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, reply_markup=get_back_markup(l), disable_web_page_preview=True)
         bot.answer_callback_query(call.id)
 
+    # --- HANDLE KLIK BINTANG ULASAN DARI PEMBELI ---
+    elif call.data.startswith('rate|'):
+        try:
+            _, rating_val, resi_code = call.data.split('|')
+            prompt_text = (
+                f"⭐ <b>RATING BINTANG {rating_val} DIPILIH!</b>\n\n"
+                "📝 Sekarang silakan <b>ketik dan kirim ulasan / pesan bebas apa saja</b> di kolom chat ini untuk melengkapi ulasan layanan kami (seperti di Roblox Studio):\n\n"
+                f"<i>(Resi: {resi_code} | Rating: {rating_val} Bintang)</i>"
+            )
+            bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=prompt_text, parse_mode="HTML")
+            
+            # Simpan sementara status rating user di memori chat atau file flag sederhana
+            with open(f"pending_review_{chat_id}.txt", "w") as f:
+                f.write(f"{resi_code}|{rating_val}")
+                
+            bot.answer_callback_query(call.id, text=f"Rating {rating_val} bintang dicatat, silakan ketik ulasanmu!")
+        except Exception as e:
+            bot.answer_callback_query(call.id, text=f"Error: {e}", show_alert=True)
+        return
+# --- HANDLE PESAN TEKS BEBAS UNTUK ULASAN & CHAT BIASA ---
+user_review_states = {}
+
+@bot.message_handler(func=lambda message: True, content_types=['text'])
+def handle_text_and_reviews(message):
+    chat_id = message.chat.id
+    if message.chat.type != 'private':
+        return
+
+    save_user(chat_id)
+    user = message.from_user
+    l = get_lang(user)
+    txt = message.text.strip()
+    
+    # Cek apakah user sedang dalam mode mengisi ulasan teks setelah klik bintang
+    review_flag_file = f"pending_review_{chat_id}.txt"
+    try:
+        if os.path.exists(review_flag_file): # atau gunakan pengecekan file sederhana
+            pass
+    except Exception:
+        pass
+
+    # Cek file flag ulasan
+    try:
+        with open(review_flag_file, "r") as f:
+            data_rev = f.read().strip().split('|')
+            if len(data_rev) == 2:
+                resi_c, rating_c = data_rev
+                save_user_review(chat_id, rating_c, txt)
+                
+                # Hapus file flag ulasan
+                try:
+                    os.remove(review_flag_file)
+                except Exception:
+                    pass
+                
+                thx_review_msg = (
+                    "🎉 <b>TERIMA KASIH ATAS ULASAN TERBAIKMU!</b> 🎉\n\n"
+                    f"⭐ Rating: {rating_c} Bintang\n"
+                    f"💬 Ulasan: \"{txt}\"\n\n"
+                    "Ulasan Anda berhasil disimpan dan sangat berarti bagi kemajuan Official Pakel MlbbStore! 🙏✨"
+                )
+                bot.reply_to(message, thx_review_msg, parse_mode="HTML", reply_markup=get_back_markup(l))
+                
+                # Teruskan laporan ulasan ke grup admin utama
+                try:
+                    report_review_admin = (
+                        "🌟 <b>ULASAN BARU DARI PEMBELI!</b> 🌟\n\n"
+                        f"👤 Dari: @{user.username if user.username else user.first_name} (ID: <code>{chat_id}</code>)\n"
+                        f"🔑 No Resi: <code>{resi_c}</code>\n"
+                        f"⭐ Rating: {rating_c} / 5 Bintang\n"
+                        f"💬 Isi Ulasan: \"{txt}\""
+                    )
+                    bot.send_message(GROUP_CHAT_ID, report_review_admin, message_thread_id=GROUP_TOPIC_ID, parse_mode="HTML")
+                except Exception as e:
+                    print(f"[REPORT REVIEW ERROR]: {e}")
+                return
+    except FileNotFoundError:
+        pass
+
+    # Chat handler biasa
+    txt_lower = txt.lower()
+    if any(w in txt_lower for w in ['price', 'harga', 'list', 'menu', 'catalog', 'katalog']):
+        res_msg = "💎 Ketik /start untuk membuka Katalog VIP!"
+    elif any(w in txt_lower for w in ['pay', 'bayar', 'dana', 'gopay', 'saweria', 'qris', 'testi', 'riwayat']):
+        res_msg = "🌟 Cek menu /start untuk melihat metode pembayaran, riwayat pesanan, & katalog lengkap!"
+    else:
+        res_msg = f"Halo {user.first_name}! Ketik /start untuk membuka menu utama atau hubungi {ADMIN_USERNAME}."
+        
+    bot.reply_to(message, res_msg, disable_web_page_preview=True)
+
+# Tambahan import os jika belum ada untuk file ulasan flag
+import os
+
 @bot.message_handler(content_types=['photo'])
 def handle_photo(message):
     save_user(message.chat.id)
@@ -1353,24 +1475,5 @@ def handle_photo(message):
     except Exception as e:
         print(f"[FORWARD PHOTO ERROR]: {e}")
 
-@bot.message_handler(func=lambda message: True)
-def auto_reply(message):
-    if message.chat.type != 'private':
-        return
-
-    save_user(message.chat.id)
-    user = message.from_user
-    l = get_lang(user)
-    txt = message.text.lower()
-    
-    if any(w in txt for w in ['price', 'harga', 'list', 'menu', 'catalog', 'katalog']):
-        res_msg = "💎 Ketik /start untuk membuka Katalog VIP!"
-    elif any(w in txt for w in ['pay', 'bayar', 'dana', 'gopay', 'saweria', 'qris', 'testi', 'riwayat']):
-        res_msg = "🌟 Cek menu /start untuk melihat metode pembayaran, riwayat pesanan, & katalog lengkap!"
-    else:
-        res_msg = f"Halo {user.first_name}! Ketik /start untuk membuka menu utama atau hubungi {ADMIN_USERNAME}."
-        
-    bot.reply_to(message, res_msg, disable_web_page_preview=True)
-
-print("[INFO] Pakel MlbbStore Master Ultimate Edition with Deep-Audit Fix Berhasil Dijalankan...")
+print("[INFO] Pakel MlbbStore Master Ultimate Edition dengan Poin di /start & Fitur Ulasan Interaktif Berhasil Dijalankan...")
 bot.infinity_polling()
