@@ -201,6 +201,8 @@ def update_order_status_by_resi(resi_target, status_baru):
                             target_points_cost = p_cost
                             current_status_db = status
                             
+                            # KUNCI UTAMA: Jika status di database sudah bukan PENDING (misal sudah BERHASIL), 
+                            # jangan izinkan perubahan status atau penambahan poin berulang!
                             if status != "PENDING":
                                 rows.append(line)
                                 continue
@@ -215,15 +217,16 @@ def update_order_status_by_resi(resi_target, status_baru):
             with open("orders.txt", "w") as f:
                 f.writelines(rows)
             
+            # EKSEKUSI BONUS/POTONGAN HANYA JIKA STATUS ASALNYA BENAR-BENAR PENDING
             if target_chat_id and current_status_db == "PENDING":
                 if status_baru == "BERHASIL":
                     set_user_coupon_status(target_chat_id, "USED")
-                    # FIX PENTING: Mencegah double deduction jika bayar via poin
+                    # Hanya berikan bonus +10 poin jika metode pembayaran BUKAN POIN dan status aslinya PENDING
                     if target_payment != "POIN":
                         add_user_points(target_chat_id, 10)
                 elif status_baru in ["DITOLAK", "EXPIRED", "CANCELLED"]:
                     set_user_coupon_status(target_chat_id, "AVAILABLE")
-                    # Kembalikan poin jika transaksi poin dibatalkan/ditolak
+                    # Kembalikan poin hanya jika transaksi poin dibatalkan/ditolak dari PENDING
                     if target_payment == "POIN" and target_points_cost > 0:
                         add_user_points(target_chat_id, target_points_cost)
                     
@@ -288,6 +291,7 @@ def check_store_status():
     if 0 <= hour < 7:
         return False, "⚠️ <b>INFO OPERASIONAL TOKO:</b>\nHalo Kak! Saat ini toko sedang istirahat (Offline) jam 00:00 - 07:00 WIB. Pesanan dan pembayaran tetap bisa dilakukan lewat bot, namun proses pengiriman script dan verifikasi resi akan dilanjutkan pagi ini mulai pukul 07:00 WIB ya! 🙏✨"
     return True, ""
+
 def get_random_masked_name():
     list_nama_tele = [
         "@R_Zky***", "@Alvinn_***", "@Dimas_99***", "@RezaPrat_***", 
