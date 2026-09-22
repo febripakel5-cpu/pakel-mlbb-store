@@ -300,34 +300,62 @@ def get_random_masked_name():
         "@Amirul_My***", "@Haikal_Iskandar***", "@Farhan_Zul***", "@Aiman_Badri***",
         "@Aqil_Danial***", "@Syahmi_Zain***", "@Luqman_Hakim***", "@Zulhelmi_My***",
         "@Alex_Walker***", "@Liam_Smith***", "@Noah_Miller***", "@Oliver_Davis***",
-        "@Sultan_Mlbb***", "@Anjay_Mabar***", "@Gacor_Gaming***", "@TopGlobal_1***"
+        "@Sultan_Mlbb***", "@Anjay_Mabar***", "@Gacor_Gaming***", "@TopGlobal_1***",
+        "@Zul_Ganz***", "@Rizky_Store***", "@Ibnu_Hkm***", "@Pandu_ID***",
+        "@Fikri_Xp***", "@Aditya_Prat***", "@Eko_Cyber***", "@Bayu_Sena***",
+        "@angga_99***", "@febri_nj***", "@putra_ml***", "@rendi_sultan***",
+        "@agung_Gz***", "@bagus_ID***", "@deni_Xyz***", "@eko_prast***",
+        "@gilang_store***", "@heru_mlbb***", "@ilham_ganz***", "@jeri_xpl***",
+        "@kiki_pro***", "@lutfi_ID***", "@miko_sultan***", "@opan_gamer***",
+        "@rama_cell***", "@rendra_ID***", "@septian_mz***", "@tegar_store***",
+        "@rizal_mlbb***", "@yoga_sultan***", "@zidan_ID***", "@dika_store***",
+        "@Aldo_Galaksi***", "@Bima_Sakti***", "@Cakra_Kusuma***", "@Dandi_Pamungkas***",
+        "@Fandi_Achmad***", "@Genta_Buana***", "@Hafid_Alfarizi***", "@Jefri_Nichol***",
+        "@Krisna_Mukti***", "@Lana_Del_Ray***", "@Mahendra_Putra***", "@Niko_Al_Hakim***",
+        "@Oki_Setiawan***", "@Prabu_Siliwangi***", "@Qois_Maulana***", "@Rangga_Dwi***",
+        "@Satrio_Piningit***", "@Taufik_Hidayat***", "@Ucok_Baba***", "@Vicky_Nitinegoro***",
+        "@Wahyu_Hidayat***", "@Xaverius_Edbert***", "@Yusuf_Mansur***", "@Zulfikar_Moch***",
+        "@Abdi_Negara***", "@Bintang_Lima***", "@Candra_Kirana***", "@Dewa_Kipas***",
+        "@Erlangga_Dewa***", "@Fahri_Hamzah***", "@Gatot_Kaca***", "@Haris_Takir***",
+        "@Irfan_Bachdim***", "@Joko_Widodo***", "@Kusuma_Wardhana***", "@Lintang_Malam***",
+        "@Mahmud_Assegaf***", "@Nabil_Bafadal***", "@Omar_Daniel***", "@Pandu_Kesuma***",
+        "@Raden_Mas***", "@Sultan_Hasan***", "@Trisno_Buntal***", "@Umar_Bin_Khattab***",
+        "@Vega_Pancaroba***", "@Wisnu_Wardhana***", "@Yudi_Tamvan***", "@Zainal_Abidin***"
     ]
     return random.choice(list_nama_tele)
 
 def generate_single_testimonial():
     list_paket = [
-        ("Natural Balance (30 Hari)", "Rp 120.000"),
-        ("Light VIP + Drone (30 Hari)", "Rp 95.000"),
-        ("Semi-Safe 14 Hari", "Rp 75.000"),
-        ("Lifetime Safe Permanent", "Rp 200.000"),
-        ("Sultan One Hit 100% (30 Hari)", "Rp 150.000"),
-        ("VIP Pro One Hit 80% (30 Hari)", "Rp 100.000"),
-        ("Semi-Private 14 Hari", "Rp 75.000"),
-        ("Permanent Legend (Lifetime)", "Rp 250.000")
+        ("Natural Balance (30 Hari)", "Rp 120.000", "30 Poin"),
+        ("Light VIP + Drone (30 Hari)", "Rp 95.000", "25 Poin"),
+        ("Semi-Safe 14 Hari", "Rp 75.000", "20 Poin"),
+        ("Lifetime Safe Permanent", "Rp 200.000", "50 Poin"),
+        ("Sultan One Hit 100% (30 Hari)", "Rp 150.000", "40 Poin"),
+        ("VIP Pro One Hit 80% (30 Hari)", "Rp 100.000", "30 Poin"),
+        ("Semi-Private 14 Hari", "Rp 75.000", "20 Poin"),
+        ("Permanent Legend (Lifetime)", "Rp 250.000", "60 Poin")
     ]
     nama = get_random_masked_name()
-    paket, harga = random.choice(list_paket)
+    paket, harga_rp, harga_poin = random.choice(list_paket)
     menit_lalu = random.randint(2, 45)
     current_hour = datetime.now(timezone(timedelta(hours=7))).hour
     waktu_ket = "pagi ini" if 4 <= current_hour < 11 else ("siang ini" if 11 <= current_hour < 15 else ("sore ini" if 15 <= current_hour < 18 else "malam ini"))
     
+    is_poin_pay = random.random() < 0.3
+    if is_poin_pay:
+        price_text = f"{harga_poin} (Klaim Saldo Poin Loyalitas ✨)"
+        pay_method_label = "REDEEMED VIA LOYALTY POINTS"
+    else:
+        price_text = harga_rp
+        pay_method_label = "SUCCESS & SCRIPT DELIVERED"
+
     return (
         "🚨 REAL-TIME TRANSACTION REPORT 🚨\n\n"
         f"✅ Buyer ID: {nama}\n"
         f"📦 Item Purchased: {paket}\n"
-        f"💵 Price: {harga}\n"
+        f"💵 Price / Method: {price_text}\n"
         f"⏱️ Time: {menit_lalu} menit yang lalu ({waktu_ket})\n"
-        f"🔒 Status: SUCCESS & SCRIPT DELIVERED\n\n"
+        f"🔒 Status: {pay_method_label}\n\n"
         "🔥 Terima kasih telah berbelanja di Official Pakel MlbbStore! Aman, lancar, & anti-detect. Mau order juga? Langsung sikat ke bot ya! 👇\n"
         f"🤖 Bot Store: @{bot.get_me().username}"
     )
@@ -703,6 +731,28 @@ def cmd_sc_interactive(message):
         markup.add(types.InlineKeyboardButton(btn_text, callback_data=f"{cb_data}|{target_buyer}"))
     bot.reply_to(message, f"🎯 Target Pembeli: <b>{target_buyer}</b>\n👇 Silakan pilih paket script yang dibeli:", reply_markup=markup, parse_mode="HTML")
 
+@bot.message_handler(commands=['scp'])
+def cmd_scp_interactive(message):
+    if message.chat.id != ADMIN_TELEGRAM_ID:
+        bot.reply_to(message, "⚠️ Perintah khusus admin utama!")
+        return
+    save_user(message.chat.id)
+    args = message.text.replace('/scp', '').strip()
+    if not args:
+        bot.reply_to(message, "⚠️ Format salah! Gunakan format:\nContoh: /scp @UsernamePembeli")
+        return
+    target_buyer = args if args.startswith('@') else f"@{args}"
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    packages_poin = [
+        ("🪙 Natural Balance (30 Poin)", "scp_buy_natural"), ("🪙 Light VIP + Drone (25 Poin)", "scp_buy_light"),
+        ("🪙 Semi-Safe 14 Hari (20 Poin)", "scp_buy_semisafe"), ("🪙 Lifetime Safe Permanent (50 Poin)", "scp_buy_lifetimesafe"),
+        ("🪙 Sultan One Hit 100% (40 Poin)", "scp_buy_sultan"), ("🪙 VIP Pro One Hit 80% (30 Poin)", "scp_buy_pro"),
+        ("🪙 Semi-Private 14 Hari (20 Poin)", "scp_buy_semiprivate"), ("🪙 Permanent Legend (60 Poin)", "scp_buy_permanent")
+    ]
+    for btn_text, cb_data in packages_poin:
+        markup.add(types.InlineKeyboardButton(btn_text, callback_data=f"{cb_data}|{target_buyer}"))
+    bot.reply_to(message, f"🎯 Target Pembeli via Poin: <b>{target_buyer}</b>\n👇 Silakan pilih paket script yang ditukar dengan poin:", reply_markup=markup, parse_mode="HTML")
+
 @bot.message_handler(commands=['testi', 'push'])
 def admin_push_testi(message):
     try:
@@ -1053,6 +1103,44 @@ def callback_handler(call):
         except Exception as e:
             bot.answer_callback_query(call.id, text=f"Gagal: {e}", show_alert=True)
         return
+
+    if call.data.startswith('scp_buy_'):
+        try:
+            data_split = call.data.split('|')
+            if len(data_split) < 2:
+                return
+            action, buyer_name = data_split[0], data_split[1]
+            paket_map_poin = {
+                'scp_buy_natural': ("Natural Balance (30 Hari)", "30 Poin (Tukar Poin Loyalitas)"),
+                'scp_buy_light': ("Light VIP + Drone (30 Hari)", "25 Poin (Tukar Poin Loyalitas)"),
+                'scp_buy_semisafe': ("Semi-Safe 14 Hari", "20 Poin (Tukar Poin Loyalitas)"),
+                'scp_buy_lifetimesafe': ("Lifetime Safe Permanent", "50 Poin (Tukar Poin Loyalitas)"),
+                'scp_buy_sultan': ("Sultan One Hit 100% (30 Hari)", "40 Poin (Tukar Poin Loyalitas)"),
+                'scp_buy_pro': ("VIP Pro One Hit 80% (30 Hari)", "30 Poin (Tukar Poin Loyalitas)"),
+                'scp_buy_semiprivate': ("Semi-Private 14 Hari", "20 Poin (Tukar Poin Loyalitas)"),
+                'scp_buy_permanent': ("Permanent Legend (Lifetime)", "60 Poin (Tukar Poin Loyalitas)")
+            }
+            p_nama, p_hrg_poin = paket_map_poin.get(action, ("VIP Package", "30 Poin"))
+            
+            current_hour = datetime.now(timezone(timedelta(hours=7))).hour
+            waktu_ket = "pagi ini" if 4 <= current_hour < 11 else ("siang ini" if 11 <= current_hour < 15 else ("sore ini" if 15 <= current_hour < 18 else "malam ini"))
+            
+            post_text = (
+                "🚨 REAL-TIME TRANSACTION REPORT 🚨\n\n"
+                f"✅ Buyer ID: {buyer_name}\n"
+                f"📦 Item Purchased: {p_nama}\n"
+                f"💵 Price / Method: {p_hrg_poin}\n"
+                f"⏱️ Time: {random.randint(1, 15)} menit yang lalu ({waktu_ket})\n"
+                f"🔒 Status: REDEEMED VIA LOYALTY POINTS & DELIVERED\n\n"
+                "🔥 Terima kasih telah menukarkan poinmu di Official Pakel MlbbStore! Main aman, kumpulin poinnya, sikat script gratisannya! 👇\n"
+                f"🤖 Bot Store: @{bot.get_me().username}"
+            )
+            bot.send_message(chat_id=GROUP_CHAT_ID, text=post_text, message_thread_id=GROUP_TOPIC_ID, disable_web_page_preview=True)
+            bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=f"✅ <b>BERHASIL KIRIM TESTI TUKAR POIN KE GRUP!</b>\n• Pembeli: {buyer_name}\n• Paket: {p_nama} ({p_hrg_poin})", parse_mode="HTML")
+            bot.answer_callback_query(call.id, text="Testimoni tukar poin sukses terkirim!")
+        except Exception as e:
+            bot.answer_callback_query(call.id, text=f"Gagal: {e}", show_alert=True)
+        return
     if call.data == 'menu_utama':
         user_points = get_user_points(chat_id)
         markup = types.InlineKeyboardMarkup(row_width=1)
@@ -1134,7 +1222,7 @@ def callback_handler(call):
             markup.add(types.InlineKeyboardButton(btn_text, callback_data=callback_val))
         markup.add(types.InlineKeyboardButton(t['next_1'], callback_data='katalog_part2'))
         markup.add(types.InlineKeyboardButton(t['back'], callback_data='menu_utama'))
-        katalog_text = f"{t['cat_title_1'].format(name=user.first_name)}\n\n{t['bonus_txt']}\n\n" + "\n\n".join([desc for _, _, desc in items_to_use]) + f"\n\n🪙 Saldo Poin Anda: <b>{get_user_points(chat_id)} Poin</b>"
+        katalog_text = f"{t['cat_title_1'].format(name=user.first_name)}\n\n{t['bonus_txt']}\n\n" + "\n\n".join([desc for _, _, desc in items_to_use]) + f"\n\n🪙 Saldo Poin Anda: <b>{get_user_points(message.chat.id)} Poin</b>"
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=katalog_text, reply_markup=markup, parse_mode="HTML", disable_web_page_preview=True)
         bot.answer_callback_query(call.id)
 
@@ -1146,7 +1234,7 @@ def callback_handler(call):
             markup.add(types.InlineKeyboardButton(btn_text, callback_data=callback_val))
         markup.add(types.InlineKeyboardButton(t['prev_2'], callback_data='katalog_part1'))
         markup.add(types.InlineKeyboardButton(t['back'], callback_data='menu_utama'))
-        katalog_text = f"{t['cat_title_2'].format(name=user.first_name)}\n\n" + "\n\n".join([desc for _, _, desc in items_to_use]) + f"\n\n🪙 Saldo Poin Anda: <b>{get_user_points(chat_id)} Poin</b>"
+        katalog_text = f"{t['cat_title_2'].format(name=user.first_name)}\n\n" + "\n\n".join([desc for _, _, desc in items_to_use]) + f"\n\n🪙 Saldo Poin Anda: <b>{get_user_points(message.chat.id)} Poin</b>"
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=katalog_text, reply_markup=markup, parse_mode="HTML", disable_web_page_preview=True)
         bot.answer_callback_query(call.id)
 
