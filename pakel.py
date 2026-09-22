@@ -4,6 +4,7 @@ import random
 import time
 import threading
 from datetime import datetime, timezone, timedelta
+import os
 
 # Token bot resmi Pakel MlbbStore
 TOKEN = '8614166487:AAFt6SzB6mP6sA31fXU7QUsz9uH8KdIEiFo'
@@ -220,13 +221,11 @@ def update_order_status_by_resi(resi_target, status_baru):
             
             if target_chat_id:
                 if status_baru == "BERHASIL":
-                    # KUNCI UTAMA: Kupon dijamin hangus permanen & tambah poin loyalitas
                     set_user_coupon_status(target_chat_id, "USED")
                     if target_payment != "POIN":
                         add_user_points(target_chat_id, 10)
                 elif status_baru in ["DITOLAK", "EXPIRED", "CANCELLED"]:
                     set_user_coupon_status(target_chat_id, "AVAILABLE")
-                    # Refund poin akurat jika dibatalkan/ditolak
                     if target_payment == "POIN" and target_points_cost > 0:
                         add_user_points(target_chat_id, target_points_cost)
                     
@@ -311,22 +310,6 @@ def get_random_masked_name():
         "@KevinWdj***", "@LukmanHkm***", "@MaulanaID***", "@NaufalXyz***",
         "@Pratama99***", "@RafliSultan***", "@SatriaGaming***", "@TegarGanz***",
         "@VianID***", "@WahyuPrat***", "@YudaDev***", "@ZakiMlf***",
-        "@EkaSltn***", "@DoniGmr***", "@FikriDx***", "@Andi99***",
-        "@BudiSt***", "@Coki***", "@Dandi***", "@EkoPrast***",
-        "@Fandi***", "@Guntur***", "@Hafiz***", "@Imam***",
-        "@Jefri***", "@Kiki***", "@Lutfi***", "@Miko***",
-        "@Nanda***", "@Oky***", "@Pandu***", "@Qomar***",
-        "@Rahmat***", "@Riki***", "@Roni***", "@Rudi***",
-        "@Sandi***", "@Toni***", "@Udin***", "@Vicky***",
-        "@Wahid***", "@Yadi***", "@Zainal***", "@Adit***",
-        "@Agus***", "@Ahmad***", "@Akbar***", "@Alex***",
-        "@Amri***", "@Anang***", "@Angga***", "@Anton***",
-        "@Arya***", "@Asep***", "@Azka***", "@Bagus***",
-        "@Basri***", "@Beni***", "@Boy***", "@Candra***",
-        "@Darma***", "@Dedi***", "@Deny***", "@Diki***",
-        "@Egi***", "@Eky***", "@Fahri***", "@Fandi***",
-        "@Farhan***", "@Fauzi***", "@Febri***", "@Firman***",
-        "@Fuat***", "@Gani***", "@Gerry***", "@Hadi***",
         "@Amirul_My***", "@Haikal_Iskandar***", "@Farhan_Zul***", "@Aiman_Badri***",
         "@Aqil_Danial***", "@Syahmi_Zain***", "@Luqman_Hakim***", "@Zulhelmi_My***",
         "@Alex_Walker***", "@Liam_Smith***", "@Noah_Miller***", "@Oliver_Davis***",
@@ -416,7 +399,6 @@ def background_auto_poster():
 poster_thread = threading.Thread(target=background_auto_poster, daemon=True)
 poster_thread.start()
 
-# --- MODUL AUTO-BROADCAST TERJADWAL (10 TEMPLATE BERBEDA) ---
 def background_auto_broadcast():
     time.sleep(300)
     broadcast_templates = [
@@ -863,7 +845,6 @@ def callback_handler(call):
     message_id = call.message.message_id
     greeting = get_time_greeting()
 
-    # --- FITUR TOMBOL BATALKAN PESANAN MANDIRI (CANCEL ORDER) ---
     if call.data.startswith('cancel_'):
         resi_target = call.data.replace('cancel_', '')
         success = update_order_status_by_resi(resi_target, "CANCELLED")
@@ -883,10 +864,9 @@ def callback_handler(call):
             bot.answer_callback_query(call.id, text="Gagal membatalkan pesanan atau sudah kadaluwarsa.", show_alert=True)
         return
 
-    # --- FITUR PILIHAN PEMBAYARAN VIA POIN / TRANSFER ---
     if call.data.startswith('paymode_'):
         parts = call.data.split('|')
-        action_type = parts[1] # 'transfer' atau 'poin'
+        action_type = parts[1]
         paket_code = parts[2]
         
         paket_dict = {
@@ -1011,7 +991,6 @@ def callback_handler(call):
             bot.answer_callback_query(call.id, text="Invoice transfer diterbitkan!")
             return
 
-    # --- ADMIN ACC / TOLAK HANDLER (TRANSFER & POIN) ---
     if call.data.startswith('acc_') or call.data.startswith('tolak_') or call.data.startswith('acc|') or call.data.startswith('tolak|') or call.data.startswith('accpoin|') or call.data.startswith('tolakpoin|'):
         try:
             sep = '|' if '|' in call.data else '_'
@@ -1077,7 +1056,6 @@ def callback_handler(call):
                 )
                 bot.send_message(target_user_id, f"<code>{template_chat_admin}</code>", parse_mode="HTML")
 
-                # --- KIRIM FORM ULASAN / RATING BINTANG OTOMATIS KE PEMBELI ---
                 markup_rating = types.InlineKeyboardMarkup(row_width=5)
                 markup_rating.add(
                     types.InlineKeyboardButton("⭐ 1", callback_data=f"rate|1|{resi_code}"),
@@ -1089,7 +1067,7 @@ def callback_handler(call):
                 review_prompt_text = (
                     "⭐ <b>BAGAIMANA PELAYANAN KAMI, KAK?</b> ⭐\n\n"
                     f"Terima kasih telah berbelanja di Official Pakel MlbbStore (Resi: <code>{resi_code}</code>)!\n"
-                    "Silakan berikan penilaian bintang dan ulasan singkat di bawah ini agar kami terus berkembang:"
+                    "Silakan berikan penilaian bintang di bawah ini:"
                 )
                 bot.send_message(target_user_id, review_prompt_text, reply_markup=markup_rating, parse_mode="HTML")
                 
@@ -1330,28 +1308,80 @@ def callback_handler(call):
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, reply_markup=get_back_markup(l), disable_web_page_preview=True)
         bot.answer_callback_query(call.id)
 
-    # --- HANDLE KLIK BINTANG ULASAN DARI PEMBELI ---
+    # --- HANDLE KLIK BINTANG (TOMBOL BERUBAH JADI PILIHAN ULASAN CEPAT) ---
     elif call.data.startswith('rate|'):
         try:
             _, rating_val, resi_code = call.data.split('|')
-            prompt_text = (
-                f"⭐ <b>RATING BINTANG {rating_val} DIPILIH!</b>\n\n"
-                "📝 Sekarang silakan <b>ketik dan kirim ulasan / pesan bebas apa saja</b> di kolom chat ini untuk melengkapi ulasan layanan kami (seperti di Roblox Studio):\n\n"
-                f"<i>(Resi: {resi_code} | Rating: {rating_val} Bintang)</i>"
-            )
-            bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=prompt_text, parse_mode="HTML")
             
-            # Simpan sementara status rating user di memori chat atau file flag sederhana
+            markup_ulasan = types.InlineKeyboardMarkup(row_width=1)
+            if int(rating_val) <= 2:
+                markup_ulasan.add(
+                    types.InlineKeyboardButton(f"⚠️ Kurang Memuaskan / Masih Ada Kendala", callback_data=f"textrev|{resi_code}|{rating_val}|Pelayanan kurang memuaskan"),
+                    types.InlineKeyboardButton(f"❌ Kecewa / Buruk", callback_data=f"textrev|{resi_code}|{rating_val}|Sangat buruk")
+                )
+            elif int(rating_val) == 3:
+                markup_ulasan.add(
+                    types.InlineKeyboardButton(f"⭐ Cukup / Standar Saja", callback_data=f"textrev|{resi_code}|{rating_val}|Cukup standar"),
+                    types.InlineKeyboardButton(f"👍 Lumayan Bagus", callback_data=f"textrev|{resi_code}|{rating_val}|Lumayan bagus")
+                )
+            else:
+                markup_ulasan.add(
+                    types.InlineKeyboardButton(f"🔥 Super Bagus & Mantap Banget!", callback_data=f"textrev|{resi_code}|{rating_val}|Super bagus dan mantap"),
+                    types.InlineKeyboardButton(f"🚀 Sangat Puas, Pelayanan Gercep!", callback_data=f"textrev|{resi_code}|{rating_val}|Sangat puas, gercep"),
+                    types.InlineKeyboardButton(f"💯 Top Global / The Best Lah Pokoknya!", callback_data=f"textrev|{resi_code}|{rating_val}|The best pokoknya")
+                )
+            
+            prompt_text = (
+                f"⭐ <b>Mantap! Terimakasih rating {rating_val} bintangnya, Kak!</b>\n\n"
+                "📝 Pilih ulasan cepat di bawah ini, atau <b>bebas ketik pesan/curhatan apa saja</b> langsung di chat ini ya, Kak:"
+            )
+            
+            bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=prompt_text, parse_mode="HTML", reply_markup=markup_ulasan)
+            
             with open(f"pending_review_{chat_id}.txt", "w") as f:
                 f.write(f"{resi_code}|{rating_val}")
                 
-            bot.answer_callback_query(call.id, text=f"Rating {rating_val} bintang dicatat, silakan ketik ulasanmu!")
+            bot.answer_callback_query(call.id, text=f"Rating {rating_val} bintang dipilih!")
         except Exception as e:
             bot.answer_callback_query(call.id, text=f"Error: {e}", show_alert=True)
         return
-# --- HANDLE PESAN TEKS BEBAS UNTUK ULASAN & CHAT BIASA ---
-user_review_states = {}
 
+    # --- HANDLE JIKA PEMBELI KLIK TOMBOL ULASAN CEPAT ---
+    elif call.data.startswith('textrev|'):
+        try:
+            _, resi_c, rating_c, quick_text = call.data.split('|', 3)
+            save_user_review(chat_id, rating_c, quick_text)
+            
+            try:
+                if os.path.exists(f"pending_review_{chat_id}.txt"):
+                    os.remove(f"pending_review_{chat_id}.txt")
+            except Exception:
+                pass
+                
+            thx_review_msg = (
+                "🎉 <b>TERIMA KASIH ATAS ULASANNYA, KAK!</b> 🎉\n\n"
+                f"⭐ Rating: {rating_c} Bintang\n"
+                f"💬 Ulasan: \"{quick_text}\"\n\n"
+                "Penilaian Anda berhasil disimpan. Sukses terus permainannya ya! 🙏✨"
+            )
+            bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=thx_review_msg, parse_mode="HTML")
+            
+            try:
+                report_review_admin = (
+                    "🌟 <b>ULASAN BARU DARI PEMBELI!</b> 🌟\n\n"
+                    f"👤 Dari: @{user.username if user.username else user.first_name} (ID: <code>{chat_id}</code>)\n"
+                    f"🔑 No Resi: <code>{resi_c}</code>\n"
+                    f"⭐ Rating: {rating_c} / 5 Bintang\n"
+                    f"💬 Ulasan: \"{quick_text}\""
+                )
+                bot.send_message(GROUP_CHAT_ID, report_review_admin, message_thread_id=GROUP_TOPIC_ID, parse_mode="HTML")
+            except Exception as e:
+                print(f"[REPORT QUICK REVIEW ERROR]: {e}")
+                
+            bot.answer_callback_query(call.id, text="Ulasan berhasil dikirim, terima kasih!")
+        except Exception as e:
+            bot.answer_callback_query(call.id, text=f"Error: {e}", show_alert=True)
+        return
 @bot.message_handler(func=lambda message: True, content_types=['text'])
 def handle_text_and_reviews(message):
     chat_id = message.chat.id
@@ -1363,23 +1393,15 @@ def handle_text_and_reviews(message):
     l = get_lang(user)
     txt = message.text.strip()
     
-    # Cek apakah user sedang dalam mode mengisi ulasan teks setelah klik bintang
     review_flag_file = f"pending_review_{chat_id}.txt"
     try:
-        if os.path.exists(review_flag_file): # atau gunakan pengecekan file sederhana
-            pass
-    except Exception:
-        pass
-
-    # Cek file flag ulasan
-    try:
-        with open(review_flag_file, "r") as f:
-            data_rev = f.read().strip().split('|')
+        if os.path.exists(review_flag_file):
+            with open(review_flag_file, "r") as f:
+                data_rev = f.read().strip().split('|')
             if len(data_rev) == 2:
                 resi_c, rating_c = data_rev
                 save_user_review(chat_id, rating_c, txt)
                 
-                # Hapus file flag ulasan
                 try:
                     os.remove(review_flag_file)
                 except Exception:
@@ -1393,23 +1415,21 @@ def handle_text_and_reviews(message):
                 )
                 bot.reply_to(message, thx_review_msg, parse_mode="HTML", reply_markup=get_back_markup(l))
                 
-                # Teruskan laporan ulasan ke grup admin utama
                 try:
                     report_review_admin = (
                         "🌟 <b>ULASAN BARU DARI PEMBELI!</b> 🌟\n\n"
                         f"👤 Dari: @{user.username if user.username else user.first_name} (ID: <code>{chat_id}</code>)\n"
                         f"🔑 No Resi: <code>{resi_c}</code>\n"
                         f"⭐ Rating: {rating_c} / 5 Bintang\n"
-                        f"💬 Isi Ulasan: \"{txt}\""
+                        f"💬 Ulasan: \"{txt}\""
                     )
                     bot.send_message(GROUP_CHAT_ID, report_review_admin, message_thread_id=GROUP_TOPIC_ID, parse_mode="HTML")
                 except Exception as e:
                     print(f"[REPORT REVIEW ERROR]: {e}")
                 return
-    except FileNotFoundError:
+    except Exception:
         pass
 
-    # Chat handler biasa
     txt_lower = txt.lower()
     if any(w in txt_lower for w in ['price', 'harga', 'list', 'menu', 'catalog', 'katalog']):
         res_msg = "💎 Ketik /start untuk membuka Katalog VIP!"
@@ -1419,10 +1439,6 @@ def handle_text_and_reviews(message):
         res_msg = f"Halo {user.first_name}! Ketik /start untuk membuka menu utama atau hubungi {ADMIN_USERNAME}."
         
     bot.reply_to(message, res_msg, disable_web_page_preview=True)
-
-# Tambahan import os jika belum ada untuk file ulasan flag
-import os
-
 @bot.message_handler(content_types=['photo'])
 def handle_photo(message):
     save_user(message.chat.id)
@@ -1475,5 +1491,5 @@ def handle_photo(message):
     except Exception as e:
         print(f"[FORWARD PHOTO ERROR]: {e}")
 
-print("[INFO] Pakel MlbbStore Master Ultimate Edition dengan Poin di /start & Fitur Ulasan Interaktif Berhasil Dijalankan...")
+print("[INFO] Pakel MlbbStore Master Ultimate Edition 8 Bagian Berhasil Dijalankan...")
 bot.infinity_polling()
