@@ -215,8 +215,6 @@ def update_order_status_by_resi(resi_target, status_baru):
             with open("orders.txt", "w") as f:
                 f.writelines(rows)
             
-            # Logika Poin: Poin baru dipotong RESMI saat di-ACC (BERHASIL). 
-            # Jika dibatalkan/ditolak, poin tidak pernah dipotong sehingga tetap utuh secara otomatis.
             if target_chat_id and current_status_db == "PENDING":
                 if status_baru == "BERHASIL":
                     set_user_coupon_status(target_chat_id, "USED")
@@ -739,7 +737,6 @@ def callback_handler(call):
         except Exception:
             pass
 
-        # Ubah status menjadi CANCELLED. Karena poin tidak pernah dipotong saat pending, poin dibiarkan utuh otomatis.
         success = update_order_status_by_resi(resi_target, "CANCELLED")
         if success:
             if admin_msg_id:
@@ -933,7 +930,6 @@ def callback_handler(call):
                     
                     current_user_pts = get_user_points(target_user_id)
                     if current_user_pts >= p_points_val:
-                        # Poin resmi dipotong saat admin klik ACC Poin
                         reduce_user_points(target_user_id, p_points_val)
                     else:
                         bot.answer_callback_query(call.id, text="Gagal ACC: Saldo poin pembeli tidak mencukupi!", show_alert=True)
@@ -1106,11 +1102,10 @@ def callback_handler(call):
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=riw_text, reply_markup=get_back_markup(l), parse_mode="HTML", disable_web_page_preview=True)
         bot.answer_callback_query(call.id)
 
-        elif call.data == 'menu_promo':
+    elif call.data == 'menu_promo':
         status_c = get_user_coupon_status(chat_id)
         user_pts = get_user_points(chat_id)
         
-        # Penjelasan status kupon member baru
         if status_c == "AVAILABLE":
             kupon_info = "🎁 Status Kupon Member Baru: <b>TERSEDIA (Belum Digunakan)</b>\n💡 Otomatis terpotong saat kamu checkout pesanan pertama!"
         elif status_c == "PENDING":
@@ -1124,10 +1119,8 @@ def callback_handler(call):
             f"{kupon_info}\n\n"
             "💡 <i>Kumpulkan terus poin transaksi suksesmu dan tukarkan dengan paket script VIP gratis tanpa bayar!</i>"
         )
-        
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=promo_text, reply_markup=get_back_markup(l), parse_mode="HTML")
         bot.answer_callback_query(call.id)
-
 
     elif call.data == 'menu_faq':
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text="💡 FAQ PAKEL MLBBSTORE\n\n❓ Aman dari banned? \n💬 A: Sangat aman, enkripsi anti-detect tinggi.", reply_markup=get_back_markup(l))
