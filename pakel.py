@@ -17,6 +17,7 @@ except Exception:
 ADMIN_USERNAME = "@PakelMlbbOfficial"
 ADMIN_LINK = "https://t.me/PakelMlbbOfficial"
 CHANNEL_TESTI_LINK = "https://t.me/PakelMlbb/368"
+ADMIN_TELEGRAM_ID = 8772023108  # Ganti/sesuaikan dengan ID Telegram admin utama
 
 GROUP_CHAT_ID = "@PakelMlbb"
 GROUP_TOPIC_ID = 368
@@ -221,8 +222,7 @@ def update_order_status_by_resi(resi_target, status_baru):
                         add_user_points(target_chat_id, 10)
                 elif status_baru in ["DITOLAK", "EXPIRED", "CANCELLED"]:
                     set_user_coupon_status(target_chat_id, "AVAILABLE")
-                    if target_payment == "POIN" and target_points_cost > 0:
-                        add_user_points(target_chat_id, target_points_cost)
+                    # Catatan: Pengembalian poin via tombol cancel ditangani langsung di handler callback agar aman dari duplikasi.
                     
             return True
     except Exception as e:
@@ -363,7 +363,7 @@ def background_auto_broadcast():
         ("🛡️ <b>KENAPA HARUS PAKAI SCRIPT PAKEL MLBBSTORE?</b> ⚡\n\nJangan pertaruhkan akun sultan Kakak pakai script sembarangan yang gampang terdeteksi sistem Moonton!\nDi sini kita pakai enkripsi <i>high-tier anti-detect</i> paling stabil se-Indonesia, aman buat main di mode <i>Ranked</i> Mythic sekalipun.\n\n📦 Pilih paket andalan Kakak sekarang sebelum kehabisan slot: @{bot_username}",),
         ("⚡ <b>BONUS FREE ALL PACKAGES TANPA SYARAT!</b> 🎁\n\nSetiap pembelian paket apa saja di Official Pakel MlbbStore, Kakak bakal otomatis dapet:\n• Panel Server Lag Musuh (<i>Global Ping Spikes</i>) 🌐\n• Drone View Eksklusif Ultra Wide X1 - X10 🦅\n\n🚀 Yuk dominasi permainan sekarang juga! Order gampang via bot: @{bot_username}",),
         ("🏆 <b>MAU JADI TOP GLOBAL ATAU NYAMPE MYTHIC GLORY DENGAN CEPAT?</b> 🔥\n\nWaktunya buktikan kemampuan terbaikmu di Land of Dawn! Gunakan <i>Custom Damage</i> dan <i>Light VIP</i> dari Pakel MlbbStore biar gameplay makin gampang dan mulus.\n\n💬 Cek riwayat pesanan, klaim kupon, atau pilih paket langsung di: @{bot_username}",),
-        ("🌟 <b>PEMBERITAHUAN UPDATE STOK & TESTIMONI HARIAN</b> 🚀\n\nRatusan player sudah membuktikan sendiri kestabilan script kita hari ini tanpa kendala. Giliran Kakak nih buat rasain bedanya pas war!\n💎 Proses cepat, amanah, dan dibimbing sampai beres.\n\n👇 Yuk amankan paket pilihanmu langsung di bot: @{bot_username}",),
+        ("🌟 <b>PEMBERITAHUAN UPDATE STOK & TESTIMONI HARIAN</b> 🚀\n\nRatusan player sudah membuktikan sendiri kestabilan script kita hari ini tanpa kendala. Giliran Kakak buat rasain bedanya pas war!\n💎 Proses cepat, amanah, dan dibimbing sampai beres.\n\n👇 Yuk amankan paket pilihanmu langsung di bot: @{bot_username}",),
         ("💥 <b>SPECIAL EDITION: SULTAN ONE HIT & INSTANT KILL</b> ⚡\n\nMau ngerasain dominasi mutlak di setiap pertandingan? Paket <i>Sultan One Hit</i> siap bikin musuh kewalahan dan rata dalam sekejap!\n🛡️ Dilengkapi sistem pengaman kelas atas agar akun tetap aman sentosa.\n\n🛒 Sikat promonya sekarang lewat bot: @{bot_username}",),
         ("🎁 <b>CEK SALDO POIN & KUPON MEMBER KAMU!</b> 💳\n\nTahukah Kakak? Setiap transaksi sukses di Official Pakel MlbbStore, Kakak bakal otomatis dapet tambahan Poin Loyalitas lho!\n🪙 Poinnya bisa ditukar buat bayar paket script gratis tanpa perlu transfer rupiah lagi. Mantap kan?\n\n✨ Yuk cek poinmu sekarang di bot: @{bot_username}",),
         ("🌐 <b>BASMI LAG & FPS DROP SAAT WAR BERSAMA KITA!</b> 📉➡️📈\n\nKesel banget kan pas lagi momen penting malah patah-patah atau sinyal mendadak merah? Tenang, script kita sudah include fitur *Server Lag Panel* buat stabilin permainan.\n🎯 Main jadi lebih PeDe, mulus, dan bebas hambatan!\n\n📦 Langsung pilih paketnya di sini: @{bot_username}",),
@@ -476,6 +476,17 @@ def get_back_markup(l):
     text = TRANSLATIONS.get(l, TRANSLATIONS['en'])['back']
     markup.add(types.InlineKeyboardButton(text, callback_data='menu_utama'))
     return markup
+@bot.message_handler(commands=['resetorders'])
+def cmd_reset_orders(message):
+    if message.chat.id != ADMIN_TELEGRAM_ID:
+        bot.reply_to(message, "⚠️ Perintah khusus admin utama!")
+        return
+    try:
+        open("orders.txt", "w").close()
+        bot.reply_to(message, "✅ Berhasil! File orders.txt sudah dikosongkan dan bersih total.")
+    except Exception as e:
+        bot.reply_to(message, f"❌ Gagal mengosongkan file: {e}")
+
 @bot.message_handler(commands=['bc', 'broadcast'])
 def broadcast_message(message):
     save_user(message.chat.id)
@@ -645,6 +656,10 @@ def callback_handler(call):
     if call.data.startswith('cancel_'):
         resi_target = call.data.replace('cancel_', '')
         admin_msg_id = None
+        pay_method_db = "TRANSFER"
+        point_cost_db = 0
+        target_chat_id_db = str(call.message.chat.id)
+        
         try:
             with open("orders.txt", "r") as f:
                 for line in f:
@@ -653,17 +668,27 @@ def callback_handler(call):
                         if p[7].strip() != "PENDING":
                             bot.answer_callback_query(call.id, text="Pesanan sudah diproses atau kadaluwarsa.", show_alert=True)
                             return
-                        admin_msg_id = int(p[11]) if p[11].isdigit() else None
+                        pay_method_db = p[9].strip() if len(p) > 9 else "TRANSFER"
+                        point_cost_db = int(p[10]) if len(p) > 10 and p[10].isdigit() else 0
+                        admin_msg_id = int(p[11]) if p[11].isdigit() and int(p[11]) > 0 else None
                         break
         except Exception:
             pass
 
         success = update_order_status_by_resi(resi_target, "CANCELLED")
         if success:
+            if pay_method_db == "POIN" and point_cost_db > 0:
+                add_user_points(target_chat_id_db, point_cost_db)
+
             if admin_msg_id:
                 try:
-                    new_admin_caption = f"❌ <b>[DIBATALKAN OLEH PEMBELI]</b>\n\n<b>STATUS: ❌ DIBATALKAN USER (Poin/Kupon Dikembalikan)</b>"
-                    bot.edit_message_caption(chat_id=GROUP_PAY_ID, message_id=admin_msg_id, caption=new_admin_caption, parse_mode="HTML", reply_markup=None)
+                    new_admin_caption = call.message.caption or call.message.text or "ADA KLAIM PEMBAYARAN MASUK!"
+                    new_admin_caption += f"\n\n<b>STATUS: ❌ DIBATALKAN OLEH PEMBELI (Poin Dikembalikan)</b>"
+                    
+                    if call.message.content_type == 'photo':
+                        bot.edit_message_caption(chat_id=GROUP_PAY_ID, message_id=admin_msg_id, caption=new_admin_caption, parse_mode="HTML", reply_markup=None)
+                    else:
+                        bot.edit_message_text(chat_id=GROUP_PAY_ID, message_id=admin_msg_id, text=new_admin_caption, parse_mode="HTML", reply_markup=None)
                 except Exception as e:
                     print(f"[EDIT ADMIN MSG CANCEL ERROR]: {e}")
 
@@ -671,13 +696,13 @@ def callback_handler(call):
                 f"❌ <b>PESANAN BERHASIL DIBATALKAN</b> ❌\n\n"
                 f"🔑 No Resi: <code>{resi_target}</code>\n"
                 "Pesanan ini telah dibatalkan atas permintaan Anda.\n"
-                "💡 Hak kupon/diskon member baru serta saldo poin Anda telah dikembalikan secara otomatis. Silakan pilih ulang paket di katalog!"
+                "💡 Hak kupon serta saldo poin Anda telah dikembalikan secara utuh ke akun Anda. Silakan pilih ulang paket di katalog!"
             )
             try:
                 bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=cancel_text, parse_mode="HTML", reply_markup=get_back_markup(l))
             except Exception:
                 bot.send_message(chat_id, cancel_text, parse_mode="HTML", reply_markup=get_back_markup(l))
-            bot.answer_callback_query(call.id, text="Pesanan berhasil dibatalkan!")
+            bot.answer_callback_query(call.id, text="Pesanan berhasil dibatalkan & poin dikembalikan!")
         else:
             bot.answer_callback_query(call.id, text="Gagal membatalkan pesanan atau sudah kadaluwarsa.", show_alert=True)
         return
@@ -741,7 +766,7 @@ def callback_handler(call):
                         f"📦 Paket: {p_name}\n"
                         f"🪙 Nominal Poin: <b>{p_points} Poin</b> (Saldo User: {user_pts} Poin)\n"
                         f"⏱️ Waktu: {waktu_str}\n"
-                        f"🔑 No Resi: <code>{resi_unik}</code>\n\n"
+                        f"🔑 No Resi Unik: <code>{resi_unik}</code>\n\n"
                         "👇 <i>Silakan klik ACC untuk memotong poin & menyetujui, atau TOLAK jika ingin membatalkan!</i>"
                     )
                     markup_admin_poin = types.InlineKeyboardMarkup(row_width=2)
@@ -776,6 +801,7 @@ def callback_handler(call):
             coupon_status = get_user_coupon_status(chat_id)
             is_promo_used = (coupon_status == "AVAILABLE")
             
+            resi_unik = f"PKL-MLBB-{random.randint(10000, 99999)}"
             save_order(chat_id, p_name, p_price, resi_unik, payment_method="TRANSFER", point_cost=0, admin_msg_id=0)
             if is_promo_used:
                 set_user_coupon_status(chat_id, "PENDING")
@@ -1173,7 +1199,6 @@ def handle_photo(message):
     WIB = timezone(timedelta(hours=7))
     now = datetime.now(WIB)
 
-    # TEMPLATE LAPORAN KE ADMIN: VIA SALDO / TRANSFER MANUAL (FOTO)
     res_to_buyer = (
         "✅ BUKTI PEMBAYARAN BERHASIL DIUNGGAH!\n"
         f"Terima kasih Kak {user.first_name} 🙏\n\n"
@@ -1200,16 +1225,6 @@ def handle_photo(message):
         bot.send_photo(chat_id=GROUP_PAY_ID, photo=message.photo[-1].file_id, caption=caption_admin, message_thread_id=GROUP_PAY_TOPIC_ID, parse_mode="HTML", reply_markup=markup)
     except Exception as e:
         print(f"[FORWARD PHOTO ERROR]: {e}")
-
-# TEMPLATE LAPORAN KE ADMIN: VIA POIN LOYALITAS (TERSEDU DI BAGIAN 5 SAAT USER CHECKOUT POIN)
-# Referensi Format Laporan Admin untuk Klaim Poin:
-# 🪙 ADA KLAIM PEMBAYARAN VIA POIN MASUK!
-# 👤 Dari User: @username (ID: ...)
-# 📦 Paket: Nama Paket
-# 🪙 Nominal Poin: X Poin (Saldo User: Y Poin)
-# ⏱️ Waktu: DD-MM-YYYY HH:MM:SS WIB
-# 🔑 No Resi Unik: PKL-MLBB-XXXXX
-# Tombol: [✅ ACC POIN] [❌ TOLAK POIN]
 
 print("[INFO] Pakel MlbbStore Master Ultimate Edition 8 Bagian Berhasil Dijalankan...")
 bot.infinity_polling()
