@@ -226,6 +226,7 @@ def update_order_status_by_resi(resi_target, status_baru):
                         add_user_points(target_chat_id, 10)
                 elif status_baru in ["DITOLAK", "EXPIRED", "CANCELLED"]:
                     set_user_coupon_status(target_chat_id, "AVAILABLE")
+                    # LOGIKA AMAN: Hanya mengembalikan poin sebesar yang ditarik sebelumnya tanpa bonus fiktif
                     if target_payment == "POIN" and target_points_cost > 0:
                         add_user_points(target_chat_id, target_points_cost)
                     
@@ -866,6 +867,10 @@ def callback_handler(call):
 
     if call.data.startswith('paymode_'):
         parts = call.data.split('|')
+        if len(parts) < 3:
+            bot.answer_callback_query(call.id, text="Data pembayaran tidak valid.", show_alert=True)
+            return
+            
         action_type = parts[1]
         paket_code = parts[2]
         
@@ -921,13 +926,14 @@ def callback_handler(call):
                         f"🪙 Nominal Poin: <b>{p_points} Poin</b> (Saldo User: {user_pts} Poin)\n"
                         f"🔑 No Resi: <code>{resi_unik}</code>\n"
                         f"⏱️ Waktu: {datetime.now(timezone(timedelta(hours=7))).strftime('%d-%m-%Y %H:%M:%S WIB')}\n\n"
-                        "👇 <i>Silakan klik ACC POIN untuk memotong poin & menyetujui, atau TOLAK POIN jika ingin membatalkan!</i>"
+                        "👇 <i>Silakan klik ACC untuk memotong poin & menyetujui, atau TOLAK jika ingin membatalkan!</i>"
                     )
                     
+                    # AMAN DARI BATASAN TELEGRAM 64-BYTE
                     markup_admin_poin = types.InlineKeyboardMarkup(row_width=2)
                     markup_admin_poin.add(
-                        types.InlineKeyboardButton("✅ ACC POIN", callback_data=f"accpoin|{chat_id}|{resi_unik}|{p_points}"),
-                        types.InlineKeyboardButton("❌ TOLAK POIN", callback_data=f"tolakpoin|{chat_id}|{resi_unik}")
+                        types.InlineKeyboardButton("✅ ACC POIN", callback_data=f"apoin|{resi_unik}"),
+                        types.InlineKeyboardButton("❌ TOLAK POIN", callback_data=f"tpoin|{resi_unik}")
                     )
                     
                     bot.send_message(GROUP_PAY_ID, report_admin_poin, message_thread_id=GROUP_PAY_TOPIC_ID, parse_mode="HTML", reply_markup=markup_admin_poin)
@@ -991,19 +997,48 @@ def callback_handler(call):
             bot.answer_callback_query(call.id, text="Invoice transfer diterbitkan!")
             return
 
-    if call.data.startswith('acc_') or call.data.startswith('tolak_') or call.data.startswith('acc|') or call.data.startswith('tolak|') or call.data.startswith('accpoin|') or call.data.startswith('tolakpoin|'):
+    if call.data.startswith('acc_') or call.data.startswith('tolak_') or call.data.startswith('acc|') or call.data.startswith('tolak|') or call.data.startswith('apoin|') or call.data.startswith('tpoin|'):
         try:
             sep = '|' if '|' in call.data else '_'
             parts = call.data.split(sep)
+            if len(parts) < 2:
+                bot.answer_callback_query(call.id, text="Format tombol tidak valid.", show_alert=True)
+                return
+                
             action = parts[0].replace('_', '')
-            target_user_id = parts[1]
-            resi_code = parts[2]
+            resi_code = parts[1] if action in ['apoin', 'tpoin'] else parts[2]
+            target_user_id = parts[1] if action not in ['apoin', 'tpoin'] else None
+
+            if action in ['apoin', 'tpoin']:
+                try:
+                    with open("orders.txt", "r") as f:
+                        for line in f:
+                            p = line.strip().split('|')
+                            if len(p) >= 11 and p[6].strip() == resi_code.strip():
+                                target_user_id = p[0]
+                                break
+                except Exception:
+                    pass
+
+            if not target_user_id:
+                bot.answer_callback_query(call.id, text="Gagal: Data user dari resi tidak ditemukan di database!", show_alert=True)
+                return
 
             original_text = call.message.caption or call.message.text or ""
 
-            if action == 'acc' or action == 'accpoin':
-                if action == 'accpoin':
-                    p_points_val = int(parts[3]) if len(parts) > 3 and parts[3].isdigit() else 0
+            if action == 'acc' or action == 'apoin':
+                p_points_val = 0
+                if action == 'apoin':
+                    try:
+                        with open("orders.txt", "r") as f:
+                            for line in f:
+                                p = line.strip().split('|')
+                                if len(p) >= 11 and p[6].strip() == resi_code.strip():
+                                    p_points_val = int(p[10]) if p[10].isdigit() else 0
+                                    break
+                    except Exception:
+                        pass
+                    
                     current_user_pts = get_user_points(target_user_id)
                     if current_user_pts >= p_points_val:
                         reduce_user_points(target_user_id, p_points_val)
@@ -1013,7 +1048,7 @@ def callback_handler(call):
 
                 update_order_status_by_resi(resi_code, "BERHASIL")
                 
-                status_label = "✅ DI-ACC ADMIN (Poin Dipotong & Kupon Hangus)" if action == 'accpoin' else "✅ TELAH DI-ACC OLEH ADMIN (Kupon Hangus & Poin Ditambahkan)"
+                status_label = f"✅ DI-ACC ADMIN (Poin Dipotong {p_points_val} & Kupon Hangus)" if action == 'apoin' else "✅ TELAH DI-ACC OLEH ADMIN (Kupon Hangus & Poin Ditambahkan)"
                 new_admin_text = original_text + f"\n\n<b>STATUS: {status_label}</b>"
                 
                 if call.message.content_type == 'photo':
@@ -1073,7 +1108,7 @@ def callback_handler(call):
                 
                 bot.answer_callback_query(call.id, text="Pembayaran di-ACC!")
 
-            elif action == 'tolak' or action == 'tolakpoin':
+            elif action == 'tolak' or action == 'tpoin':
                 update_order_status_by_resi(resi_code, "DITOLAK")
 
                 new_admin_text = original_text + "\n\n<b>STATUS: ❌ DITOLAK OLEH ADMIN (Kupon & Poin Dikembalikan)</b>"
@@ -1098,6 +1133,10 @@ def callback_handler(call):
     if call.data.startswith('sc_buy_'):
         try:
             data_split = call.data.split('|')
+            if len(data_split) < 2:
+                bot.answer_callback_query(call.id, text="Format data testimoni salah.", show_alert=True)
+                return
+                
             action = data_split[0]
             buyer_name = data_split[1]
             
@@ -1308,10 +1347,15 @@ def callback_handler(call):
         bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, reply_markup=get_back_markup(l), disable_web_page_preview=True)
         bot.answer_callback_query(call.id)
 
-    # --- HANDLE KLIK BINTANG (TOMBOL BERUBAH JADI PILIHAN ULASAN CEPAT) ---
     elif call.data.startswith('rate|'):
         try:
-            _, rating_val, resi_code = call.data.split('|')
+            parts = call.data.split('|')
+            if len(parts) < 3:
+                bot.answer_callback_query(call.id, text="Data ulasan tidak valid.", show_alert=True)
+                return
+                
+            rating_val = parts[1]
+            resi_code = parts[2]
             
             markup_ulasan = types.InlineKeyboardMarkup(row_width=1)
             if int(rating_val) <= 2:
@@ -1346,10 +1390,17 @@ def callback_handler(call):
             bot.answer_callback_query(call.id, text=f"Error: {e}", show_alert=True)
         return
 
-    # --- HANDLE JIKA PEMBELI KLIK TOMBOL ULASAN CEPAT ---
     elif call.data.startswith('textrev|'):
         try:
-            _, resi_c, rating_c, quick_text = call.data.split('|', 3)
+            parts = call.data.split('|', 3)
+            if len(parts) < 4:
+                bot.answer_callback_query(call.id, text="Data ulasan cepat tidak valid.", show_alert=True)
+                return
+                
+            resi_c = parts[1]
+            rating_c = parts[2]
+            quick_text = parts[3]
+            
             save_user_review(chat_id, rating_c, quick_text)
             
             try:
