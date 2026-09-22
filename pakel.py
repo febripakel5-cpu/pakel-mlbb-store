@@ -158,8 +158,10 @@ def save_order(chat_id, paket_nama, harga, resi, payment_method="TRANSFER", poin
             'Mon': 'Senin', 'Tue': 'Selasa', 'Wed': 'Rabu', 
             'Thu': 'Kamis', 'Fri': 'Jumat', 'Sat': 'Sabtu', 'Sun': 'Minggu'
         }
-        hari_str = days_indo.get(now.strftime('%a'), 'Senin')
+        hari_en = now.strftime('%a')
+        hari_str = days_indo.get(hari_en, hari_en)
         
+        # Menyimpan admin_msg_id di indeks ke-11 untuk tracking edit pesan grup admin
         order_line = f"{chat_id}|{tanggal_str}|{hari_str}|{jam_str}|{paket_nama}|{harga}|{resi}|PENDING|{timestamp_epoch}|{payment_method}|{point_cost}|{admin_msg_id}\n"
         
         with open("orders.txt", "a") as f:
@@ -173,7 +175,7 @@ def update_order_status_by_resi(resi_target, status_baru):
         target_chat_id = None
         target_payment = "TRANSFER"
         target_points_cost = 0
-        current_status = ""
+        current_status_db = ""
         rows = []
         
         try:
@@ -198,9 +200,10 @@ def update_order_status_by_resi(resi_target, status_baru):
                             target_chat_id = chat_id
                             target_payment = pay_method
                             target_points_cost = p_cost
-                            current_status = status
+                            current_status_db = status
                             
-                            if status in ["BERHASIL", "DITOLAK", "CANCELLED", "EXPIRED"] and status_baru in ["BERHASIL", "DITOLAK"]:
+                            # PROTEKSI KETAT: Blokir duplikat proses jika status sudah final
+                            if status in ["BERHASIL", "DITOLAK", "CANCELLED", "EXPIRED"] and status_baru in ["BERHASIL", "DITOLAK", "CANCELLED"]:
                                 rows.append(line)
                                 continue
                                 
@@ -215,7 +218,8 @@ def update_order_status_by_resi(resi_target, status_baru):
             with open("orders.txt", "w") as f:
                 f.writelines(rows)
             
-            if target_chat_id and current_status not in ["BERHASIL", "DITOLAK", "CANCELLED", "EXPIRED"]:
+            # Eksekusi poin/kupon hanya jika status sebelumnya belum final
+            if target_chat_id and current_status_db not in ["BERHASIL", "DITOLAK", "CANCELLED", "EXPIRED"]:
                 if status_baru == "BERHASIL":
                     set_user_coupon_status(target_chat_id, "USED")
                     if target_payment != "POIN":
@@ -357,11 +361,70 @@ def background_auto_poster():
 
 threading.Thread(target=background_auto_poster, daemon=True).start()
 
+# --- 10 TEMPLATE AUTO-BROADCAST LENGKAP ---
 def background_auto_broadcast():
     time.sleep(300)
     broadcast_templates = [
-        ("📢 <b>INFO PROMO SPESIAL HARI INI!</b> 🔥\n\nBuruan sikat script VIP kita sekarang!\n🛒 Cek katalog di bot: @{bot_username}",),
-        ("🛡️ <b>KENAPA HARUS PAKAI SCRIPT PAKEL MLBBSTORE?</b> ⚡\n\nEnkripsi high-tier anti-detect paling stabil se-Indonesia.\n📦 Pilih paket di: @{bot_username}",)
+        (
+            "📢 <b>INFO PROMO SPESIAL HARI INI!</b> 🔥\n\n"
+            "Buat Kakak yang mau ngebut <i>push rank</i> tanpa takut kena ban, buruan sikat script VIP kita sekarang!\n"
+            "🎁 Spesial hari ini, ada potongan harga spesial + bonus <i>Server Lag Panel</i> dan <i>Drone View X10</i> gratis tanpa biaya tambahan.\n\n"
+            "🛒 Langsung cek katalog lengkapnya di bot: @{bot_username}"
+        ),
+        (
+            "🛡️ <b>KENAPA HARUS PAKAI SCRIPT PAKEL MLBBSTORE?</b> ⚡\n\n"
+            "Jangan pertaruhkan akun sultan Kakak pakai script sembarangan yang gampang terdeteksi sistem Moonton!\n"
+            "Di sini kita pakai enkripsi <i>high-tier anti-detect</i> paling stabil se-Indonesia, aman buat main di mode <i>Ranked</i> Mythic sekalipun.\n\n"
+            "📦 Pilih paket andalan Kakak sekarang sebelum kehabisan slot: @{bot_username}"
+        ),
+        (
+            "⚡ <b>BONUS FREE ALL PACKAGES TANPA SYARAT!</b> 🎁\n\n"
+            "Setiap pembelian paket apa saja di Official Pakel MlbbStore, Kakak bakal otomatis dapet:\n"
+            "• Panel Server Lag Musuh (<i>Global Ping Spikes</i>) 🌐\n"
+            "• Drone View Eksklusif Ultra Wide X1 - X10 🦅\n\n"
+            "🚀 Yuk dominasi permainan sekarang juga! Order gampang via bot: @{bot_username}"
+        ),
+        (
+            "🏆 <b>MAU JADI TOP GLOBAL ATAU NYAMPE MYTHIC GLORY DENGAN CEPAT?</b> 🔥\n\n"
+            "Waktunya buktikan kemampuan terbaikmu di Land of Dawn! Gunakan <i>Custom Damage</i> dan <i>Light VIP</i> dari Pakel MlbbStore biar gameplay makin gampang dan mulus.\n\n"
+            "💬 Cek riwayat pesanan, klaim kupon, atau pilih paket langsung di: @{bot_username}"
+        ),
+        (
+            "🌟 <b>PEMBERITAHUAN UPDATE STOK & TESTIMONI HARIAN</b> 🚀\n\n"
+            "Ratusan player sudah membuktikan sendiri kestabilan script kita hari ini tanpa kendala. Giliran Kakak nih buat rasain bedanya pas war!\n"
+            "💎 Proses cepat, amanah, dan dibimbing sampai beres.\n\n"
+            "👇 Yuk amankan paket pilihanmu langsung di bot: @{bot_username}"
+        ),
+        (
+            "💥 <b>SPECIAL EDITION: SULTAN ONE HIT & INSTANT KILL</b> ⚡\n\n"
+            "Mau ngerasain dominasi mutlak di setiap pertandingan? Paket <i>Sultan One Hit</i> siap bikin musuh kewalahan dan rata dalam sekejap!\n"
+            "🛡️ Dilengkapi sistem pengaman kelas atas agar akun tetap aman sentosa.\n\n"
+            "🛒 Sikat promonya sekarang lewat bot: @{bot_username}"
+        ),
+        (
+            "🎁 <b>CEK SALDO POIN & KUPON MEMBER KAMU!</b> 💳\n\n"
+            "Tahukah Kakak? Setiap transaksi sukses di Official Pakel MlbbStore, Kakak bakal otomatis dapet tambahan Poin Loyalitas lho!\n"
+            "🪙 Poinnya bisa ditukar buat bayar paket script gratis tanpa perlu transfer rupiah lagi. Mantap kan?\n\n"
+            "✨ Yuk cek poinmu sekarang di bot: @{bot_username}"
+        ),
+        (
+            "🌐 <b>BASMI LAG & FPS DROP SAAT WAR BERSAMA KITA!</b> 📉➡️📈\n\n"
+            "Kesel banget kan pas lagi momen penting malah patah-patah atau sinyal mendadak merah? Tenang, script kita sudah include fitur *Server Lag Panel* buat stabilin permainan.\n"
+            "🎯 Main jadi lebih PeDe, mulus, dan bebas hambatan!\n\n"
+            "📦 Langsung pilih paketnya di sini: @{bot_username}"
+        ),
+        (
+            "⏰ <b>WAKTU TERBATAS: GASPOL PUSH RANK AKHIR SEASON!</b> ⏳\n\n"
+            "Jangan biarkan bintangmu turun atau stuck di satu tier terus! Maksimalkan performa permainanmu dengan script premium anti-detect terpercaya se-Indonesia.\n"
+            "⚡ Dijamin ampuh buat bantu naik tier dengan mulus.\n\n"
+            "🚀 Amankan paketmu sekarang juga via bot: @{bot_username}"
+        ),
+        (
+            "👋 <b>HALO KAKAK-KAKAK PLAYER MLBB INDONESIA!</b> 🎮✨\n\n"
+            "Mau mabar bareng squad tapi minder sama performa hero? Jangan khawatir, Official Pakel MlbbStore selalu siap jadi solusi terbaik buat naikin performa game kamu hari ini.\n"
+            "💎 Aman, stabil, dan bergaransi.\n\n"
+            "👇 Yuk langsung mampir ke katalog bot: @{bot_username}"
+        )
     ]
     while True:
         try:
@@ -373,14 +436,17 @@ def background_auto_broadcast():
                 continue
             if not users:
                 continue
-            pesan_final = random.choice(broadcast_templates)[0].format(bot_username=bot.get_me().username)
+            
+            template_pilihan = random.choice(broadcast_templates)
+            pesan_final = template_pilihan.format(bot_username=bot.get_me().username)
             for chat_id in set(users):
                 try:
-                    bot.send_message(chat_id=chat_id, text=f"📢 <b>PENGUMUMAN OTOMATIS</b>\n\n{pesan_final}", parse_mode="HTML")
+                    bot.send_message(chat_id=chat_id, text=f"📢 <b>PENGUMUMAN OTOMATIS</b>\n\n{pesan_final}", parse_mode="HTML", disable_web_page_preview=True)
                     time.sleep(0.05)
                 except Exception:
                     pass
-        except Exception:
+        except Exception as e:
+            print(f"[AUTO-BROADCAST ERROR]: {e}")
             time.sleep(300)
 
 threading.Thread(target=background_auto_broadcast, daemon=True).start()
@@ -397,34 +463,47 @@ TRANSLATIONS = {
         'btn_konfirmasi': "✅ Cek Status & Konfirmasi Resi",
         'btn_admin': "💬 Hubungi Admin Resmi",
         'back': "⬅️ Kembali ke Menu Utama",
-        'cat_title_1': "🔥 VIP EXCLUSIVE CATALOGUE - BAGIAN 1 (Kak {name}) 🔥",
-        'cat_title_2': "🔥 VIP EXCLUSIVE CATALOGUE - BAGIAN 2 (Kak {name}) 🔥",
-        'bonus_txt': "⚡ BONUS SPESIAL FREE ALL PACKAGES:\n  • Panel Server Lag Musuh\n  • Drone View X1 - X10",
+        'cat_title_1': "🔥 VIP EXCLUSIVE CATALOGUE - BAGIAN 1 (Kak {name}) 🔥\n*(Kategori: Custom Damage High-Tier & Fair Play Anti-Detect)*",
+        'cat_title_2': "🔥 VIP EXCLUSIVE CATALOGUE - BAGIAN 2 (Kak {name}) 🔥\n*(Kategori: Sultan One Hit Instan & Dominasi Mutlak)*",
+        'bonus_txt': "⚡ BONUS SPESIAL FREE ALL PACKAGES (TANPA BIAYA TAMBAHAN): \n🎁 Setiap pembelian paket apa saja, otomatis mendapatkan:\n  • Panel Server Lag Musuh (Global Ping Spikes)\n  • Drone View Eksklusif X1 sampai X10 (Ultra Wide View)\n\n📂 SILAKAN PILIH SCRIPT & PELAJARI DETAIL FITUR DI BAWAH INI:",
         'p1_normal': [
-            ("🛒 Beli: Natural Balance (Rp 120k / 30 Poin)", "buy_natural", "• 💎 Natural Balance — Rp 120.000 / 30 Poin"),
-            ("🛒 Beli: Light VIP + Drone (Rp 95k / 25 Poin)", "buy_light", "• ⚡ Light VIP + Drone — Rp 95.000 / 25 Poin"),
-            ("🛒 Beli: Semi-Safe 14 Hari (Rp 75k / 20 Poin)", "buy_semisafe", "• 🛡️ Semi-Safe — Rp 75.000 / 20 Poin"),
-            ("🛒 Beli: Lifetime Safe (Rp 200k / 50 Poin)", "buy_lifetimesafe", "• 👑 Lifetime — Rp 200.000 / 50 Poin")
+            ("🛒 Beli: Natural Balance (Rp 120k / 30 Poin)", "buy_natural", "• 💎 Natural Balance (30 Hari) — Rp 120.000 (Atau tukar 30 Poin)\n  └ 🎯 Fungsi: Script penyetara damage halus, aman anti-detect untuk tier Mythic."),
+            ("🛒 Beli: Light VIP + Drone (Rp 95k / 25 Poin)", "buy_light", "• ⚡ Light VIP + Drone (30 Hari) — Rp 95.000 (Atau tukar 25 Poin)\n  └ 🎯 Fungsi: Boost damage ringan + map vision luas (drone view)."),
+            ("🛒 Beli: Semi-Safe 14 Hari (Rp 75k / 20 Poin)", "buy_semisafe", "• 🛡️ Semi-Safe (14 Hari) — Rp 75.000 (Atau tukar 20 Poin)\n  └ 🎯 Fungsi: Solusi cepat push rank akhir season."),
+            ("🛒 Beli: Lifetime Safe (Rp 200k / 50 Poin)", "buy_lifetimesafe", "• 👑 Lifetime Safe (Permanent) — Rp 200.000 (Atau tukar 50 Poin)\n  └ 🎯 Fungsi: Akses permanen seumur hidup + update gratis.")
         ],
         'p1_promo': [
-            ("🛒 Natural Balance (Hemat 10k / 30 Poin)", "buy_natural", "• 💎 Natural Balance — <s>Rp 120.000</s> <b>Rp 110.000</b> (Promo Member Baru!)"),
-            ("🛒 Light VIP + Drone (Hemat 10k / 25 Poin)", "buy_light", "• ⚡ Light VIP + Drone — <s>Rp 95.000</s> <b>Rp 85.000</b> (Promo Member Baru!)"),
-            ("🛒 Semi-Safe 14 Hari (Hemat 10k / 20 Poin)", "buy_semisafe", "• 🛡️ Semi-Safe — <s>Rp 75.000</s> <b>Rp 65.000</b> (Promo Member Baru!)"),
-            ("🛒 Lifetime Safe (Hemat 10k / 50 Poin)", "buy_lifetimesafe", "• 👑 Lifetime — <s>Rp 200.000</s> <b>Rp 190.000</b> (Promo Member Baru!)")
+            ("🛒 Natural Balance (Hemat 10k / 30 Poin)", "buy_natural", "• 💎 Natural Balance (30 Hari) — <s>Rp 120.000</s> <b>Rp 110.000</b> (Hemat Rp 10.000 / Tukar 30 Poin)\n  └ 🎯 Fungsi: Script penyetara damage halus, aman anti-detect untuk tier Mythic."),
+            ("🛒 Light VIP + Drone (Hemat 10k / 25 Poin)", "buy_light", "• ⚡ Light VIP + Drone (30 Hari) — <s>Rp 95.000</s> <b>Rp 85.000</b> (Hemat Rp 10.000 / Tukar 25 Poin)\n  └ 🎯 Fungsi: Boost damage ringan + map vision luas (drone view)."),
+            ("🛒 Semi-Safe 14 Hari (Hemat 10k / 20 Poin)", "buy_semisafe", "• 🛡️ Semi-Safe (14 Hari) — <s>Rp 75.000</s> <b>Rp 65.000</b> (Hemat Rp 10.000 / Tukar 20 Poin)\n  └ 🎯 Fungsi: Solusi cepat push rank akhir season."),
+            ("🛒 Lifetime Safe (Hemat 10k / 50 Poin)", "buy_lifetimesafe", "• 👑 Lifetime Safe (Permanent) — <s>Rp 200.000</s> <b>Rp 190.000</b> (Hemat Rp 10.000 / Tukar 50 Poin)\n  └ 🎯 Fungsi: Akses permanen seumur hidup + update gratis.")
         ],
         'p2_normal': [
-            ("🛒 Beli: Sultan One Hit (Rp 150k / 40 Poin)", "buy_sultan", "• 💥 Sultan One Hit — Rp 150.000 / 40 Poin"),
-            ("🛒 Beli: VIP Pro One Hit (Rp 100k / 30 Poin)", "buy_pro", "• ⚡ VIP Pro — Rp 100.000 / 30 Poin")
+            ("🛒 Beli: Sultan One Hit (Rp 150k / 40 Poin)", "buy_sultan", "• 💥 Sultan One Hit 100% (30 Hari) — Rp 150.000 (Atau tukar 40 Poin)\n  └ 🎯 Fungsi: One hit kill mutlak untuk dominasi total."),
+            ("🛒 Beli: VIP Pro One Hit (Rp 100k / 30 Poin)", "buy_pro", "• ⚡ VIP Pro One Hit 80% (30 Hari) — Rp 100.000 (Atau tukar 30 Poin)\n  └ 🎯 Fungsi: Keseimbangan kekuatan dan keamanan akun."),
+            ("🛒 Beli: Semi-Private 14 Hari (Rp 75k / 20 Poin)", "buy_semiprivate", "• 🔒 Semi-Private (14 Hari) — Rp 75.000 (Atau tukar 20 Poin)\n  └ 🎯 Fungsi: Script privat eksklusif 2 minggu."),
+            ("🛒 Beli: Permanent Legend (Rp 250k / 60 Poin)", "buy_permanent", "• 🏆 Permanent Legend (Lifetime) — Rp 250.000 (Atau tukar 60 Poin)\n  └ 🎯 Fungsi: Paket elit permanen seumur hidup.")
         ],
         'p2_promo': [
-            ("🛒 Sultan One Hit (Hemat 10k / 40 Poin)", "buy_sultan", "• 💥 Sultan One Hit — <s>Rp 150.000</s> <b>Rp 140.000</b> (Promo Member Baru!)"),
-            ("🛒 VIP Pro One Hit (Hemat 10k / 30 Poin)", "buy_pro", "• ⚡ VIP Pro — <s>Rp 100.000</s> <b>Rp 90.000</b> (Promo Member Baru!)")
+            ("🛒 Sultan One Hit (Hemat 10k / 40 Poin)", "buy_sultan", "• 💥 Sultan One Hit 100% (30 Hari) — <s>Rp 150.000</s> <b>Rp 140.000</b> (Hemat Rp 10.000 / Tukar 40 Poin)\n  └ 🎯 Fungsi: One hit kill mutlak untuk dominasi total."),
+            ("🛒 VIP Pro One Hit (Hemat 10k / 30 Poin)", "buy_pro", "• ⚡ VIP Pro One Hit 80% (30 Hari) — <s>Rp 100.000</s> <b>Rp 90.000</b> (Hemat Rp 10.000 / Tukar 30 Poin)\n  └ 🎯 Fungsi: Keseimbangan kekuatan dan keamanan akun."),
+            ("🛒 Semi-Private 14 Hari (Hemat 10k / 20 Poin)", "buy_semiprivate", "• 🔒 Semi-Private (14 Hari) — <s>Rp 75.000</s> <b>Rp 65.000</b> (Hemat Rp 10.000 / Tukar 20 Poin)\n  └ 🎯 Fungsi: Script privat eksklusif 2 minggu."),
+            ("🛒 Permanent Legend (Hemat 10k / 60 Poin)", "buy_permanent", "• 🏆 Permanent Legend (Lifetime) — <s>Rp 250.000</s> <b>Rp 240.000</b> (Hemat Rp 10.000 / Tukar 60 Poin)\n  └ 🎯 Fungsi: Paket elit permanen seumur hidup.")
         ],
-        'next_1': "▶️ Lanjut ke Katalog Bagian 2",
+        'next_1': "▶️ Lanjut ke Katalog Bagian 2 (Sultan One Hit)",
         'prev_2': "◀️ Kembali ke Katalog Bagian 1",
         'inv_title': "🛒 INVOICE PEMESANAN RESMI VIP (Kak {name}) 🧾",
-        'pay_info': f"💳 DANA / GoPay: <code>{INFO_DANA}</code> (a.n. PakelMlbb)",
-        'confirm_instr': "🛡️ Kirim screenshot bukti transfer untuk verifikasi resi.",
+        'pay_info': (
+            "💳 SILAKAN PILIH METODE PEMBAYARAN DI BAWAH INI:\n\n"
+            "1️⃣ QRIS (CROSS-BORDER / ALL E-WALLET):\n"
+            "   ⚠️ <b>Mohon Maaf, QRIS Saat Ini Sedang Gangguan / Error!</b>\n\n"
+            "2️⃣ TRANSFER MANUAL DANA / GOPAY (RECOMMENDED):\n"
+            f"   • Nomor: <code>{INFO_DANA}</code>\n"
+            "   • Atas Nama: PakelMlbb\n\n"
+            "3️⃣ SAWERIA (Support Kartu & E-Wallet):\n"
+            f"   • Link: {INFO_SAWERIA}\n"
+        ),
+        'confirm_instr': "🛡️ INSTRUKSI KONFIRMASI PEMBAYARAN:\nSetelah sukses membayar via transfer manual, silakan kirim Screenshot Bukti Transfer ke bot ini untuk mendapatkan Resi Unik.",
     },
     'en': {
         'btn_katalog': "💎 VIP Catalogue", 'btn_testi': "🌟 Live Testimonials",
@@ -452,12 +531,62 @@ def get_back_markup(l):
     markup = types.InlineKeyboardMarkup()
     markup.add(types.InlineKeyboardButton(TRANSLATIONS.get(l, TRANSLATIONS['en'])['back'], callback_data='menu_utama'))
     return markup
+@bot.message_handler(commands=['bc', 'broadcast'])
+def broadcast_message(message):
+    save_user(message.chat.id)
+    pesan_bc = message.text.replace('/bc', '').replace('/broadcast', '').strip()
+    if not pesan_bc:
+        bot.reply_to(message, "⚠️ Format salah! Contoh: /bc Halo semua!")
+        return
+    try:
+        with open("users.txt", "r") as f:
+            users = [line.strip() for line in f.read().splitlines() if line.strip()]
+    except FileNotFoundError:
+        bot.reply_to(message, "⚠️ Belum ada user tercatat.")
+        return
+    success = 0
+    for chat_id in set(users):
+        try:
+            bot.send_message(chat_id, f"📢 <b>PENGUMUMAN RESMI</b>\n\n{pesan_bc}", parse_mode="HTML")
+            success += 1
+            time.sleep(0.05)
+        except Exception:
+            pass
+    bot.send_message(message.chat.id, f"✅ Broadcast Selesai ke {success} member.")
+
+@bot.message_handler(commands=['bcs'])
+def broadcast_buyers_only(message):
+    pesan_bcs = message.text.replace('/bcs', '').strip()
+    if not pesan_bcs:
+        bot.reply_to(message, "⚠️ Format salah! Contoh: /bcs Info khusus VIP!")
+        return
+    buyer_ids = set()
+    try:
+        with open("orders.txt", "r") as f:
+            for line in f:
+                parts = line.strip().split('|')
+                if len(parts) >= 8 and parts[7].strip() == "BERHASIL":
+                    buyer_ids.add(parts[0].strip())
+    except FileNotFoundError:
+        bot.reply_to(message, "⚠️ Belum ada data pesanan sukses.")
+        return
+    success = 0
+    for chat_id in buyer_ids:
+        try:
+            bot.send_message(chat_id, f"💎 <b>INFO KHUSUS PELANGGAN VIP</b>\n\n{pesan_bcs}", parse_mode="HTML")
+            success += 1
+            time.sleep(0.05)
+        except Exception:
+            pass
+    bot.send_message(message.chat.id, f"✅ Broadcast VIP Selesai ke {success} pelanggan.")
+
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
     user = message.from_user
     save_user(message.chat.id)
     l = get_lang(user)
     t = TRANSLATIONS[l]
+    greeting = get_time_greeting()
     user_points = get_user_points(message.chat.id)
     
     markup = types.InlineKeyboardMarkup(row_width=1)
@@ -473,7 +602,7 @@ def send_welcome(message):
         types.InlineKeyboardButton(t['btn_admin'], url=ADMIN_LINK)
     )
     is_open, store_msg = check_store_status()
-    text = f"🔥 {get_time_greeting()}, Kak {user.first_name}!\n🪙 Saldo Poin Anda: <b>{user_points} Poin</b>\n\nPusat layanan script VIP Mobile Legends terpercaya.\n\n"
+    text = f"🔥 {greeting}, Kak {user.first_name}!\n🪙 Saldo Poin: <b>{user_points} Poin</b>\n\n"
     if not is_open:
         text += f"{store_msg}\n\n"
     text += "👇 Silakan pilih menu di bawah:"
@@ -486,9 +615,8 @@ def cmd_riwayat(message):
     l = get_lang(user)
     get_latest_user_order_data(message.chat.id)
     orders = get_user_orders(message.chat.id)
-    
     if not orders:
-        text = f"📋 RIWAYAT PESANAN SAYA (Kak {user.first_name})\n\n❌ Belum ada riwayat pesanan tercatat."
+        text = f"📋 RIWAYAT PESANAN SAYA (Kak {user.first_name})\n\n❌ Belum ada riwayat pesanan."
     else:
         text = f"📋 <b>RIWAYAT PESANAN SAYA (Kak {user.first_name})</b>\n\n"
         for idx, o in enumerate(orders[-5:], 1):
@@ -504,16 +632,31 @@ def cmd_katalog(message):
     t = TRANSLATIONS[l]
     coupon_status = get_user_coupon_status(message.chat.id)
     items = t['p1_promo'] if coupon_status == "AVAILABLE" else t['p1_normal']
-    
     markup = types.InlineKeyboardMarkup(row_width=1)
     for btn_text, cb_val, _ in items:
         markup.add(types.InlineKeyboardButton(btn_text, callback_data=cb_val))
     markup.add(types.InlineKeyboardButton(t['next_1'], callback_data='katalog_part2'))
     markup.add(types.InlineKeyboardButton(t['back'], callback_data='menu_utama'))
-
     txt = f"{t['cat_title_1'].format(name=user.first_name)}\n\n{t['bonus_txt']}\n\n" + "\n\n".join([d for _, _, d in items])
-    txt += f"\n\n🪙 Saldo Poin Anda: <b>{get_user_points(message.chat.id)} Poin</b>"
+    txt += f"\n\n🪙 Saldo Poin: <b>{get_user_points(message.chat.id)} Poin</b>"
     bot.send_message(message.chat.id, txt, reply_markup=markup, parse_mode="HTML")
+
+@bot.message_handler(commands=['sc'])
+def cmd_sc_interactive(message):
+    save_user(message.chat.id)
+    args = message.text.replace('/sc', '').strip()
+    if not args:
+        bot.reply_to(message, "⚠️ Format salah! Contoh: /sc @Username")
+        return
+    target_buyer = args if args.startswith('@') else f"@{args}"
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    for btn_text, cb_data in [
+        ("💎 Natural Balance", "sc_buy_natural"), ("⚡ Light VIP", "sc_buy_light"),
+        ("🛡️ Semi-Safe", "sc_buy_semisafe"), ("👑 Lifetime Safe", "sc_buy_lifetimesafe"),
+        ("💥 Sultan One Hit", "sc_buy_sultan"), ("⚡ VIP Pro", "sc_buy_pro")
+    ]:
+        markup.add(types.InlineKeyboardButton(btn_text, callback_data=f"{cb_data}|{target_buyer}"))
+    bot.reply_to(message, f"🎯 Target: <b>{target_buyer}</b>\nPilih paket:", reply_markup=markup, parse_mode="HTML")
 
 @bot.message_handler(commands=['testi', 'push'])
 def admin_push_testi(message):
@@ -522,24 +665,6 @@ def admin_push_testi(message):
         bot.reply_to(message, "✅ Berhasil mengirim testimoni!")
     except Exception as e:
         bot.reply_to(message, f"⚠️ Gagal: {e}")
-
-@bot.message_handler(commands=['sc'])
-def cmd_sc_interactive(message):
-    save_user(message.chat.id)
-    args = message.text.replace('/sc', '').strip()
-    if not args:
-        bot.reply_to(message, "⚠️ Format salah! Contoh: /sc @UsernamePembeli")
-        return
-    target_buyer = args if args.startswith('@') else f"@{args}"
-    markup = types.InlineKeyboardMarkup(row_width=1)
-    for btn_text, cb_data in [
-        ("💎 Natural Balance (30 Hari)", "sc_buy_natural"),
-        ("⚡ Light VIP + Drone (30 Hari)", "sc_buy_light"),
-        ("🛡️ Semi-Safe 14 Hari", "sc_buy_semisafe"),
-        ("👑 Lifetime Safe Permanent", "sc_buy_lifetimesafe")
-    ]:
-        markup.add(types.InlineKeyboardButton(btn_text, callback_data=f"{cb_data}|{target_buyer}"))
-    bot.reply_to(message, f"🎯 Target: <b>{target_buyer}</b>\nPilih paket:", reply_markup=markup, parse_mode="HTML")
 @bot.callback_query_handler(func=lambda call: True)
 def callback_handler(call):
     save_user(call.message.chat.id)
@@ -548,6 +673,7 @@ def callback_handler(call):
     t = TRANSLATIONS[l]
     chat_id = call.message.chat.id
     message_id = call.message.message_id
+    greeting = get_time_greeting()
 
     if call.data.startswith('cancel_'):
         resi_target = call.data.replace('cancel_', '')
@@ -569,8 +695,7 @@ def callback_handler(call):
         if success:
             if admin_msg_id:
                 try:
-                    old_caption = call.message.caption or "Laporan Pembayaran Poin"
-                    new_admin_caption = f"❌ <b>[DIBATALKAN OLEH PEMBELI]</b>\n\n{old_caption}\n\n<b>STATUS: ❌ DIBATALKAN USER (Poin Dikembalikan)</b>"
+                    new_admin_caption = f"❌ <b>[DIBATALKAN OLEH PEMBELI]</b>\n\n<b>STATUS: ❌ DIBATALKAN USER (Poin/Kupon Dikembalikan)</b>"
                     bot.edit_message_caption(chat_id=GROUP_PAY_ID, message_id=admin_msg_id, caption=new_admin_caption, parse_mode="HTML", reply_markup=None)
                 except Exception as e:
                     print(f"[EDIT ADMIN MSG CANCEL ERROR]: {e}")
@@ -602,7 +727,9 @@ def callback_handler(call):
             'buy_semisafe': ("Semi-Safe 14 Hari", "Rp 75.000", 20),
             'buy_lifetimesafe': ("Lifetime Safe Permanent", "Rp 200.000", 50),
             'buy_sultan': ("Sultan One Hit 100% (30 Hari)", "Rp 150.000", 40),
-            'buy_pro': ("VIP Pro One Hit 80% (30 Hari)", "Rp 100.000", 30)
+            'buy_pro': ("VIP Pro One Hit 80% (30 Hari)", "Rp 100.000", 30),
+            'buy_semiprivate': ("Semi-Private 14 Hari", "Rp 75.000", 20),
+            'buy_permanent': ("Permanent Legend (Lifetime)", "Rp 250.000", 60)
         }
         p_name, p_price, p_points = paket_dict.get(paket_code, ("VIP Package", "Rp 100.000", 30))
         resi_unik = f"PKL-MLBB-{random.randint(10000, 99999)}"
@@ -651,6 +778,8 @@ def callback_handler(call):
                         types.InlineKeyboardButton("❌ TOLAK POIN", callback_data=f"tpoin|{resi_unik}")
                     )
                     admin_sent = bot.send_message(GROUP_PAY_ID, report_admin_poin, message_thread_id=GROUP_PAY_TOPIC_ID, parse_mode="HTML", reply_markup=markup_admin_poin)
+                    
+                    # SIMPAN ORDER DENGAN MEREKAM ADMIN_MSG_ID
                     save_order(chat_id, p_name, f"{p_points} Poin", resi_unik, payment_method="POIN", point_cost=p_points, admin_msg_id=admin_sent.message_id)
                 except Exception as e:
                     print(f"[REPORT ADMIN POIN ERROR]: {e}")
@@ -694,8 +823,6 @@ def callback_handler(call):
             resi_code = parts[1] if action in ['apoin', 'tpoin'] else parts[2]
             target_user_id = parts[1] if action not in ['apoin', 'tpoin'] else None
 
-            order_status_db = "PENDING"
-            p_points_val = 0
             if action in ['apoin', 'tpoin']:
                 try:
                     with open("orders.txt", "r") as f:
@@ -703,8 +830,6 @@ def callback_handler(call):
                             p = line.strip().split('|')
                             if len(p) >= 11 and p[6].strip() == resi_code.strip():
                                 target_user_id = p[0]
-                                order_status_db = p[7]
-                                p_points_val = int(p[10]) if p[10].isdigit() else 0
                                 break
                 except Exception:
                     pass
@@ -713,14 +838,21 @@ def callback_handler(call):
                 bot.answer_callback_query(call.id, text="Gagal: Data resi tidak ditemukan!", show_alert=True)
                 return
 
-            if order_status_db in ["CANCELLED", "EXPIRED", "BERHASIL", "DITOLAK"]:
-                bot.answer_callback_query(call.id, text=f"Peringatan: Pesanan ini sudah berstatus {order_status_db}!", show_alert=True)
-                return
-
             original_text = call.message.caption or call.message.text or ""
 
             if action == 'acc' or action == 'apoin':
+                p_points_val = 0
                 if action == 'apoin':
+                    try:
+                        with open("orders.txt", "r") as f:
+                            for line in f:
+                                p = line.strip().split('|')
+                                if len(p) >= 11 and p[6].strip() == resi_code.strip():
+                                    p_points_val = int(p[10]) if p[10].isdigit() else 0
+                                    break
+                    except Exception:
+                        pass
+                    
                     if get_user_points(target_user_id) >= p_points_val:
                         reduce_user_points(target_user_id, p_points_val)
                     else:
@@ -769,7 +901,9 @@ def callback_handler(call):
                 'sc_buy_natural': ("Natural Balance", "Rp 120.000"),
                 'sc_buy_light': ("Light VIP + Drone", "Rp 95.000"),
                 'sc_buy_semisafe': ("Semi-Safe 14 Hari", "Rp 75.000"),
-                'sc_buy_lifetimesafe': ("Lifetime Safe", "Rp 200.000")
+                'sc_buy_lifetimesafe': ("Lifetime Safe", "Rp 200.000"),
+                'sc_buy_sultan': ("Sultan One Hit", "Rp 150.000"),
+                'sc_buy_pro': ("VIP Pro", "Rp 100.000")
             }
             p_nama, p_hrg = paket_map.get(action, ("VIP Package", "Rp 100.000"))
             post_text = (
@@ -801,7 +935,7 @@ def callback_handler(call):
             types.InlineKeyboardButton(t['btn_konfirmasi'], callback_data='menu_konfirmasi'),
             types.InlineKeyboardButton(t['btn_admin'], url=ADMIN_LINK)
         )
-        text = f"🔥 {get_time_greeting()}, Kak {user.first_name}!\n🪙 Saldo Poin Anda: <b>{user_points} Poin</b>\n\nPilih menu utama:"
+        text = f"🔥 {greeting}, Kak {user.first_name}!\n🪙 Saldo Poin: <b>{user_points} Poin</b>\n\nPilih menu utama:"
         try:
             bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, reply_markup=markup, parse_mode="HTML")
         except Exception:
