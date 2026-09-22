@@ -214,6 +214,19 @@ def update_order_status_by_resi(resi_target, status_baru):
         if updated:
             with open("orders.txt", "w") as f:
                 f.writelines(rows)
+            
+            # Logika Poin: Poin baru dipotong RESMI saat di-ACC (BERHASIL). 
+            # Jika dibatalkan/ditolak, poin tidak pernah dipotong sehingga tetap utuh secara otomatis.
+            if target_chat_id and current_status_db == "PENDING":
+                if status_baru == "BERHASIL":
+                    set_user_coupon_status(target_chat_id, "USED")
+                    if target_payment == "POIN" and target_points_cost > 0:
+                        reduce_user_points(target_chat_id, target_points_cost)
+                    elif target_payment != "POIN":
+                        add_user_points(target_chat_id, 10)
+                elif status_baru in ["DITOLAK", "EXPIRED", "CANCELLED"]:
+                    set_user_coupon_status(target_chat_id, "AVAILABLE")
+                    
             return True
     except Exception as e:
         print(f"[UPDATE ORDER ERROR]: {e}")
@@ -712,9 +725,6 @@ def callback_handler(call):
     if call.data.startswith('cancel_'):
         resi_target = call.data.replace('cancel_', '')
         admin_msg_id = None
-        pay_method_db = "TRANSFER"
-        point_cost_db = 0
-        target_chat_id_db = str(call.message.chat.id)
         
         try:
             with open("orders.txt", "r") as f:
@@ -724,22 +734,18 @@ def callback_handler(call):
                         if p[7].strip() != "PENDING":
                             bot.answer_callback_query(call.id, text="Pesanan sudah dibatalkan atau diproses sebelumnya.", show_alert=True)
                             return
-                        pay_method_db = p[9].strip() if len(p) > 9 else "TRANSFER"
-                        point_cost_db = int(p[10]) if len(p) > 10 and p[10].isdigit() else 0
                         admin_msg_id = int(p[11]) if p[11].isdigit() and int(p[11]) > 0 else None
                         break
         except Exception:
             pass
 
+        # Ubah status menjadi CANCELLED. Karena poin tidak pernah dipotong saat pending, poin dibiarkan utuh otomatis.
         success = update_order_status_by_resi(resi_target, "CANCELLED")
         if success:
-            if pay_method_db == "POIN" and point_cost_db > 0:
-                add_user_points(target_chat_id_db, point_cost_db)
-
             if admin_msg_id:
                 try:
                     new_admin_caption = call.message.caption or call.message.text or "ADA KLAIM PEMBAYARAN MASUK!"
-                    new_admin_caption += f"\n\n<b>STATUS: ❌ DIBATALKAN OLEH PEMBELI (Poin Dikembalikan)</b>"
+                    new_admin_caption += f"\n\n<b>STATUS: ❌ DIBATALKAN OLEH PEMBELI (Poin Tetap Utuh)</b>"
                     
                     if call.message.content_type == 'photo':
                         bot.edit_message_caption(chat_id=GROUP_PAY_ID, message_id=admin_msg_id, caption=new_admin_caption, parse_mode="HTML", reply_markup=None)
@@ -752,13 +758,13 @@ def callback_handler(call):
                 f"❌ <b>PESANAN BERHASIL DIBATALKAN</b> ❌\n\n"
                 f"🔑 No Resi: <code>{resi_target}</code>\n"
                 "Pesanan ini telah dibatalkan atas permintaan Anda.\n"
-                "💡 Hak kupon serta saldo poin Anda telah dikembalikan secara utuh ke akun Anda. Silakan pilih ulang paket di katalog!"
+                "💡 Saldo poin Anda tetap utuh seperti semula karena belum pernah dipotong."
             )
             try:
                 bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=cancel_text, parse_mode="HTML", reply_markup=get_back_markup(l))
             except Exception:
                 bot.send_message(chat_id, cancel_text, parse_mode="HTML", reply_markup=get_back_markup(l))
-            bot.answer_callback_query(call.id, text="Pesanan berhasil dibatalkan & poin dikembalikan!")
+            bot.answer_callback_query(call.id, text="Pesanan dibatalkan, poin tetap utuh!")
         else:
             bot.answer_callback_query(call.id, text="Pesanan sudah diproses atau dibatalkan sebelumnya.", show_alert=True)
         return
@@ -927,6 +933,7 @@ def callback_handler(call):
                     
                     current_user_pts = get_user_points(target_user_id)
                     if current_user_pts >= p_points_val:
+                        # Poin resmi dipotong saat admin klik ACC Poin
                         reduce_user_points(target_user_id, p_points_val)
                     else:
                         bot.answer_callback_query(call.id, text="Gagal ACC: Saldo poin pembeli tidak mencukupi!", show_alert=True)
@@ -994,7 +1001,7 @@ def callback_handler(call):
 
             elif action == 'tolak' or action == 'tpoin':
                 update_order_status_by_resi(resi_code, "DITOLAK")
-                new_admin_text = original_text + "\n\n<b>STATUS: ❌ DITOLAK OLEH ADMIN (Kupon & Poin Dikembalikan)</b>"
+                new_admin_text = original_text + "\n\n<b>STATUS: ❌ DITOLAK OLEH ADMIN (Poin Tetap Utuh)</b>"
                 if call.message.content_type == 'photo':
                     bot.edit_message_caption(chat_id=chat_id, message_id=message_id, caption=new_admin_text, parse_mode="HTML", reply_markup=None)
                 else:
@@ -1004,11 +1011,11 @@ def callback_handler(call):
                     "❌ <b>MOHON MAAF, PEMBAYARAN DITOLAK</b> ❌\n\n"
                     f"🔑 No Resi: <code>{resi_code}</code>\n"
                     "Bukti pembayaran Anda tidak valid atau mutasi tidak ditemukan.\n"
-                    "💡 <i>Tenang Kak, hak diskon member baru atau saldo poin Anda telah dikembalikan secara utuh!</i>\n\n"
+                    "💡 <i>Tenang Kak, saldo poin Anda tetap utuh seperti semula!</i>\n\n"
                     f"💬 Silakan hubungi Admin resmi untuk konfirmasi lebih lanjut: {ADMIN_USERNAME}"
                 )
                 bot.send_message(target_user_id, buyer_msg, parse_mode="HTML", disable_web_page_preview=True)
-                bot.answer_callback_query(call.id, text="Pembayaran ditolak & kupon/poin dikembalikan!")
+                bot.answer_callback_query(call.id, text="Pembayaran ditolak, poin tetap utuh!")
         except Exception as e:
             bot.answer_callback_query(call.id, text=f"Error: {e}", show_alert=True)
         return
