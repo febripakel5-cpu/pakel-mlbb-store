@@ -201,7 +201,7 @@ def update_order_status_by_resi(resi_target, status_baru):
                             target_points_cost = p_cost
                             current_status_db = status
                             
-                            if status in ["BERHASIL", "DITOLAK", "CANCELLED", "EXPIRED"] and status_baru in ["BERHASIL", "DITOLAK", "CANCELLED"]:
+                            if status != "PENDING":
                                 rows.append(line)
                                 continue
                                 
@@ -214,15 +214,6 @@ def update_order_status_by_resi(resi_target, status_baru):
         if updated:
             with open("orders.txt", "w") as f:
                 f.writelines(rows)
-            
-            if target_chat_id and current_status_db not in ["BERHASIL", "DITOLAK", "CANCELLED", "EXPIRED"]:
-                if status_baru == "BERHASIL":
-                    set_user_coupon_status(target_chat_id, "USED")
-                    if target_payment != "POIN":
-                        add_user_points(target_chat_id, 10)
-                elif status_baru in ["DITOLAK", "EXPIRED", "CANCELLED"]:
-                    set_user_coupon_status(target_chat_id, "AVAILABLE")
-                    
             return True
     except Exception as e:
         print(f"[UPDATE ORDER ERROR]: {e}")
@@ -731,7 +722,7 @@ def callback_handler(call):
                     p = line.strip().split('|')
                     if len(p) >= 12 and p[6].strip() == resi_target.strip():
                         if p[7].strip() != "PENDING":
-                            bot.answer_callback_query(call.id, text="Pesanan sudah diproses atau kadaluwarsa.", show_alert=True)
+                            bot.answer_callback_query(call.id, text="Pesanan sudah dibatalkan atau diproses sebelumnya.", show_alert=True)
                             return
                         pay_method_db = p[9].strip() if len(p) > 9 else "TRANSFER"
                         point_cost_db = int(p[10]) if len(p) > 10 and p[10].isdigit() else 0
@@ -769,7 +760,7 @@ def callback_handler(call):
                 bot.send_message(chat_id, cancel_text, parse_mode="HTML", reply_markup=get_back_markup(l))
             bot.answer_callback_query(call.id, text="Pesanan berhasil dibatalkan & poin dikembalikan!")
         else:
-            bot.answer_callback_query(call.id, text="Gagal membatalkan pesanan atau sudah kadaluwarsa.", show_alert=True)
+            bot.answer_callback_query(call.id, text="Pesanan sudah diproses atau dibatalkan sebelumnya.", show_alert=True)
         return
 
     if call.data.startswith('paymode_'):
