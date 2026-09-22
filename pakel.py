@@ -28,7 +28,6 @@ INFO_DANA = "085188371150"
 INFO_GOPAY = "085188371150"
 INFO_SAWERIA = "https://saweria.co/PakelMlbb"
 QRIS_WEB_LINK = "https://ibb.co.com/cX2J28kj"
-
 def save_user(chat_id):
     try:
         chat_id_str = str(chat_id).strip()
@@ -161,7 +160,6 @@ def save_order(chat_id, paket_nama, harga, resi, payment_method="TRANSFER", poin
         hari_str = days_indo.get(now.strftime('%a'), 'Senin')
         
         order_line = f"{chat_id}|{tanggal_str}|{hari_str}|{jam_str}|{paket_nama}|{harga}|{resi}|PENDING|{timestamp_epoch}|{payment_method}|{point_cost}|{admin_msg_id}\n"
-        
         with open("orders.txt", "a") as f:
             f.write(order_line)
     except Exception as e:
@@ -224,7 +222,6 @@ def update_order_status_by_resi(resi_target, status_baru):
                     set_user_coupon_status(target_chat_id, "AVAILABLE")
                     if target_payment == "POIN" and target_points_cost > 0:
                         add_user_points(target_chat_id, target_points_cost)
-                    
             return True
     except Exception as e:
         print(f"[UPDATE ORDER ERROR]: {e}")
@@ -238,14 +235,9 @@ def get_user_orders(chat_id):
                 parts = line.strip().split('|')
                 if len(parts) >= 8 and parts[0] == str(chat_id):
                     orders.append({
-                        'tanggal': parts[1],
-                        'hari': parts[2],
-                        'jam': parts[3],
-                        'paket': parts[4],
-                        'harga': parts[5],
-                        'resi': parts[6],
-                        'status': parts[7],
-                        'pay_method': parts[9] if len(parts) > 9 else "TRANSFER"
+                        'tanggal': parts[1], 'hari': parts[2], 'jam': parts[3],
+                        'paket': parts[4], 'harga': parts[5], 'resi': parts[6],
+                        'status': parts[7], 'pay_method': parts[9] if len(parts) > 9 else "TRANSFER"
                     })
     except FileNotFoundError:
         pass
@@ -289,7 +281,7 @@ def check_store_status():
     WIB = timezone(timedelta(hours=7))
     hour = datetime.now(WIB).hour
     if 0 <= hour < 7:
-        return False, "⚠️ <b>INFO OPERASIONAL TOKO:</b>\nHalo Kak! Saat ini toko sedang istirahat (Offline) jam 00:00 - 07:00 WIB. Pesanan dan pembayaran tetap bisa dilakukan lewat bot, namun proses pengiriman script dan verifikasi resi akan dilanjutkan pagi ini mulai pukul 07:00 WIB ya! 🙏✨"
+        return False, "⚠️ <b>INFO OPERASIONAL TOKO:</b>\nHalo Kak! Saat ini toko sedang istirahat (Offline) jam 00:00 - 07:00 WIB. Pesanan tetap bisa dilakukan lewat bot, pengiriman dilanjutkan jam 07:00 WIB ya! 🙏✨"
     return True, ""
 def get_random_masked_name():
     list_nama_tele = [
@@ -299,13 +291,7 @@ def get_random_masked_name():
         "@Arif_Wd***", "@DaniPratama***", "@Hendra_99***", "@Rian_Xyz***",
         "@Aldi_07***", "@Bintang_ID***", "@CandraPras***", "@DikaPrast_***",
         "@Fajar_01***", "@GalihGmr***", "@IqbalID***", "@JokoPrasetyo***",
-        "@KevinWdj***", "@LukmanHkm***", "@MaulanaID***", "@NaufalXyz***",
-        "@Pratama99***", "@RafliSultan***", "@SatriaGaming***", "@TegarGanz***",
-        "@VianID***", "@WahyuPrat***", "@YudaDev***", "@ZakiMlf***",
-        "@Amirul_My***", "@Haikal_Iskandar***", "@Farhan_Zul***", "@Aiman_Badri***",
-        "@Aqil_Danial***", "@Syahmi_Zain***", "@Luqman_Hakim***", "@Zulhelmi_My***",
-        "@Alex_Walker***", "@Liam_Smith***", "@Noah_Miller***", "@Oliver_Davis***",
-        "@Sultan_Mlbb***", "@Anjay_Mabar***", "@Gacor_Gaming***", "@TopGlobal_1***"
+        "@KevinWdj***", "@LukmanHkm***", "@MaulanaID***", "@NaufalXyz***"
     ]
     return random.choice(list_nama_tele)
 
@@ -316,94 +302,46 @@ def generate_single_testimonial():
         ("Semi-Safe 14 Hari", "Rp 75.000"),
         ("Lifetime Safe Permanent", "Rp 200.000"),
         ("Sultan One Hit 100% (30 Hari)", "Rp 150.000"),
-        ("VIP Pro One Hit 80% (30 Hari)", "Rp 100.000"),
-        ("Semi-Private 14 Hari", "Rp 75.000"),
-        ("Permanent Legend (Lifetime)", "Rp 250.000")
+        ("VIP Pro One Hit 80% (30 Hari)", "Rp 100.000")
     ]
     nama = get_random_masked_name()
     paket, harga = random.choice(list_paket)
     menit_lalu = random.randint(2, 45)
-    current_hour = datetime.now(timezone(timedelta(hours=7))).hour
-    waktu_ket = "pagi ini" if 4 <= current_hour < 11 else ("siang ini" if 11 <= current_hour < 15 else ("sore ini" if 15 <= current_hour < 18 else "malam ini"))
-    
     return (
         "🚨 REAL-TIME TRANSACTION REPORT 🚨\n\n"
         f"✅ Buyer ID: {nama}\n"
         f"📦 Item Purchased: {paket}\n"
         f"💵 Price: {harga}\n"
-        f"⏱️ Time: {menit_lalu} menit yang lalu ({waktu_ket})\n"
+        f"⏱️ Time: {menit_lalu} menit yang lalu\n"
         f"🔒 Status: SUCCESS & SCRIPT DELIVERED\n\n"
-        "🔥 Terima kasih telah berbelanja di Official Pakel MlbbStore! Aman, lancar, & anti-detect. Mau order juga? Langsung sikat ke bot ya! 👇\n"
         f"🤖 Bot Store: @{bot.get_me().username}"
     )
 
+def generate_fake_testimonials_list():
+    list_paket = [
+        ("Natural Balance", "Rp 120.000"), ("Light VIP + Drone", "Rp 95.000"),
+        ("Semi-Safe 14 Hari", "Rp 75.000"), ("Lifetime Safe", "Rp 200.000"),
+        ("Sultan One Hit", "Rp 150.000"), ("VIP Pro", "Rp 100.000")
+    ]
+    testi_output = ""
+    for i in range(1, 6):
+        nama = get_random_masked_name()
+        paket, harga = random.choice(list_paket)
+        menit_lalu = random.randint(2, 45)
+        testi_output += f"✅ {i}. Buyer ID: {nama}\n   • Dibeli: {paket} ({harga})\n   • Status: LUNAS\n\n"
+    return testi_output
+
 def background_auto_poster():
-    time.sleep(60) 
+    time.sleep(60)
     while True:
         try:
-            pilihan_waktu = [1500, 3600, 7200, 10800]
-            time.sleep(random.choice(pilihan_waktu))
+            time.sleep(random.choice([1500, 3600, 7200]))
             bot.send_message(chat_id=GROUP_CHAT_ID, text=generate_single_testimonial(), message_thread_id=GROUP_TOPIC_ID, disable_web_page_preview=True)
-        except Exception as e:
-            print(f"[AUTO-POST ERROR]: {e}")
+        except Exception:
             time.sleep(60)
 
 threading.Thread(target=background_auto_poster, daemon=True).start()
 
-def background_auto_broadcast():
-    time.sleep(300)
-    broadcast_templates = [
-        ("📢 <b>INFO PROMO SPESIAL HARI INI!</b> 🔥\n\nBuruan sikat script VIP kita sekarang!\n🛒 Cek katalog di bot: @{bot_username}",),
-        ("🛡️ <b>KENAPA HARUS PAKAI SCRIPT PAKEL MLBBSTORE?</b> ⚡\n\nEnkripsi high-tier anti-detect paling stabil se-Indonesia.\n📦 Pilih paket di: @{bot_username}",)
-    ]
-    while True:
-        try:
-            time.sleep(random.randint(14400, 28800))
-            try:
-                with open("users.txt", "r") as f:
-                    users = [line.strip() for line in f.read().splitlines() if line.strip()]
-            except FileNotFoundError:
-                continue
-            if not users:
-                continue
-            pesan_final = random.choice(broadcast_templates)[0].format(bot_username=bot.get_me().username)
-            for chat_id in set(users):
-                try:
-                    bot.send_message(chat_id=chat_id, text=f"📢 <b>PENGUMUMAN OTOMATIS</b>\n\n{pesan_final}", parse_mode="HTML")
-                    time.sleep(0.05)
-                except Exception:
-                    pass
-        except Exception as e:
-            print(f"[AUTO-BROADCAST ERROR]: {e}")
-            time.sleep(300)
-
-threading.Thread(target=background_auto_broadcast, daemon=True).start()
-
-@bot.message_handler(commands=['testi', 'push'])
-def admin_push_testi(message):
-    try:
-        bot.send_message(chat_id=GROUP_CHAT_ID, text=generate_single_testimonial(), message_thread_id=GROUP_TOPIC_ID, disable_web_page_preview=True)
-        bot.reply_to(message, "✅ Berhasil mengirim testimoni!")
-    except Exception as e:
-        bot.reply_to(message, f"⚠️ Gagal: {e}")
-
-@bot.message_handler(commands=['sc'])
-def cmd_sc_interactive(message):
-    save_user(message.chat.id)
-    args = message.text.replace('/sc', '').strip()
-    if not args:
-        bot.reply_to(message, "⚠️ Format salah! Contoh: /sc @UsernamePembeli")
-        return
-    target_buyer = args if args.startswith('@') else f"@{args}"
-    markup = types.InlineKeyboardMarkup(row_width=1)
-    for btn_text, cb_data in [
-        ("💎 Natural Balance (30 Hari)", "sc_buy_natural"),
-        ("⚡ Light VIP + Drone (30 Hari)", "sc_buy_light"),
-        ("🛡️ Semi-Safe 14 Hari", "sc_buy_semisafe"),
-        ("👑 Lifetime Safe Permanent", "sc_buy_lifetimesafe")
-    ]:
-        markup.add(types.InlineKeyboardButton(btn_text, callback_data=f"{cb_data}|{target_buyer}"))
-    bot.reply_to(message, f"🎯 Target: <b>{target_buyer}</b>\nPilih paket:", reply_markup=markup, parse_mode="HTML")
 TRANSLATIONS = {
     'id': {
         'btn_katalog': "💎 Katalog VIP & Harga Paket",
@@ -446,28 +384,18 @@ TRANSLATIONS = {
         'confirm_instr': "🛡️ Kirim screenshot bukti transfer untuk verifikasi resi.",
     },
     'en': {
-        'btn_katalog': "💎 VIP Catalogue",
-        'btn_testi': "🌟 Live Testimonials",
-        'btn_riwayat': "📦 My Orders",
-        'btn_promo': "🎁 Claim Promo & Points",
-        'btn_cara_order': "❓ How to Order",
-        'btn_bayar': "💳 Payments",
-        'btn_faq': "💡 FAQ",
-        'btn_konfirmasi': "✅ Check Status",
-        'btn_admin': "💬 Contact Admin",
-        'back': "⬅️ Main Menu",
-        'cat_title_1': "🔥 CATALOGUE PART 1",
-        'cat_title_2': "🔥 CATALOGUE PART 2",
-        'bonus_txt': "⚡ SPECIAL BONUS:",
-        'p1_normal': [("🛒 Natural Balance", "buy_natural", "• Natural Balance — $8")],
-        'p1_promo': [("🛒 Natural Balance (Promo)", "buy_natural", "• Natural Balance — $7.3")],
-        'p2_normal': [("🛒 Sultan One Hit", "buy_sultan", "• Sultan One Hit — $10")],
-        'p2_promo': [("🛒 Sultan One Hit (Promo)", "buy_sultan", "• Sultan One Hit — $9.3")],
-        'next_1': "▶️ Next",
-        'prev_2': "◀️ Back",
-        'inv_title': "🛒 INVOICE",
-        'pay_info': "💳 Payment Info",
-        'confirm_instr': "🛡️ Send receipt.",
+        'btn_katalog': "💎 VIP Catalogue", 'btn_testi': "🌟 Live Testimonials",
+        'btn_riwayat': "📦 My Orders", 'btn_promo': "🎁 Claim Promo & Points",
+        'btn_cara_order': "❓ How to Order", 'btn_bayar': "💳 Payments",
+        'btn_faq': "💡 FAQ", 'btn_konfirmasi': "✅ Check Status",
+        'btn_admin': "💬 Contact Admin", 'back': "⬅️ Main Menu",
+        'cat_title_1': "🔥 CATALOGUE PART 1", 'cat_title_2': "🔥 CATALOGUE PART 2",
+        'bonus_txt': "⚡ SPECIAL BONUS:", 'p1_normal': [("🛒 Natural Balance", "buy_natural", "• Natural Balance")],
+        'p1_promo': [("🛒 Natural Balance (Promo)", "buy_natural", "• Natural Balance")],
+        'p2_normal': [("🛒 Sultan One Hit", "buy_sultan", "• Sultan One Hit")],
+        'p2_promo': [("🛒 Sultan One Hit (Promo)", "buy_sultan", "• Sultan One Hit")],
+        'next_1': "▶️ Next", 'prev_2': "◀️ Back", 'inv_title': "🛒 INVOICE",
+        'pay_info': "💳 Payment Info", 'confirm_instr': "🛡️ Send receipt.",
     }
 }
 
@@ -543,6 +471,14 @@ def cmd_katalog(message):
     txt = f"{t['cat_title_1'].format(name=user.first_name)}\n\n{t['bonus_txt']}\n\n" + "\n\n".join([d for _, _, d in items])
     txt += f"\n\n🪙 Saldo Poin Anda: <b>{get_user_points(message.chat.id)} Poin</b>"
     bot.send_message(message.chat.id, txt, reply_markup=markup, parse_mode="HTML")
+
+@bot.message_handler(commands=['testi', 'push'])
+def admin_push_testi(message):
+    try:
+        bot.send_message(chat_id=GROUP_CHAT_ID, text=generate_single_testimonial(), message_thread_id=GROUP_TOPIC_ID, disable_web_page_preview=True)
+        bot.reply_to(message, "✅ Berhasil mengirim testimoni!")
+    except Exception as e:
+        bot.reply_to(message, f"⚠️ Gagal: {e}")
 @bot.callback_query_handler(func=lambda call: True)
 def callback_handler(call):
     save_user(call.message.chat.id)
@@ -552,7 +488,62 @@ def callback_handler(call):
     chat_id = call.message.chat.id
     message_id = call.message.message_id
 
-    if call.data.startswith('cancel_'):
+    if call.data == 'menu_testi':
+        fake_data = generate_fake_testimonials_list()
+        testi_text = f"🌟 <b>LIVE TESTIMONI & TRANSAKSI SUKSES</b> (Kak {user.first_name})\n\n{fake_data}💡 Toko 100% amanah & terpercaya! 🚀"
+        markup_testi = types.InlineKeyboardMarkup(row_width=1)
+        markup_testi.add(
+            types.InlineKeyboardButton("🔄 Refresh Testimoni", callback_data='menu_testi'),
+            types.InlineKeyboardButton("🌟 Lihat Ratusan Testi di Channel", url=CHANNEL_TESTI_LINK),
+            types.InlineKeyboardButton(t['back'], callback_data='menu_utama')
+        )
+        try:
+            bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=testi_text, reply_markup=markup_testi, parse_mode="HTML", disable_web_page_preview=True)
+        except Exception:
+            bot.send_message(chat_id, text=testi_text, reply_markup=markup_testi, parse_mode="HTML", disable_web_page_preview=True)
+        bot.answer_callback_query(call.id, text="Testimoni diperbarui!")
+
+    elif call.data == 'menu_riwayat':
+        get_latest_user_order_data(chat_id)
+        orders = get_user_orders(chat_id)
+        if not orders:
+            riw_text = f"📋 <b>RIWAYAT PESANAN SAYA</b> (Kak {user.first_name})\n\n❌ Belum ada riwayat pesanan tercatat."
+        else:
+            riw_text = f"📋 <b>RIWAYAT PESANAN SAYA</b> (Kak {user.first_name})\n\n"
+            for idx, o in enumerate(orders[-5:], 1):
+                st = {"BERHASIL": "✅ BERHASIL", "DITOLAK": "❌ DITOLAK", "CANCELLED": "❌ DIBATALKAN", "EXPIRED": "⌛ EXPIRED"}.get(o['status'], "⏳ PENDING")
+                riw_text += f"<b>{idx}. {o['paket']}</b>\n   • Harga: {o['harga']}\n   • Resi: <code>{o['resi']}</code>\n   • Status: {st}\n\n"
+        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=riw_text, reply_markup=get_back_markup(l), parse_mode="HTML")
+        bot.answer_callback_query(call.id)
+
+    elif call.data == 'menu_promo':
+        status_c = get_user_coupon_status(chat_id)
+        user_pts = get_user_points(chat_id)
+        promo_text = f"🎁 <b>PROMO & POIN LOYALITAS</b> (Kak {user.first_name})\n\n✨ Kupon Member Baru: <b>{status_c}</b>\n🪙 Saldo Poin Anda: <b>{user_pts} Poin</b>\n\n💡 Kumpulkan poin dengan rutin berbelanja!"
+        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=promo_text, reply_markup=get_back_markup(l), parse_mode="HTML")
+        bot.answer_callback_query(call.id)
+
+    elif call.data == 'menu_cara_order':
+        text = "❓ <b>PANDUAN CARA ORDER</b>\n\n1. Pilih paket di katalog.\n2. Pilih metode pembayaran (Transfer / Poin).\n3. Selesaikan pembayaran dan kirim bukti transfer jika via transfer."
+        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, reply_markup=get_back_markup(l), parse_mode="HTML")
+        bot.answer_callback_query(call.id)
+
+    elif call.data == 'menu_bayar':
+        text = f"💳 <b>METODE PEMBAYARAN</b>\n\n1. QRIS: ⚠️ <i>Sedang Gangguan</i>\n2. DANA / GoPay: <code>{INFO_DANA}</code> (a.n. PakelMlbb)\n3. Saweria: {INFO_SAWERIA}"
+        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, reply_markup=get_back_markup(l), parse_mode="HTML", disable_web_page_preview=True)
+        bot.answer_callback_query(call.id)
+
+    elif call.data == 'menu_faq':
+        text = "💡 <b>FAQ / PERTANYAAN UMUM</b>\n\n❓ <i>Aman dari banned?</i>\n💬 A: Sangat aman, menggunakan enkripsi anti-detect tingkat tinggi."
+        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, reply_markup=get_back_markup(l), parse_mode="HTML")
+        bot.answer_callback_query(call.id)
+
+    elif call.data == 'menu_konfirmasi':
+        text = "✅ <b>KONFIRMASI PEMBAYARAN</b>\n\nSilakan kirim screenshot bukti transfer ke chat bot ini dengan menyertakan Nomor Resi unik Anda sebelum batas waktu 15 menit habis."
+        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, reply_markup=get_back_markup(l), parse_mode="HTML")
+        bot.answer_callback_query(call.id)
+
+    elif call.data.startswith('cancel_'):
         resi_target = call.data.replace('cancel_', '')
         admin_msg_id = None
         try:
@@ -592,8 +583,7 @@ def callback_handler(call):
         else:
             bot.answer_callback_query(call.id, text="Gagal membatalkan pesanan.", show_alert=True)
         return
-
-    if call.data.startswith('paymode_'):
+    elif call.data.startswith('paymode_'):
         parts = call.data.split('|')
         if len(parts) < 3:
             return
@@ -693,7 +683,7 @@ def callback_handler(call):
             bot.answer_callback_query(call.id)
             return
 
-    if call.data.startswith('acc_') or call.data.startswith('tolak_') or call.data.startswith('acc|') or call.data.startswith('tolak|') or call.data.startswith('apoin|') or call.data.startswith('tpoin|'):
+    elif call.data.startswith('acc_') or call.data.startswith('tolak_') or call.data.startswith('acc|') or call.data.startswith('tolak|') or call.data.startswith('apoin|') or call.data.startswith('tpoin|'):
         try:
             sep = '|' if '|' in call.data else '_'
             parts = call.data.split(sep)
@@ -768,8 +758,7 @@ def callback_handler(call):
         except Exception as e:
             bot.answer_callback_query(call.id, text=f"Error: {e}", show_alert=True)
         return
-
-    if call.data == 'menu_utama':
+    elif call.data == 'menu_utama':
         user_points = get_user_points(chat_id)
         markup = types.InlineKeyboardMarkup(row_width=1)
         markup.add(
@@ -787,7 +776,7 @@ def callback_handler(call):
         try:
             bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=text, reply_markup=markup, parse_mode="HTML")
         except Exception:
-            bot.send_message(chat_id, text=text, reply_markup=markup, parse_mode="HTML")
+            bot.send_message(chat_id=chat_id, text=text, reply_markup=markup, parse_mode="HTML")
         bot.answer_callback_query(call.id)
 
     elif call.data == 'menu_katalog' or call.data == 'katalog_part1':
@@ -799,7 +788,10 @@ def callback_handler(call):
         markup.add(types.InlineKeyboardButton(t['next_1'], callback_data='katalog_part2'))
         markup.add(types.InlineKeyboardButton(t['back'], callback_data='menu_utama'))
         txt = f"{t['cat_title_1'].format(name=user.first_name)}\n\n" + "\n\n".join([d for _, _, d in items]) + f"\n\n🪙 Saldo Poin: {get_user_points(chat_id)}"
-        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=txt, reply_markup=markup, parse_mode="HTML")
+        try:
+            bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=txt, reply_markup=markup, parse_mode="HTML")
+        except Exception:
+            bot.send_message(chat_id, text=txt, reply_markup=markup, parse_mode="HTML")
         bot.answer_callback_query(call.id)
 
     elif call.data == 'katalog_part2':
@@ -811,7 +803,10 @@ def callback_handler(call):
         markup.add(types.InlineKeyboardButton(t['prev_2'], callback_data='katalog_part1'))
         markup.add(types.InlineKeyboardButton(t['back'], callback_data='menu_utama'))
         txt = f"{t['cat_title_2'].format(name=user.first_name)}\n\n" + "\n\n".join([d for _, _, d in items]) + f"\n\n🪙 Saldo Poin: {get_user_points(chat_id)}"
-        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=txt, reply_markup=markup, parse_mode="HTML")
+        try:
+            bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=txt, reply_markup=markup, parse_mode="HTML")
+        except Exception:
+            bot.send_message(chat_id, text=txt, reply_markup=markup, parse_mode="HTML")
         bot.answer_callback_query(call.id)
 
     elif call.data.startswith('buy_'):
@@ -889,6 +884,7 @@ def handle_text_and_reviews(message):
         pass
 
     bot.reply_to(message, f"Halo {user.first_name}! Ketik /start untuk membuka menu utama.", disable_web_page_preview=True)
+
 @bot.message_handler(content_types=['photo'])
 def handle_photo(message):
     save_user(message.chat.id)
@@ -913,5 +909,5 @@ def handle_photo(message):
     except Exception as e:
         print(f"[FORWARD PHOTO ERROR]: {e}")
 
-print("[INFO] Pakel MlbbStore Master Ultimate Edition 8 Bagian Berhasil Dijalankan...")
+print("[INFO] Pakel MlbbStore Master Final 9 Bagian Berhasil Dijalankan...")
 bot.infinity_polling()
