@@ -285,7 +285,7 @@ def check_store_status():
     if 0 <= hour < 7:
         return False, "⚠️ <b>INFO OPERASIONAL TOKO:</b>\nHalo Kak! Saat ini toko sedang istirahat (Offline) jam 00:00 - 07:00 WIB. Pesanan dan pembayaran tetap bisa dilakukan lewat bot, namun proses pengiriman script dan verifikasi resi akan dilanjutkan pagi ini mulai pukul 07:00 WIB ya! 🙏✨"
     return True, ""
- def get_random_masked_name():
+def get_random_masked_name():
     list_nama_tele = [
         "@R_Zky***", "@Alvinn_***", "@Dimas_99***", "@RezaPrat_***", 
         "@Bayu_Official***", "@Farel_X***", "@Yoga_Mlg***", "@DickyGez_***", 
