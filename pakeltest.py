@@ -1620,13 +1620,63 @@ def cmd_buatvoucher(message):
         bot.reply_to(message, "⚠️ Diskon, max_pakai, dan durasi harus angka.")
         return
     create_voucher(kode, diskon, max_pakai, durasi_jam)
+
+    # Reply ke admin
     bot.reply_to(message,
                  f"✅ Voucher dibuat!\n\n"
                  f"🎫 Kode: <code>{kode}</code>\n"
                  f"💵 Diskon: Rp {diskon:,}\n"
                  f"📊 Max Pakai: {max_pakai} kali\n"
-                 f"⏱️ Expired: {durasi_jam} jam",
+                 f"⏱️ Expired: {durasi_jam} jam\n\n"
+                 f"📢 Sedang broadcast ke semua user...",
                  parse_mode="HTML")
+
+    # ⚡ AUTO BROADCAST VOUCHER BARU (di thread background biar ga blocking)
+    def _bc_voucher():
+        try:
+            with open(F_USERS, "r") as f:
+                users = [line.strip() for line in f.read().splitlines() if line.strip()]
+        except FileNotFoundError:
+            return
+
+        # Template BC voucher
+        bc_text = (
+            "🎫 <b>VOUCHER BARU DARI PAKEL MLBBSTORE!</b> 🎫\n\n"
+            f"🎁 Kode Voucher: <code>{kode}</code>\n"
+            f"💵 Diskon: <b>Rp {diskon:,}</b>\n"
+            f"📊 Kuota Terbatas: <b>{max_pakai} user</b>\n"
+            f"⏱️ Berlaku: <b>{durasi_jam} jam</b>\n\n"
+            "📌 <b>CARA PAKAI:</b>\n"
+            f"Ketik: <code>Voucher {kode}</code>\n"
+            "Ke bot ini, langsung terkunci ke akunmu!\n\n"
+            "⚡ <i>Buruan sebelum kuota habis! Yang cepat, yang dapat!</i>\n\n"
+            f"🛒 Cek katalog & checkout di bot: @{bot.get_me().username}"
+        )
+
+        success = 0
+        for chat_id in set(users):
+            try:
+                bot.send_message(chat_id, bc_text, parse_mode="HTML",
+                                 disable_web_page_preview=True)
+                success += 1
+                time.sleep(0.05)
+            except Exception:
+                pass
+
+        # Notif admin hasil BC
+        try:
+            bot.send_message(
+                ADMIN_TELEGRAM_ID,
+                f"📢 <b>BROADCAST VOUCHER SELESAI</b>\n\n"
+                f"🎫 Kode: <code>{kode}</code>\n"
+                f"✅ Berhasil terkirim: <b>{success}</b> user\n"
+                f"👥 Total user: {len(set(users))}",
+                parse_mode="HTML"
+            )
+        except Exception:
+            pass
+
+    threading.Thread(target=_bc_voucher, daemon=True).start()
 
 @bot.message_handler(commands=['listvoucher'])
 def cmd_listvoucher(message):
