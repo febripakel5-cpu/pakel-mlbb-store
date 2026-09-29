@@ -109,7 +109,7 @@ FOLDER_PROOFS = "proofs"
 # FIX v15: AI CS Groq
 GROQ_API_KEY = os.environ.get('GROQ_API_KEY', '')
 GROQ_MODEL = "llama-3.3-70b-versatile"
-AI_ENABLED = True
+AI_ENABLED = False
 
 # FAQ Auto-Reply Database
 FAQ_RESPONSES = {
