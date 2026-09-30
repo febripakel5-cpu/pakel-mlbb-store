@@ -19,7 +19,7 @@ from flask_cors import CORS
 #  ⚠️ JANGAN SHARE FILE INI - TOKEN SENSITIVE
 # =====================================================================================
 
-TOKEN = '8614166487:AAGz6_1eyMGD6t9cS_gZBCb_ErFgHgo1tjU'
+TOKEN = '8614166487:AAH69ae24_NSeIB4obMBg6XwKpcka7s4wWM'
 bot = telebot.TeleBot(TOKEN)
 
 try:
